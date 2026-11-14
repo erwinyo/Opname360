@@ -1,26 +1,38 @@
 # Build plan
 
-Status: **agreed, not started.** Vocabulary is in [GLOSSARY.md](../GLOSSARY.md), decisions in [adr/](adr/), open client questions in [client-questions.md](client-questions.md).
+Status: **agreed on 2026-11-15, nothing built yet.**
 
-## How the work runs
-
-- Work happens on a branch per slice (`slice-1-foundation`), one commit per step. Merging to `main` is the owner's call.
-- Work stops after every step so the result can be opened in the browser before the next step starts.
+Vocabulary is in [GLOSSARY.md](../GLOSSARY.md), decisions in [adr/](adr/), open client questions in [client-questions.md](client-questions.md).
 
 ## Slices
 
 Each slice works end to end (API, screens, tests) before the next starts.
 
-| # | Slice | What the shop can do when it's done |
-|---|---|---|
-| 1 | Foundation | Sign in, set up the catalogue, print barcode labels, receive goods, see stock and the Stock Card |
-| 2 | Stock Opname | Run the Opening Opname and Partial Opnames, approve Variances |
-| 3 | POS | Sell, return, exchange, take payments, run Shifts and Promotions, print Receipts |
-| 4 | Reports | Daily stock report, live hourly Profit and Loss, Fast-moving SKUs, ABC Class |
-| 5 | Ledger | Chart of accounts, automatic journal entries, Cash-out, supplier debts, Profit and Loss, Balance Sheet |
-| 6 | Later | Medicine Batches, screen for switching the Costing Method |
+| # | Slice | What the shop can do when it's done | Steps |
+|---|---|---|---|
+| 1 | [Foundation](plan/slice-1-foundation.md) | Sign in, set up the catalogue, print barcode labels, receive goods, see stock and the Stock Card | 6 |
+| 2 | [Stock Opname](plan/slice-2-stock-opname.md) | Run the Opening Opname and Partial Opnames while open for business; the Owner approves and decides who bears each Shortage | 5 |
+| 3 | [POS](plan/slice-3-pos.md) | Sell, return, exchange, take payments, run Shifts and Promotions, print Receipts. Smartlink can be switched off | 6 |
+| 4 | [Reports](plan/slice-4-reports.md) | The Owner sees live sales and gross profit by hour, daily stock, what sells, and where stock went missing | 5 |
+| 5 | [Ledger](plan/slice-5-ledger.md) | Cash-out, supplier debts, Profit and Loss, Balance Sheet in T layout | 6 |
+| 6 | [Later](plan/slice-6-later.md) | Medicine Batches, switching the Costing Method, and the list of what's deliberately left out | planned when needed |
 
-Only slice 1 is planned in detail below. Each later slice gets its own plan before it starts.
+## How the work runs
+
+- Work happens on a branch per slice (`slice-1-foundation`), one commit per step. Merging to `main` is the owner's call.
+- Work stops after every step so the result can be opened in the browser before the next step starts.
+- Before a slice starts, its plan is re-read against what the earlier slices taught and adjusted if needed.
+
+## Go-live
+
+The shop goes live **after slice 4**, subject to the client confirming ([question 20](client-questions.md)). Stock, opname, POS and the Owner's dashboard are what the project is for; the Ledger follows and posts everything recorded since day one ([ADR 0003](adr/0003-built-in-double-entry-ledger.md)).
+
+1. Deploy: the app, a managed PostgreSQL database, a domain with HTTPS, nightly database backups with one tested restore.
+2. Create the Owner account; the Owner creates the staff accounts.
+3. Import the catalogue from Excel and print labels for everything without a manufacturer Barcode.
+4. Check the hardware in the shop: scanner, receipt printer, label printer, internet with a backup connection.
+5. Train staff on a copy with made-up data, then wipe it.
+6. Run the Opening Opname. From its approval onward every sale goes through Opname360 and Smartlink is switched off.
 
 ## Stack
 
@@ -51,6 +63,50 @@ What that means here:
 
 One deliberate difference: the sqlmodel skill suggests SQLite for tests; this project tests on PostgreSQL ([ADR 0007](adr/0007-postgresql-everywhere.md)).
 
+## Security
+
+The app is on the public internet, so from slice 1:
+
+- HTTPS only in production. The session cookie is HTTP-only, Secure and SameSite=Lax; requests that change anything must come from the app's own origin.
+- Passwords are at least 8 characters, hashed with argon2. Five failed sign-ins lock the account for 15 minutes.
+- A session ends after 12 hours without use, and at once when the Owner deactivates the user.
+- Every endpoint checks the role on the server. Hiding a menu is never the only protection.
+- Every create, complete, approve, void and reverse is written to the Activity Log.
+
+## Shared patterns
+
+### Documents
+
+Goods Receipts, Production Receipts, Supplier Returns, Stock Opnames, Receipts, Cash-outs and journal entries all behave the same way ([ADR 0009](adr/0009-completed-documents-are-immutable.md)):
+
+- A document has a number: type prefix, year and month, running number. `BM-2611-0001` is the first Goods Receipt (Barang Masuk) of November 2026.
+- While it is a draft it can be edited or discarded and affects nothing.
+- Completing it writes its effects (Stock Movements, later journal entries) in one transaction. From then on it can't be edited or deleted.
+- A mistake is undone by a Reversal, which mirrors the original and links to it.
+
+### Costing rules
+
+These apply everywhere stock moves. Each has a test in the slice that first needs it.
+
+1. Every Stock Movement records its quantity, its unit cost, and the SKU's quantity and stock value after it.
+2. **Goods in** (Goods Receipt, Production Receipt) enter at the unit cost on the document. In a FIFO Category each one adds a Cost Layer.
+3. **Goods out** (sale, Supplier Return, Shortage) leave at the current average cost under Moving Average, or from the oldest Cost Layers first under FIFO.
+4. **Back from a customer** (Resellable Return): at the cost it was sold at.
+5. **Surplus found in an opname:** at the current average cost (Moving Average) or the latest unit cost (FIFO). If the SKU has never had a cost, the Admin enters one.
+6. **Negative Stock:** units sold beyond what the system holds leave at the SKU's latest unit cost. When goods arrive they fill the gap first; any difference between their cost and the cost already used is booked as a COGS adjustment on the day they arrive. Past sales are never touched ([ADR 0008](adr/0008-sales-never-blocked-by-stock.md)).
+7. **Reversal:** mirrors the original's quantity and cost exactly.
+8. When a SKU's quantity reaches zero its stock value is zero; any rounding remainder leaves with the last unit.
+9. Switching a Category's Costing Method follows [ADR 0002](adr/0002-costing-method-per-category.md).
+
+### Screens and devices
+
+| Who | Device | Screens |
+|---|---|---|
+| Owner | Phone first | Dashboard, approvals, reports |
+| Admin | Desktop browser | Catalogue, stock documents, opname setup, bookkeeping |
+| Cashier | Desktop or tablet with a barcode scanner; Chrome set to print Receipts without a dialog | POS |
+| Checker | Phone | Counting |
+
 ## Folder layout
 
 The layered layout from the scaffold stays: one module per feature in each layer.
@@ -62,73 +118,22 @@ src/opname360/
 ├── core/                   config, db, security (hashing, sessions)
 ├── api/
 │   ├── deps.py             SessionDep, CurrentUserDep, role checks
-│   └── routes/             auth, users, catalogue, suppliers, stock,
-│                           goods_receipts, production_receipts,
-│                           supplier_returns, activity_log
+│   └── routes/             one module per feature
 ├── models/                 same feature names: tables + request/response schemas
-└── services/               same feature names, plus costing.py
+└── services/               same feature names, plus costing.py and (slice 5) posting.py
 alembic/                    migrations
 frontend/                   React app (src/pages, src/components, src/client generated)
 tests/
 compose.yaml                PostgreSQL for dev and tests
 ```
 
-## Slice 1: Foundation
+Features by slice:
 
-### Data
-
-- **User:** username, full name, password hash, role (Owner, Admin, Cashier), active flag. No email. **Session** rows so deactivating a user signs them out at once.
-- **Activity Log:** who, when, what action, on which document.
-- **Category** (with its Costing Method), **Sub-category**, **Product**, **SKU** (code, size, colour, Barcode, Stock Unit, Purchase Pack name and size, Selling Price, active flag), **Selling Price history**.
-- **Location:** seeded with one, "Toko".
-- **Stock Movement:** append-only; SKU, Location, signed quantity, unit cost, reason, source document, balance after, who, when.
-- **Stock balance:** quantity and total cost per SKU and Location, updated in the same transaction as the movement, under a row lock.
-- **Cost Layer:** per receipt, for FIFO Categories only.
-- **Supplier**, **Goods Receipt**, **Production Receipt**, **Supplier Return**, each with lines, a document number, and a status: draft → completed → reversed.
-
-### Rules (each one gets a test)
-
-1. Only the Owner manages users. Cashiers can do nothing in this slice. Admin and Owner do everything else.
-2. A Barcode belongs to exactly one SKU. A SKU without a manufacturer Barcode gets a generated one.
-3. A draft document can be edited. Completing it writes its Stock Movements; from then on it can't be edited or deleted, only reversed.
-4. Goods Receipt: a line entered as 2 boxes of 12 at Rp 60.000 per box becomes 24 pcs at Rp 5.000.
-5. Moving Average: receiving 10 at Rp 5.000 then 10 at Rp 6.000 gives an average of Rp 5.500. FIFO: the same receipts stay two Cost Layers, used oldest first.
-6. Supplier Return: can't return more than that Goods Receipt brought in, minus earlier returns.
-7. A Reversal writes the opposite Stock Movements and links both documents. If the goods are already gone, the SKU goes into Negative Stock and is flagged.
-8. Two documents completed at the same moment for the same SKU leave the correct balance.
-9. Every create, complete and reverse appears in the Activity Log.
-
-### Screens (Indonesian)
-
-| Screen | Who | What |
-|---|---|---|
-| Masuk | all | Sign in |
-| Pengguna | Owner | Add staff, set role, deactivate, reset password |
-| Kategori | Owner, Admin | Categories with Costing Method, Sub-categories |
-| Produk | Owner, Admin | Search and filter; Product form with its SKUs (size, colour, Barcode, unit, pack, price) |
-| Cetak Label | Owner, Admin | Pick SKUs and copies, print Code 128 labels with name, size and price |
-| Impor Produk | Owner, Admin | Download the Excel template, upload, preview errors, import |
-| Pemasok | Owner, Admin | Suppliers |
-| Barang Masuk | Owner, Admin | Goods Receipts: scan to add lines, save draft, complete, reverse |
-| Hasil Produksi | Owner, Admin | Production Receipts, same pattern |
-| Retur Pembelian | Owner, Admin | Pick a Goods Receipt, choose lines and quantities to send back |
-| Stok | Owner, Admin | Quantity and value per SKU, filter by Category and Sub-category, Negative Stock highlighted |
-| Kartu Stok | Owner, Admin | Stock Card for one SKU |
-| Log Aktivitas | Owner | Activity Log |
-
-### Steps
-
-Each step ends with something to open in the browser.
-
-1. **Base:** PostgreSQL, Alembic, test setup; React app served by FastAPI; sign-in, roles, first Owner created by a setup command, Pengguna screen. The placeholder `Item` is removed.
-2. **Catalogue:** Kategori and Produk screens, Barcodes, Selling Price with history.
-3. **Stock core and Goods Receipt:** Stock Movements, balances, both Costing Methods, Pemasok, Barang Masuk, Stok, Kartu Stok.
-4. **Other documents:** Hasil Produksi, Retur Pembelian, Reversals, Log Aktivitas.
-5. **Labels and import:** Cetak Label, Impor Produk.
-6. **Browser test** of the main path: sign in → create a Product with SKUs → receive goods → see the Stock Card.
-
-### Not in slice 1
-
-- Paying off what's owed to a Supplier. A Goods Receipt only records "paid" or "owed"; settling debts comes with the Ledger (slice 5).
-- Selling, counting, reports, journal entries.
-- Hosting. Everything runs locally until this slice works. FastAPI Cloud (`uv run fastapi deploy`) is the first candidate for the app, as the fastapi skill recommends; where the PostgreSQL database lives is decided at the same time.
+| Slice | Feature modules |
+|---|---|
+| 1 | `auth`, `users`, `activity_log`, `catalogue`, `suppliers`, `stock`, `goods_receipts`, `production_receipts`, `supplier_returns` |
+| 2 | `opnames`, `employee_charges` |
+| 3 | `shop_settings`, `payment_methods`, `shifts`, `receipts`, `promotions` |
+| 4 | `reports`, `dashboard` |
+| 5 | `accounts`, `journal`, `cash`, `supplier_payments`, `financial_reports` |
+| 6 | `batches` |

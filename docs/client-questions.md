@@ -19,3 +19,8 @@ Belum terjawab di meeting pertama. Sampai dijawab, pengembangan memakai asumsi d
 | 13 | Perangkat apa yang sudah ada di toko (scanner barcode, printer struk, printer label, komputer/tablet kasir)? | Scanner USB/Bluetooth, printer struk thermal 58/80 mm, printer label thermal; dibeli jika belum ada. |
 | 14 | Apakah koneksi internet di toko stabil? Ada cadangan (mis. hotspot HP)? | Stabil, dengan hotspot HP sebagai cadangan. POS tidak bisa dipakai tanpa internet. |
 | 15 | Berapa hari batas waktu retur? | 7 hari. |
+| 16 | Saat tutup shift, apakah semua uang di laci kasir disetor, lalu shift berikutnya mulai dengan modal kas baru? | Ya. |
+| 17 | Ganti rugi karyawan dihitung dari harga pokok atau harga jual? | Harga pokok (HPP); owner bisa mengubah nominalnya. |
+| 18 | Apakah admin kadang juga melayani penjualan di kasir? | Tidak. Admin tidak bisa menjual; kasir tidak bisa membuka menu admin. |
+| 19 | Uang retur dikembalikan tunai atau lewat cara pembayaran semula? | Tunai dari laci; kasir bisa memilih cara lain. |
+| 20 | Kapan mau mulai dipakai: setelah stok, opname, kasir dan dashboard owner jadi, atau menunggu laporan keuangan (neraca) juga? | Mulai dipakai setelah dashboard owner jadi; laporan keuangan menyusul dan mencatat mundur sejak hari pertama. |

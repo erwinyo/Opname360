@@ -92,6 +92,10 @@ _Avoid_: Book stock
 How many of a SKU were actually found when counted.
 _ID_: Stok fisik
 
+**Stock Value**:
+What the System Quantity of a SKU at a Location cost, according to its Costing Method.
+_ID_: Nilai stok, nilai persediaan
+
 **Goods Receipt**:
 Goods from a Supplier entering stock, each SKU at its unit cost, either paid on the spot or owed to the Supplier.
 _ID_: Barang masuk, penerimaan barang
@@ -128,8 +132,12 @@ _Avoid_: Voucher, discount code
 One Cashier's working period at the cash drawer, opened with a cash float and closed with a blind cash count. Sales happen only inside an open Shift.
 _ID_: Shift kasir
 
+**Float**:
+The cash put in the drawer when a Shift opens.
+_ID_: Modal kas
+
 **Cash Variance**:
-Counted cash minus expected cash at Shift close.
+Counted cash minus expected cash at Shift close, where expected cash is the Float plus cash taken minus cash given back.
 _ID_: Selisih kas
 
 **Payment Method**:
@@ -174,7 +182,7 @@ _ID_: Log aktivitas
 A quantity of one SKU that entered stock together at one unit cost: one receipt or one production batch.
 
 **Costing Method**:
-The rule that turns Cost Layers into COGS: Moving Average or FIFO. Set per Category and changeable from a chosen date.
+The rule that turns Cost Layers into COGS: Moving Average or FIFO. Set per Category; a switch affects only what happens after it.
 _ID_: Metode HPP
 
 **COGS**:
@@ -210,6 +218,14 @@ One SKU counted in a Stock Opname, holding the System Quantity at the moment it 
 **Blind Count**:
 Counting without being shown the System Quantity.
 
+**Count Entry**:
+One scan or typed quantity by one Checker, adding to an Opname Line's Physical Quantity.
+_ID_: Hitungan
+
+**Moved While Counting**:
+The mark on an Opname Line whose SKU was sold, returned or received between its first and last Count Entry, so its count may be off.
+_ID_: Bergerak saat dihitung
+
 **Variance**:
 Physical Quantity minus the System Quantity on the Opname Line. Negative is a Shortage, positive a Surplus.
 _ID_: Selisih (kurang / lebih)
@@ -234,6 +250,47 @@ _ID_: Ganti rugi karyawan, piutang karyawan
 **Ledger**:
 The business's double-entry books, into which stock, sales, opname and cash events post automatically.
 _ID_: Buku besar
+
+**Account**:
+One line of the chart of accounts, e.g. Kas Besar, Persediaan, Penjualan.
+_ID_: Akun
+
+**Journal Entry**:
+One balanced set of debits and credits in the Ledger, written for one document.
+_ID_: Jurnal
+
+**Posting**:
+Writing the Journal Entry for a completed document. It happens by itself; staff type a Journal Entry only for what no document covers.
+
+**Opening Balance**:
+What the business had in cash, bank, debts and capital on the day the Ledger starts. Opening stock comes from the Opening Opname instead.
+_ID_: Saldo awal
+
+**Lock Date**:
+The date on or before which nothing more can be posted.
+_ID_: Tutup periode
+
+**Cash Transfer**:
+Money moved from one cash or bank Account to another, e.g. depositing cash at the bank.
+_ID_: Pindah kas
+
+**Supplier Payment**:
+Money paid to a Supplier for Goods Receipts that were owed.
+_ID_: Bayar hutang
+
+**Settlement**:
+An employee clearing an Employee Charge, by paying it back or by deduction from salary.
+_ID_: Pelunasan ganti rugi
+
+**Net Sales**:
+Price times quantity, minus discounts and refunds, over a period. Voided Receipts count for nothing; a return counts when it happens.
+_ID_: Penjualan bersih
+_Avoid_: Omzet for this figure when discounts or refunds matter, revenue
+
+**Gross Profit**:
+Net Sales minus COGS. No expenses are taken off.
+_ID_: Laba kotor
+_Avoid_: Profit, laba (alone)
 
 **Balance Sheet**:
 Assets, liabilities and equity at a date, shown in T-account layout.

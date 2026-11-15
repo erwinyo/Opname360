@@ -22,5 +22,7 @@ export const REASON_LABELS: Record<MovementReason, string> = {
 /** Where a Stock Movement's document can be opened, if it has a screen. */
 export function documentPath(type: string, id: number): string | null {
   if (type === 'goods_receipt') return `/barang-masuk/${id}`
+  if (type === 'production_receipt') return `/hasil-produksi/${id}`
+  if (type === 'supplier_return') return `/retur-pembelian/${id}`
   return null
 }

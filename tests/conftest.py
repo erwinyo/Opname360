@@ -1,4 +1,5 @@
 from collections.abc import Iterator
+from decimal import Decimal
 from itertools import count
 
 import pytest
@@ -176,3 +177,17 @@ def new_receipt(
         assert response.status_code == 200, response.text
         receipt = response.json()
     return receipt
+
+
+def receipt_line(
+    sku_id: int | None, quantity: float, unit_cost: float
+) -> dict:
+    return {'sku_id': sku_id, 'quantity': quantity, 'unit_cost': unit_cost}
+
+
+def stock_of(
+    client: TestClient, sku_id: int | None
+) -> tuple[Decimal, Decimal]:
+    """The SKU's System Quantity and Stock Value, read from its Stock Card."""
+    card = client.get(f'/api/v1/stock/skus/{sku_id}/card').json()
+    return Decimal(card['sku']['quantity']), Decimal(card['sku']['value'])

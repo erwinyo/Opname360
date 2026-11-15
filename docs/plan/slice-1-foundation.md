@@ -29,7 +29,7 @@ Each one gets a test.
 6. A draft document can be edited. Completing it writes its Stock Movements; from then on it can't be edited or deleted, only reversed.
 7. Goods Receipt: a line entered as 2 boxes of 12 at Rp 60.000 per box becomes 24 pcs at Rp 5.000.
 8. Moving Average: receiving 10 at Rp 5.000 then 10 at Rp 6.000 gives an average of Rp 5.500. FIFO: the same receipts stay two Cost Layers, used oldest first.
-9. Supplier Return: can't return more than that Goods Receipt brought in, minus earlier returns.
+9. Supplier Return: can't return more than that Goods Receipt brought in, minus earlier returns. A Goods Receipt with completed returns can only be reversed after its returns are.
 10. A Reversal writes the opposite Stock Movements and links both documents. If the goods are already gone, the SKU goes into Negative Stock and is flagged.
 11. Goods arriving for a SKU in Negative Stock fill the gap first (costing rule 6).
 12. Two documents completed at the same moment for the same SKU leave the correct balance.

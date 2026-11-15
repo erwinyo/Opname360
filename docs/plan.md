@@ -82,7 +82,8 @@ Goods Receipts, Production Receipts, Supplier Returns, Stock Opnames, Receipts, 
 - A document has a number: type prefix, year and month, running number. `BM-2611-0001` is the first Goods Receipt (Barang Masuk) of November 2026.
 - While it is a draft it can be edited or discarded and affects nothing.
 - Completing it writes its effects (Stock Movements, later journal entries) in one transaction. From then on it can't be edited or deleted.
-- A mistake is undone by a Reversal, which mirrors the original and links to it.
+- A mistake is undone by a Reversal, which mirrors the original and links to it. A Reversal has its own number (`BTL-2611-0001`); its Stock Movements point at the document they cancel.
+- Prefixes so far: `BM` Goods Receipt, `HP` Production Receipt, `RB` Supplier Return, `BTL` Reversal.
 
 ### Costing rules
 

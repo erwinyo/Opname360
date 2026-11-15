@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { ArrowLeftIcon, PlusIcon, ScanBarcodeIcon, Trash2Icon } from 'lucide-react'
+import { PlusIcon, Trash2Icon, Undo2Icon } from 'lucide-react'
 import { useRef, useState } from 'react'
 import type { FormEvent } from 'react'
 import { Link, useNavigate, useParams } from 'react-router'
@@ -9,7 +9,6 @@ import {
   goodsReceiptsCompleteReceipt,
   goodsReceiptsCreateReceipt,
   goodsReceiptsUpdateReceipt,
-  productsSearchSkus,
 } from '@/client'
 import type {
   GoodsReceiptLinePublic,
@@ -20,9 +19,18 @@ import type {
 import {
   goodsReceiptsDiscardReceiptMutation,
   goodsReceiptsReadReceiptOptions,
+  goodsReceiptsReverseReceiptMutation,
   suppliersListSuppliersOptions,
 } from '@/client/@tanstack/react-query.gen'
+import {
+  BackLink,
+  Facts,
+  ReversalNotice,
+  ReverseDialog,
+  StatusBadge,
+} from '@/components/documents'
 import { Field, FormDialog } from '@/components/FormDialog'
+import { SkuFinder } from '@/components/SkuFinder'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -56,7 +64,6 @@ import {
 } from '@/lib/format'
 import { PAYMENT_LABELS } from '@/lib/labels'
 
-import { StatusBadge } from './GoodsReceiptsPage'
 import { SupplierDialog } from './SuppliersPage'
 
 export function GoodsReceiptPage() {
@@ -75,7 +82,7 @@ export function GoodsReceiptPage() {
   if (receiptId !== null && receipt.isError) {
     return (
       <>
-        <BackLink />
+        <BackLink to="/barang-masuk" label="Barang Masuk" />
         <p className="mt-4 text-destructive">{errorMessage(receipt.error)}</p>
       </>
     )
@@ -84,18 +91,6 @@ export function GoodsReceiptPage() {
     return <ReceiptView receipt={receipt.data} />
   }
   return <ReceiptForm key={receiptId ?? 'new'} receipt={receipt.data} />
-}
-
-function BackLink() {
-  return (
-    <Link
-      to="/barang-masuk"
-      className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
-    >
-      <ArrowLeftIcon className="size-4" />
-      Barang Masuk
-    </Link>
-  )
 }
 
 /** One line as typed: a quantity and a cost in the unit chosen for it. */
@@ -298,7 +293,7 @@ function ReceiptForm({ receipt }: { receipt?: GoodsReceiptPublic }) {
   return (
     <>
       <form onSubmit={submit} noValidate>
-        <BackLink />
+        <BackLink to="/barang-masuk" label="Barang Masuk" />
         <h1 className="mt-3 text-2xl font-semibold tracking-tight">
           {receipt ? 'Draf barang masuk' : 'Barang masuk baru'}
         </h1>
@@ -556,128 +551,72 @@ function ReceiptForm({ receipt }: { receipt?: GoodsReceiptPublic }) {
   )
 }
 
-/** Scan a Barcode or type part of a name; one match is added straight away. */
-function SkuFinder({ onPick }: { onPick: (option: SkuOption) => void }) {
-  const [text, setText] = useState('')
-  const [options, setOptions] = useState<SkuOption[] | null>(null)
-  const input = useRef<HTMLInputElement>(null)
-
-  const pick = (option: SkuOption) => {
-    onPick(option)
-    setText('')
-    setOptions(null)
-    input.current?.focus()
-  }
-  const search = useMutation({
-    mutationFn: async (query: string) => {
-      const { data } = await productsSearchSkus({
-        query: { query },
-        throwOnError: true,
-      })
-      return data
-    },
-    onSuccess: (found) => {
-      if (found.length === 1) pick(found[0])
-      else setOptions(found)
+function ReceiptView({ receipt }: { receipt: GoodsReceiptPublic }) {
+  const [reversing, setReversing] = useState(false)
+  const reverse = useMutation({
+    ...goodsReceiptsReverseReceiptMutation(),
+    onSuccess: (reversed) => {
+      queryClient.invalidateQueries()
+      toast.success(
+        `Barang masuk ${reversed.number} dibatalkan. Stok dikurangi kembali.`,
+      )
+      setReversing(false)
     },
   })
-
-  return (
-    <div className="mt-3">
-      <div className="relative">
-        <ScanBarcodeIcon className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground" />
-        <Input
-          ref={input}
-          value={text}
-          onChange={(event) => {
-            setText(event.target.value)
-            setOptions(null)
-          }}
-          onKeyDown={(event) => {
-            if (event.key !== 'Enter') return
-            // Enter here looks for a SKU; it must not save the form.
-            event.preventDefault()
-            if (text.trim()) search.mutate(text)
-          }}
-          placeholder="Scan barcode, atau ketik nama lalu Enter"
-          aria-label="Tambah barang"
-          className="bg-card pl-8"
-        />
-      </div>
-      {search.isError && (
-        <p className="mt-2 text-sm text-destructive">
-          {errorMessage(search.error)}
-        </p>
-      )}
-      {options?.length === 0 && (
-        <p className="mt-2 text-sm text-muted-foreground">
-          Tidak ada barang yang cocok dengan "{text}".
-        </p>
-      )}
-      {options && options.length > 1 && (
-        <ul className="mt-2 rounded-xl border bg-card">
-          {options.map((option) => (
-            <li key={option.id} className="border-b last:border-b-0">
-              <button
-                type="button"
-                onClick={() => pick(option)}
-                className="flex w-full items-baseline gap-3 px-3 py-2 text-left hover:bg-muted"
-              >
-                <span className="font-medium">
-                  {[option.product_name, variantLabel(option)]
-                    .filter(Boolean)
-                    .join(' · ')}
-                </span>
-                <span className="ml-auto text-sm text-muted-foreground tabular-nums">
-                  {option.code} · {option.barcode}
-                </span>
-              </button>
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
+  const returnable = receipt.lines.some(
+    (line) => Number(line.quantity) > Number(line.returned_quantity),
   )
-}
+  const anyReturned = receipt.lines.some(
+    (line) => Number(line.returned_quantity) > 0,
+  )
 
-function ReceiptView({ receipt }: { receipt: GoodsReceiptPublic }) {
-  const facts: [string, string][] = [
-    ['Pemasok', receipt.supplier_name],
-    ['Tanggal terima', formatDate(receipt.received_on)],
-    ['Pembayaran', PAYMENT_LABELS[receipt.payment_status]],
-    ['No. faktur pemasok', receipt.supplier_invoice ?? '–'],
-    ['Lokasi', receipt.location_name],
-    [
-      'Diselesaikan',
-      receipt.completed_at
-        ? `${receipt.completed_by_name ?? '–'} · ${formatDateTime(receipt.completed_at)}`
-        : '–',
-    ],
-  ]
   return (
     <>
-      <BackLink />
+      <BackLink to="/barang-masuk" label="Barang Masuk" />
       <div className="mt-3 flex flex-wrap items-center gap-3">
         <h1 className="text-2xl font-semibold tracking-tight tabular-nums">
           {receipt.number}
         </h1>
         <StatusBadge status={receipt.status} />
+        {receipt.status === 'completed' && (
+          <span className="ml-auto flex flex-wrap gap-2">
+            {returnable && (
+              <Button variant="outline" asChild>
+                <Link to={`/retur-pembelian/baru?dari=${receipt.id}`}>
+                  <Undo2Icon />
+                  Retur ke pemasok
+                </Link>
+              </Button>
+            )}
+            <Button
+              variant="ghost"
+              className="text-destructive hover:text-destructive"
+              onClick={() => setReversing(true)}
+            >
+              Batalkan
+            </Button>
+          </span>
+        )}
       </div>
 
-      <dl className="mt-6 grid gap-x-6 gap-y-4 rounded-xl border bg-card p-4 sm:grid-cols-2 lg:grid-cols-3">
-        {facts.map(([term, value]) => (
-          <div key={term}>
-            <dt className="text-sm text-muted-foreground">{term}</dt>
-            <dd className="font-medium">{value}</dd>
-          </div>
-        ))}
-        {receipt.note && (
-          <div className="sm:col-span-2 lg:col-span-3">
-            <dt className="text-sm text-muted-foreground">Catatan</dt>
-            <dd>{receipt.note}</dd>
-          </div>
-        )}
-      </dl>
+      {receipt.reversal && <ReversalNotice reversal={receipt.reversal} />}
+
+      <Facts
+        facts={[
+          ['Pemasok', receipt.supplier_name],
+          ['Tanggal terima', formatDate(receipt.received_on)],
+          ['Pembayaran', PAYMENT_LABELS[receipt.payment_status]],
+          ['No. faktur pemasok', receipt.supplier_invoice ?? '–'],
+          ['Lokasi', receipt.location_name],
+          [
+            'Diselesaikan',
+            receipt.completed_at
+              ? `${receipt.completed_by_name ?? '–'} · ${formatDateTime(receipt.completed_at)}`
+              : '–',
+          ],
+        ]}
+        note={receipt.note}
+      />
 
       <div className="mt-6 overflow-x-auto rounded-xl border bg-card">
         <Table>
@@ -685,6 +624,9 @@ function ReceiptView({ receipt }: { receipt: GoodsReceiptPublic }) {
             <TableRow>
               <TableHead>Barang</TableHead>
               <TableHead className="text-right">Jumlah</TableHead>
+              {anyReturned && (
+                <TableHead className="text-right">Diretur</TableHead>
+              )}
               <TableHead className="text-right">Harga beli</TableHead>
               <TableHead className="text-right">Subtotal</TableHead>
             </TableRow>
@@ -711,6 +653,13 @@ function ReceiptView({ receipt }: { receipt: GoodsReceiptPublic }) {
                     </span>
                   )}
                 </TableCell>
+                {anyReturned && (
+                  <TableCell className="text-right whitespace-nowrap tabular-nums">
+                    {Number(line.returned_quantity) > 0
+                      ? `${quantity(line.returned_quantity)} ${line.stock_unit}`
+                      : '–'}
+                  </TableCell>
+                )}
                 <TableCell className="text-right whitespace-nowrap tabular-nums">
                   {money(line.unit_cost)}
                   {line.pack_cost !== null && (
@@ -727,7 +676,7 @@ function ReceiptView({ receipt }: { receipt: GoodsReceiptPublic }) {
           </TableBody>
           <TableFooter>
             <TableRow>
-              <TableCell colSpan={3} className="text-right">
+              <TableCell colSpan={anyReturned ? 4 : 3} className="text-right">
                 Total
               </TableCell>
               <TableCell className="text-right tabular-nums">
@@ -737,6 +686,22 @@ function ReceiptView({ receipt }: { receipt: GoodsReceiptPublic }) {
           </TableFooter>
         </Table>
       </div>
+
+      {reversing && (
+        <ReverseDialog
+          title={`Batalkan ${receipt.number}?`}
+          description="Semua barang di dokumen ini dikeluarkan lagi dari stok dengan harga pokok yang sama. Barang yang sudah terjual membuat stoknya minus."
+          pending={reverse.isPending}
+          error={reverse.error}
+          onReverse={(reason) =>
+            reverse.mutate({
+              path: { receipt_id: receipt.id },
+              body: { reason },
+            })
+          }
+          onClose={() => setReversing(false)}
+        />
+      )}
     </>
   )
 }

@@ -3,8 +3,8 @@
 import { type DefaultError, type InfiniteData, infiniteQueryOptions, queryOptions, type UseMutationOptions } from '@tanstack/react-query';
 
 import { client } from '../client.gen';
-import { authLogin, authLogout, authReadMe, categoriesCreateCategory, categoriesCreateSubCategory, categoriesDeleteCategory, categoriesDeleteSubCategory, categoriesListCategories, categoriesRenameSubCategory, categoriesUpdateCategory, goodsReceiptsCompleteReceipt, goodsReceiptsCreateReceipt, goodsReceiptsDiscardReceipt, goodsReceiptsListReceipts, goodsReceiptsReadReceipt, goodsReceiptsUpdateReceipt, healthHealthCheck, type Options, productsCreateProduct, productsDeleteProduct, productsListPriceChanges, productsListProducts, productsReadProduct, productsSearchSkus, productsUpdateProduct, stockListLocations, stockListStock, stockReadStockCard, suppliersCreateSupplier, suppliersListSuppliers, suppliersUpdateSupplier, usersCreateUser, usersListUsers, usersResetPassword, usersUpdateUser } from '../sdk.gen';
-import type { AuthLoginData, AuthLoginError, AuthLoginResponse, AuthLogoutData, AuthLogoutError, AuthLogoutResponse, AuthReadMeData, AuthReadMeError, AuthReadMeResponse, CategoriesCreateCategoryData, CategoriesCreateCategoryError, CategoriesCreateCategoryResponse, CategoriesCreateSubCategoryData, CategoriesCreateSubCategoryError, CategoriesCreateSubCategoryResponse, CategoriesDeleteCategoryData, CategoriesDeleteCategoryError, CategoriesDeleteCategoryResponse, CategoriesDeleteSubCategoryData, CategoriesDeleteSubCategoryError, CategoriesDeleteSubCategoryResponse, CategoriesListCategoriesData, CategoriesListCategoriesError, CategoriesListCategoriesResponse, CategoriesRenameSubCategoryData, CategoriesRenameSubCategoryError, CategoriesRenameSubCategoryResponse, CategoriesUpdateCategoryData, CategoriesUpdateCategoryError, CategoriesUpdateCategoryResponse, GoodsReceiptsCompleteReceiptData, GoodsReceiptsCompleteReceiptError, GoodsReceiptsCompleteReceiptResponse, GoodsReceiptsCreateReceiptData, GoodsReceiptsCreateReceiptError, GoodsReceiptsCreateReceiptResponse, GoodsReceiptsDiscardReceiptData, GoodsReceiptsDiscardReceiptError, GoodsReceiptsDiscardReceiptResponse, GoodsReceiptsListReceiptsData, GoodsReceiptsListReceiptsError, GoodsReceiptsListReceiptsResponse, GoodsReceiptsReadReceiptData, GoodsReceiptsReadReceiptError, GoodsReceiptsReadReceiptResponse, GoodsReceiptsUpdateReceiptData, GoodsReceiptsUpdateReceiptError, GoodsReceiptsUpdateReceiptResponse, HealthHealthCheckData, HealthHealthCheckResponse, ProductsCreateProductData, ProductsCreateProductError, ProductsCreateProductResponse, ProductsDeleteProductData, ProductsDeleteProductError, ProductsDeleteProductResponse, ProductsListPriceChangesData, ProductsListPriceChangesError, ProductsListPriceChangesResponse, ProductsListProductsData, ProductsListProductsError, ProductsListProductsResponse, ProductsReadProductData, ProductsReadProductError, ProductsReadProductResponse, ProductsSearchSkusData, ProductsSearchSkusError, ProductsSearchSkusResponse, ProductsUpdateProductData, ProductsUpdateProductError, ProductsUpdateProductResponse, StockListLocationsData, StockListLocationsError, StockListLocationsResponse, StockListStockData, StockListStockError, StockListStockResponse, StockReadStockCardData, StockReadStockCardError, StockReadStockCardResponse, SuppliersCreateSupplierData, SuppliersCreateSupplierError, SuppliersCreateSupplierResponse, SuppliersListSuppliersData, SuppliersListSuppliersError, SuppliersListSuppliersResponse, SuppliersUpdateSupplierData, SuppliersUpdateSupplierError, SuppliersUpdateSupplierResponse, UsersCreateUserData, UsersCreateUserError, UsersCreateUserResponse, UsersListUsersData, UsersListUsersError, UsersListUsersResponse, UsersResetPasswordData, UsersResetPasswordError, UsersResetPasswordResponse, UsersUpdateUserData, UsersUpdateUserError, UsersUpdateUserResponse } from '../types.gen';
+import { activityLogListEntries, authLogin, authLogout, authReadMe, categoriesCreateCategory, categoriesCreateSubCategory, categoriesDeleteCategory, categoriesDeleteSubCategory, categoriesListCategories, categoriesRenameSubCategory, categoriesUpdateCategory, goodsReceiptsCompleteReceipt, goodsReceiptsCreateReceipt, goodsReceiptsDiscardReceipt, goodsReceiptsListReceipts, goodsReceiptsReadReceipt, goodsReceiptsReverseReceipt, goodsReceiptsUpdateReceipt, healthHealthCheck, type Options, productionReceiptsCompleteReceipt, productionReceiptsCreateReceipt, productionReceiptsDiscardReceipt, productionReceiptsListReceipts, productionReceiptsReadReceipt, productionReceiptsReverseReceipt, productionReceiptsUpdateReceipt, productsCreateProduct, productsDeleteProduct, productsListPriceChanges, productsListProducts, productsReadProduct, productsSearchSkus, productsUpdateProduct, stockListLocations, stockListStock, stockReadStockCard, supplierReturnsCompleteReturn, supplierReturnsCreateReturn, supplierReturnsDiscardReturn, supplierReturnsListReturns, supplierReturnsReadReturn, supplierReturnsReverseReturn, supplierReturnsUpdateReturn, suppliersCreateSupplier, suppliersListSuppliers, suppliersUpdateSupplier, usersCreateUser, usersListUsers, usersResetPassword, usersUpdateUser } from '../sdk.gen';
+import type { ActivityLogListEntriesData, ActivityLogListEntriesError, ActivityLogListEntriesResponse, AuthLoginData, AuthLoginError, AuthLoginResponse, AuthLogoutData, AuthLogoutError, AuthLogoutResponse, AuthReadMeData, AuthReadMeError, AuthReadMeResponse, CategoriesCreateCategoryData, CategoriesCreateCategoryError, CategoriesCreateCategoryResponse, CategoriesCreateSubCategoryData, CategoriesCreateSubCategoryError, CategoriesCreateSubCategoryResponse, CategoriesDeleteCategoryData, CategoriesDeleteCategoryError, CategoriesDeleteCategoryResponse, CategoriesDeleteSubCategoryData, CategoriesDeleteSubCategoryError, CategoriesDeleteSubCategoryResponse, CategoriesListCategoriesData, CategoriesListCategoriesError, CategoriesListCategoriesResponse, CategoriesRenameSubCategoryData, CategoriesRenameSubCategoryError, CategoriesRenameSubCategoryResponse, CategoriesUpdateCategoryData, CategoriesUpdateCategoryError, CategoriesUpdateCategoryResponse, GoodsReceiptsCompleteReceiptData, GoodsReceiptsCompleteReceiptError, GoodsReceiptsCompleteReceiptResponse, GoodsReceiptsCreateReceiptData, GoodsReceiptsCreateReceiptError, GoodsReceiptsCreateReceiptResponse, GoodsReceiptsDiscardReceiptData, GoodsReceiptsDiscardReceiptError, GoodsReceiptsDiscardReceiptResponse, GoodsReceiptsListReceiptsData, GoodsReceiptsListReceiptsError, GoodsReceiptsListReceiptsResponse, GoodsReceiptsReadReceiptData, GoodsReceiptsReadReceiptError, GoodsReceiptsReadReceiptResponse, GoodsReceiptsReverseReceiptData, GoodsReceiptsReverseReceiptError, GoodsReceiptsReverseReceiptResponse, GoodsReceiptsUpdateReceiptData, GoodsReceiptsUpdateReceiptError, GoodsReceiptsUpdateReceiptResponse, HealthHealthCheckData, HealthHealthCheckResponse, ProductionReceiptsCompleteReceiptData, ProductionReceiptsCompleteReceiptError, ProductionReceiptsCompleteReceiptResponse, ProductionReceiptsCreateReceiptData, ProductionReceiptsCreateReceiptError, ProductionReceiptsCreateReceiptResponse, ProductionReceiptsDiscardReceiptData, ProductionReceiptsDiscardReceiptError, ProductionReceiptsDiscardReceiptResponse, ProductionReceiptsListReceiptsData, ProductionReceiptsListReceiptsError, ProductionReceiptsListReceiptsResponse, ProductionReceiptsReadReceiptData, ProductionReceiptsReadReceiptError, ProductionReceiptsReadReceiptResponse, ProductionReceiptsReverseReceiptData, ProductionReceiptsReverseReceiptError, ProductionReceiptsReverseReceiptResponse, ProductionReceiptsUpdateReceiptData, ProductionReceiptsUpdateReceiptError, ProductionReceiptsUpdateReceiptResponse, ProductsCreateProductData, ProductsCreateProductError, ProductsCreateProductResponse, ProductsDeleteProductData, ProductsDeleteProductError, ProductsDeleteProductResponse, ProductsListPriceChangesData, ProductsListPriceChangesError, ProductsListPriceChangesResponse, ProductsListProductsData, ProductsListProductsError, ProductsListProductsResponse, ProductsReadProductData, ProductsReadProductError, ProductsReadProductResponse, ProductsSearchSkusData, ProductsSearchSkusError, ProductsSearchSkusResponse, ProductsUpdateProductData, ProductsUpdateProductError, ProductsUpdateProductResponse, StockListLocationsData, StockListLocationsError, StockListLocationsResponse, StockListStockData, StockListStockError, StockListStockResponse, StockReadStockCardData, StockReadStockCardError, StockReadStockCardResponse, SupplierReturnsCompleteReturnData, SupplierReturnsCompleteReturnError, SupplierReturnsCompleteReturnResponse, SupplierReturnsCreateReturnData, SupplierReturnsCreateReturnError, SupplierReturnsCreateReturnResponse, SupplierReturnsDiscardReturnData, SupplierReturnsDiscardReturnError, SupplierReturnsDiscardReturnResponse, SupplierReturnsListReturnsData, SupplierReturnsListReturnsError, SupplierReturnsListReturnsResponse, SupplierReturnsReadReturnData, SupplierReturnsReadReturnError, SupplierReturnsReadReturnResponse, SupplierReturnsReverseReturnData, SupplierReturnsReverseReturnError, SupplierReturnsReverseReturnResponse, SupplierReturnsUpdateReturnData, SupplierReturnsUpdateReturnError, SupplierReturnsUpdateReturnResponse, SuppliersCreateSupplierData, SuppliersCreateSupplierError, SuppliersCreateSupplierResponse, SuppliersListSuppliersData, SuppliersListSuppliersError, SuppliersListSuppliersResponse, SuppliersUpdateSupplierData, SuppliersUpdateSupplierError, SuppliersUpdateSupplierResponse, UsersCreateUserData, UsersCreateUserError, UsersCreateUserResponse, UsersListUsersData, UsersListUsersError, UsersListUsersResponse, UsersResetPasswordData, UsersResetPasswordError, UsersResetPasswordResponse, UsersUpdateUserData, UsersUpdateUserError, UsersUpdateUserResponse } from '../types.gen';
 
 export type QueryKey<TOptions extends Options> = [
     Pick<TOptions, 'baseUrl' | 'body' | 'headers' | 'path' | 'query'> & {
@@ -666,6 +666,325 @@ export const goodsReceiptsCompleteReceiptMutation = (options?: Partial<Options<G
     return mutationOptions;
 };
 
+/**
+ * Reverse Receipt
+ */
+export const goodsReceiptsReverseReceiptMutation = (options?: Partial<Options<GoodsReceiptsReverseReceiptData>>): UseMutationOptions<GoodsReceiptsReverseReceiptResponse, GoodsReceiptsReverseReceiptError, Options<GoodsReceiptsReverseReceiptData>> => {
+    const mutationOptions: UseMutationOptions<GoodsReceiptsReverseReceiptResponse, GoodsReceiptsReverseReceiptError, Options<GoodsReceiptsReverseReceiptData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await goodsReceiptsReverseReceipt({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+export const productionReceiptsListReceiptsQueryKey = (options?: Options<ProductionReceiptsListReceiptsData>) => createQueryKey('productionReceiptsListReceipts', options);
+
+/**
+ * List Receipts
+ */
+export const productionReceiptsListReceiptsOptions = (options?: Options<ProductionReceiptsListReceiptsData>) => queryOptions<ProductionReceiptsListReceiptsResponse, ProductionReceiptsListReceiptsError, ProductionReceiptsListReceiptsResponse, ReturnType<typeof productionReceiptsListReceiptsQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await productionReceiptsListReceipts({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: productionReceiptsListReceiptsQueryKey(options)
+});
+
+export const productionReceiptsListReceiptsInfiniteQueryKey = (options?: Options<ProductionReceiptsListReceiptsData>): QueryKey<Options<ProductionReceiptsListReceiptsData>> => createQueryKey('productionReceiptsListReceipts', options, true);
+
+/**
+ * List Receipts
+ */
+export const productionReceiptsListReceiptsInfiniteOptions = (options?: Options<ProductionReceiptsListReceiptsData>) => {
+    const opts = infiniteQueryOptions<ProductionReceiptsListReceiptsResponse, ProductionReceiptsListReceiptsError, InfiniteData<ProductionReceiptsListReceiptsResponse>, QueryKey<Options<ProductionReceiptsListReceiptsData>>, number | Pick<QueryKey<Options<ProductionReceiptsListReceiptsData>>[0], 'body' | 'headers' | 'path' | 'query'>>(
+    // @ts-ignore
+    {
+        queryFn: async ({ pageParam, queryKey, signal }) => {
+            // @ts-ignore
+            const page: Pick<QueryKey<Options<ProductionReceiptsListReceiptsData>>[0], 'body' | 'headers' | 'path' | 'query'> = typeof pageParam === 'object' ? pageParam : {
+                query: {
+                    offset: pageParam
+                }
+            };
+            const params = createInfiniteParams(queryKey, page);
+            const { data } = await productionReceiptsListReceipts({
+                ...options,
+                ...params,
+                signal,
+                throwOnError: true
+            });
+            return data;
+        },
+        queryKey: productionReceiptsListReceiptsInfiniteQueryKey(options)
+    });
+    return opts as Omit<typeof opts, 'initialData'>;
+};
+
+/**
+ * Create Receipt
+ */
+export const productionReceiptsCreateReceiptMutation = (options?: Partial<Options<ProductionReceiptsCreateReceiptData>>): UseMutationOptions<ProductionReceiptsCreateReceiptResponse, ProductionReceiptsCreateReceiptError, Options<ProductionReceiptsCreateReceiptData>> => {
+    const mutationOptions: UseMutationOptions<ProductionReceiptsCreateReceiptResponse, ProductionReceiptsCreateReceiptError, Options<ProductionReceiptsCreateReceiptData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await productionReceiptsCreateReceipt({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Discard Receipt
+ */
+export const productionReceiptsDiscardReceiptMutation = (options?: Partial<Options<ProductionReceiptsDiscardReceiptData>>): UseMutationOptions<ProductionReceiptsDiscardReceiptResponse, ProductionReceiptsDiscardReceiptError, Options<ProductionReceiptsDiscardReceiptData>> => {
+    const mutationOptions: UseMutationOptions<ProductionReceiptsDiscardReceiptResponse, ProductionReceiptsDiscardReceiptError, Options<ProductionReceiptsDiscardReceiptData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await productionReceiptsDiscardReceipt({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+export const productionReceiptsReadReceiptQueryKey = (options: Options<ProductionReceiptsReadReceiptData>) => createQueryKey('productionReceiptsReadReceipt', options);
+
+/**
+ * Read Receipt
+ */
+export const productionReceiptsReadReceiptOptions = (options: Options<ProductionReceiptsReadReceiptData>) => queryOptions<ProductionReceiptsReadReceiptResponse, ProductionReceiptsReadReceiptError, ProductionReceiptsReadReceiptResponse, ReturnType<typeof productionReceiptsReadReceiptQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await productionReceiptsReadReceipt({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: productionReceiptsReadReceiptQueryKey(options)
+});
+
+/**
+ * Update Receipt
+ */
+export const productionReceiptsUpdateReceiptMutation = (options?: Partial<Options<ProductionReceiptsUpdateReceiptData>>): UseMutationOptions<ProductionReceiptsUpdateReceiptResponse, ProductionReceiptsUpdateReceiptError, Options<ProductionReceiptsUpdateReceiptData>> => {
+    const mutationOptions: UseMutationOptions<ProductionReceiptsUpdateReceiptResponse, ProductionReceiptsUpdateReceiptError, Options<ProductionReceiptsUpdateReceiptData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await productionReceiptsUpdateReceipt({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Complete Receipt
+ */
+export const productionReceiptsCompleteReceiptMutation = (options?: Partial<Options<ProductionReceiptsCompleteReceiptData>>): UseMutationOptions<ProductionReceiptsCompleteReceiptResponse, ProductionReceiptsCompleteReceiptError, Options<ProductionReceiptsCompleteReceiptData>> => {
+    const mutationOptions: UseMutationOptions<ProductionReceiptsCompleteReceiptResponse, ProductionReceiptsCompleteReceiptError, Options<ProductionReceiptsCompleteReceiptData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await productionReceiptsCompleteReceipt({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Reverse Receipt
+ */
+export const productionReceiptsReverseReceiptMutation = (options?: Partial<Options<ProductionReceiptsReverseReceiptData>>): UseMutationOptions<ProductionReceiptsReverseReceiptResponse, ProductionReceiptsReverseReceiptError, Options<ProductionReceiptsReverseReceiptData>> => {
+    const mutationOptions: UseMutationOptions<ProductionReceiptsReverseReceiptResponse, ProductionReceiptsReverseReceiptError, Options<ProductionReceiptsReverseReceiptData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await productionReceiptsReverseReceipt({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+export const supplierReturnsListReturnsQueryKey = (options?: Options<SupplierReturnsListReturnsData>) => createQueryKey('supplierReturnsListReturns', options);
+
+/**
+ * List Returns
+ */
+export const supplierReturnsListReturnsOptions = (options?: Options<SupplierReturnsListReturnsData>) => queryOptions<SupplierReturnsListReturnsResponse, SupplierReturnsListReturnsError, SupplierReturnsListReturnsResponse, ReturnType<typeof supplierReturnsListReturnsQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await supplierReturnsListReturns({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: supplierReturnsListReturnsQueryKey(options)
+});
+
+export const supplierReturnsListReturnsInfiniteQueryKey = (options?: Options<SupplierReturnsListReturnsData>): QueryKey<Options<SupplierReturnsListReturnsData>> => createQueryKey('supplierReturnsListReturns', options, true);
+
+/**
+ * List Returns
+ */
+export const supplierReturnsListReturnsInfiniteOptions = (options?: Options<SupplierReturnsListReturnsData>) => {
+    const opts = infiniteQueryOptions<SupplierReturnsListReturnsResponse, SupplierReturnsListReturnsError, InfiniteData<SupplierReturnsListReturnsResponse>, QueryKey<Options<SupplierReturnsListReturnsData>>, number | Pick<QueryKey<Options<SupplierReturnsListReturnsData>>[0], 'body' | 'headers' | 'path' | 'query'>>(
+    // @ts-ignore
+    {
+        queryFn: async ({ pageParam, queryKey, signal }) => {
+            // @ts-ignore
+            const page: Pick<QueryKey<Options<SupplierReturnsListReturnsData>>[0], 'body' | 'headers' | 'path' | 'query'> = typeof pageParam === 'object' ? pageParam : {
+                query: {
+                    offset: pageParam
+                }
+            };
+            const params = createInfiniteParams(queryKey, page);
+            const { data } = await supplierReturnsListReturns({
+                ...options,
+                ...params,
+                signal,
+                throwOnError: true
+            });
+            return data;
+        },
+        queryKey: supplierReturnsListReturnsInfiniteQueryKey(options)
+    });
+    return opts as Omit<typeof opts, 'initialData'>;
+};
+
+/**
+ * Create Return
+ */
+export const supplierReturnsCreateReturnMutation = (options?: Partial<Options<SupplierReturnsCreateReturnData>>): UseMutationOptions<SupplierReturnsCreateReturnResponse, SupplierReturnsCreateReturnError, Options<SupplierReturnsCreateReturnData>> => {
+    const mutationOptions: UseMutationOptions<SupplierReturnsCreateReturnResponse, SupplierReturnsCreateReturnError, Options<SupplierReturnsCreateReturnData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await supplierReturnsCreateReturn({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Discard Return
+ */
+export const supplierReturnsDiscardReturnMutation = (options?: Partial<Options<SupplierReturnsDiscardReturnData>>): UseMutationOptions<SupplierReturnsDiscardReturnResponse, SupplierReturnsDiscardReturnError, Options<SupplierReturnsDiscardReturnData>> => {
+    const mutationOptions: UseMutationOptions<SupplierReturnsDiscardReturnResponse, SupplierReturnsDiscardReturnError, Options<SupplierReturnsDiscardReturnData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await supplierReturnsDiscardReturn({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+export const supplierReturnsReadReturnQueryKey = (options: Options<SupplierReturnsReadReturnData>) => createQueryKey('supplierReturnsReadReturn', options);
+
+/**
+ * Read Return
+ */
+export const supplierReturnsReadReturnOptions = (options: Options<SupplierReturnsReadReturnData>) => queryOptions<SupplierReturnsReadReturnResponse, SupplierReturnsReadReturnError, SupplierReturnsReadReturnResponse, ReturnType<typeof supplierReturnsReadReturnQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await supplierReturnsReadReturn({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: supplierReturnsReadReturnQueryKey(options)
+});
+
+/**
+ * Update Return
+ */
+export const supplierReturnsUpdateReturnMutation = (options?: Partial<Options<SupplierReturnsUpdateReturnData>>): UseMutationOptions<SupplierReturnsUpdateReturnResponse, SupplierReturnsUpdateReturnError, Options<SupplierReturnsUpdateReturnData>> => {
+    const mutationOptions: UseMutationOptions<SupplierReturnsUpdateReturnResponse, SupplierReturnsUpdateReturnError, Options<SupplierReturnsUpdateReturnData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await supplierReturnsUpdateReturn({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Complete Return
+ */
+export const supplierReturnsCompleteReturnMutation = (options?: Partial<Options<SupplierReturnsCompleteReturnData>>): UseMutationOptions<SupplierReturnsCompleteReturnResponse, SupplierReturnsCompleteReturnError, Options<SupplierReturnsCompleteReturnData>> => {
+    const mutationOptions: UseMutationOptions<SupplierReturnsCompleteReturnResponse, SupplierReturnsCompleteReturnError, Options<SupplierReturnsCompleteReturnData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await supplierReturnsCompleteReturn({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Reverse Return
+ */
+export const supplierReturnsReverseReturnMutation = (options?: Partial<Options<SupplierReturnsReverseReturnData>>): UseMutationOptions<SupplierReturnsReverseReturnResponse, SupplierReturnsReverseReturnError, Options<SupplierReturnsReverseReturnData>> => {
+    const mutationOptions: UseMutationOptions<SupplierReturnsReverseReturnResponse, SupplierReturnsReverseReturnError, Options<SupplierReturnsReverseReturnData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await supplierReturnsReverseReturn({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
 export const stockListStockQueryKey = (options?: Options<StockListStockData>) => createQueryKey('stockListStock', options);
 
 /**
@@ -776,6 +1095,54 @@ export const stockReadStockCardInfiniteOptions = (options: Options<StockReadStoc
             return data;
         },
         queryKey: stockReadStockCardInfiniteQueryKey(options)
+    });
+    return opts as Omit<typeof opts, 'initialData'>;
+};
+
+export const activityLogListEntriesQueryKey = (options?: Options<ActivityLogListEntriesData>) => createQueryKey('activityLogListEntries', options);
+
+/**
+ * List Entries
+ */
+export const activityLogListEntriesOptions = (options?: Options<ActivityLogListEntriesData>) => queryOptions<ActivityLogListEntriesResponse, ActivityLogListEntriesError, ActivityLogListEntriesResponse, ReturnType<typeof activityLogListEntriesQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await activityLogListEntries({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: activityLogListEntriesQueryKey(options)
+});
+
+export const activityLogListEntriesInfiniteQueryKey = (options?: Options<ActivityLogListEntriesData>): QueryKey<Options<ActivityLogListEntriesData>> => createQueryKey('activityLogListEntries', options, true);
+
+/**
+ * List Entries
+ */
+export const activityLogListEntriesInfiniteOptions = (options?: Options<ActivityLogListEntriesData>) => {
+    const opts = infiniteQueryOptions<ActivityLogListEntriesResponse, ActivityLogListEntriesError, InfiniteData<ActivityLogListEntriesResponse>, QueryKey<Options<ActivityLogListEntriesData>>, number | Pick<QueryKey<Options<ActivityLogListEntriesData>>[0], 'body' | 'headers' | 'path' | 'query'>>(
+    // @ts-ignore
+    {
+        queryFn: async ({ pageParam, queryKey, signal }) => {
+            // @ts-ignore
+            const page: Pick<QueryKey<Options<ActivityLogListEntriesData>>[0], 'body' | 'headers' | 'path' | 'query'> = typeof pageParam === 'object' ? pageParam : {
+                query: {
+                    offset: pageParam
+                }
+            };
+            const params = createInfiniteParams(queryKey, page);
+            const { data } = await activityLogListEntries({
+                ...options,
+                ...params,
+                signal,
+                throwOnError: true
+            });
+            return data;
+        },
+        queryKey: activityLogListEntriesInfiniteQueryKey(options)
     });
     return opts as Omit<typeof opts, 'initialData'>;
 };

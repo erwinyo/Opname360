@@ -124,11 +124,17 @@ def issue(
     reason: MovementReason,
     source: Source,
     actor: User | None,
+    unit_cost: Decimal | None = None,
+    layer_of: int | None = None,
 ) -> StockMovement:
     """Goods out, costed by the SKU's Costing Method.
 
     The cost is `-movement.value`. Stock never blocks it: what the system
     doesn't hold goes out at the SKU's latest unit cost (costing rule 6).
+
+    A Reversal passes the cost the goods came in at as `unit_cost`, and under
+    FIFO the movement that brought them in as `layer_of`, so taking them back
+    restores the stock as it was (costing rule 7).
     """
     assert quantity > 0
     assert sku.id is not None
@@ -143,10 +149,18 @@ def issue(
         cost = max(balance.value, ZERO) if available > 0 else ZERO
         _consume_layers(session, sku.id, location_id, None)
     elif _method(sku) == CostingMethod.fifo:
-        cost = _consume_layers(session, sku.id, location_id, from_stock)
+        cost = _consume_layers(
+            session, sku.id, location_id, from_stock, first=layer_of
+        )
+    elif unit_cost is not None:
+        # Never take out more value than the stock holds.
+        cost = min(money(from_stock * unit_cost), max(balance.value, ZERO))
     else:
         cost = money(from_stock * balance.value / balance.quantity)
-    cost += money(oversold * (sku.latest_unit_cost or ZERO))
+    oversold_cost = (
+        unit_cost if unit_cost is not None else sku.latest_unit_cost
+    )
+    cost += money(oversold * (oversold_cost or ZERO))
 
     return _record(
         session,
@@ -158,6 +172,74 @@ def issue(
         source=source,
         actor=actor,
     )
+
+
+def reverse(
+    session: Session,
+    *,
+    document_type: str,
+    document_id: int,
+    number: str,
+    actor: User,
+) -> None:
+    """Write the opposite of every Stock Movement a document made.
+
+    The new movements point at the same document and carry the Reversal's
+    `number`. Goods already gone leave the SKU in Negative Stock.
+    """
+    originals = session.exec(
+        select(StockMovement)
+        .where(
+            StockMovement.document_type == document_type,
+            StockMovement.document_id == document_id,
+            StockMovement.reason != MovementReason.reversal,
+        )
+        # SKU order avoids deadlocks; within a SKU, the original order.
+        .order_by(col(StockMovement.sku_id), col(StockMovement.id))
+    ).all()
+    source = Source(document_type, document_id, number)
+    for original in originals:
+        sku = session.get(Sku, original.sku_id)
+        assert sku is not None
+        if original.quantity > 0:
+            issue(
+                session,
+                sku=sku,
+                location_id=original.location_id,
+                quantity=original.quantity,
+                reason=MovementReason.reversal,
+                source=source,
+                actor=actor,
+                unit_cost=original.unit_cost,
+                layer_of=original.id,
+            )
+        elif original.quantity < 0:
+            receive(
+                session,
+                sku=sku,
+                location_id=original.location_id,
+                quantity=-original.quantity,
+                value=-original.value,
+                reason=MovementReason.reversal,
+                source=source,
+                actor=actor,
+                sets_latest_cost=False,
+            )
+        else:
+            balance = _lock_balance(
+                session, original.sku_id, original.location_id
+            )
+            _record(
+                session,
+                balance,
+                reason=MovementReason.reversal,
+                quantity=ZERO,
+                unit_cost=ZERO,
+                value=-original.value,
+                source=source,
+                actor=actor,
+            )
+        session.flush()
 
 
 def _method(sku: Sku) -> CostingMethod:
@@ -218,20 +300,29 @@ def _record(
 
 
 def _consume_layers(
-    session: Session, sku_id: int, location_id: int, quantity: Decimal | None
+    session: Session,
+    sku_id: int,
+    location_id: int,
+    quantity: Decimal | None,
+    *,
+    first: int | None = None,
 ) -> Decimal:
     """Take `quantity` from the oldest Cost Layers (all of them for None).
 
+    The layer made by movement `first`, if still there, goes before the rest.
     Returns what the taken units cost.
     """
-    layers = session.exec(
-        select(CostLayer)
-        .where(
-            CostLayer.sku_id == sku_id,
-            CostLayer.location_id == location_id,
-        )
-        .order_by(col(CostLayer.received_at), col(CostLayer.id))
-    ).all()
+    layers = sorted(
+        session.exec(
+            select(CostLayer)
+            .where(
+                CostLayer.sku_id == sku_id,
+                CostLayer.location_id == location_id,
+            )
+            .order_by(col(CostLayer.received_at), col(CostLayer.id))
+        ).all(),
+        key=lambda layer: layer.movement_id != first,
+    )
     cost = ZERO
     for layer in layers:
         if quantity is not None and quantity <= 0:

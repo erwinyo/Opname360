@@ -76,7 +76,7 @@ test('receive goods by scanning, in boxes, and see the stock', async ({
     await confirm.getByRole('button', { name: 'Selesaikan' }).click()
 
     await expect(
-      page.getByRole('heading', { name: /^BM-\d{4}-0001$/ }),
+      page.getByRole('heading', { name: /^BM-\d{4}-\d{4}$/ }),
     ).toBeVisible()
     const row = page.getByRole('row', { name: /Pulpen Biru/ })
     await expect(row).toContainText('24 pcs')

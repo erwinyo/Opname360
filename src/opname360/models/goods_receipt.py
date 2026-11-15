@@ -5,12 +5,7 @@ from enum import StrEnum
 from sqlmodel import Field, Relationship, SQLModel
 
 from opname360.models._types import enum_type, utc_now
-
-
-class DocumentStatus(StrEnum):
-    draft = 'draft'
-    completed = 'completed'
-    reversed = 'reversed'
+from opname360.models.document import DocumentStatus, ReversalPublic
 
 
 class PaymentStatus(StrEnum):
@@ -115,6 +110,8 @@ class GoodsReceiptLinePublic(SQLModel):
     pack_size: Decimal | None
     pack_quantity: Decimal | None
     pack_cost: Decimal | None
+    # Sent back on completed Supplier Returns.
+    returned_quantity: Decimal
 
 
 class GoodsReceiptPublic(SQLModel):
@@ -134,6 +131,7 @@ class GoodsReceiptPublic(SQLModel):
     created_at: datetime
     completed_by_name: str | None
     completed_at: datetime | None
+    reversal: ReversalPublic | None
     lines: list[GoodsReceiptLinePublic]
 
 

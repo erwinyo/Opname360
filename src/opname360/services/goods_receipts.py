@@ -18,6 +18,8 @@ from opname360.models import (
     MovementReason,
     Sku,
     Supplier,
+    SupplierReturn,
+    SupplierReturnLine,
     User,
 )
 from opname360.models._types import utc_now
@@ -89,6 +91,7 @@ def receipt_public(
     supplier = suppliers.get_supplier(session, receipt.supplier_id)
     location = session.get(Location, receipt.location_id)
     assert location is not None
+    returned = returned_quantities(session, receipt)
     lines = []
     for line in receipt.lines:
         sku = session.get(Sku, line.sku_id)
@@ -103,6 +106,9 @@ def receipt_public(
                     'code': sku.code,
                     'barcode': sku.barcode,
                     'stock_unit': sku.stock_unit,
+                    'returned_quantity': returned.get(
+                        line.id or 0, Decimal(0)
+                    ),
                     'purchase_pack_name': sku.purchase_pack_name,
                     'purchase_pack_size': sku.purchase_pack_size,
                 },
@@ -113,8 +119,15 @@ def receipt_public(
         update={
             'supplier_name': supplier.name,
             'location_name': location.name,
-            'created_by_name': _user_name(session, receipt.created_by),
-            'completed_by_name': _user_name(session, receipt.completed_by),
+            'created_by_name': documents.user_name(
+                session, receipt.created_by
+            ),
+            'completed_by_name': documents.user_name(
+                session, receipt.completed_by
+            ),
+            'reversal': documents.reversal_public(
+                session, DOCUMENT_TYPE, receipt.id
+            ),
             'lines': lines,
         },
     )
@@ -183,12 +196,8 @@ def complete(
 ) -> GoodsReceipt:
     """Write the receipt's Stock Movements; from here on it is immutable."""
     # Lock the receipt, so two people completing it can't both get through.
-    receipt = session.exec(
-        select(GoodsReceipt)
-        .where(GoodsReceipt.id == receipt.id)
-        .with_for_update()
-        .execution_options(populate_existing=True)
-    ).one()
+    assert receipt.id is not None
+    receipt = documents.lock(session, GoodsReceipt, receipt.id)
     _require_draft(receipt)
     assert receipt.id is not None
     if not receipt.lines:
@@ -230,6 +239,53 @@ def complete(
     )
     session.commit()
     return receipt
+
+
+def reverse(
+    session: Session, receipt: GoodsReceipt, reason: str, *, actor: User
+) -> GoodsReceipt:
+    assert receipt.id is not None
+    receipt = documents.lock(session, GoodsReceipt, receipt.id)
+    returns = session.exec(
+        select(SupplierReturn.number).where(
+            SupplierReturn.goods_receipt_id == receipt.id,
+            SupplierReturn.status == DocumentStatus.completed,
+        )
+    ).all()
+    if returns:
+        raise ConflictError(
+            f'Barang masuk {receipt.number} sudah diretur ({", ".join(n for n in returns if n)}). '
+            'Batalkan returnya dulu.'
+        )
+    documents.reverse(
+        session,
+        receipt,
+        document_type=DOCUMENT_TYPE,
+        label=f'barang masuk {receipt.number}',
+        reason=reason,
+        actor=actor,
+    )
+    session.commit()
+    return receipt
+
+
+def returned_quantities(
+    session: Session, receipt: GoodsReceipt
+) -> dict[int, Decimal]:
+    """Per receipt line: how much went back on completed Supplier Returns."""
+    rows = session.exec(
+        select(
+            SupplierReturnLine.goods_receipt_line_id,
+            func.sum(SupplierReturnLine.quantity),
+        )
+        .join(SupplierReturn)
+        .where(
+            SupplierReturn.goods_receipt_id == receipt.id,
+            SupplierReturn.status == DocumentStatus.completed,
+        )
+        .group_by(col(SupplierReturnLine.goods_receipt_line_id))
+    ).all()
+    return {line_id: total for line_id, total in rows}
 
 
 def _apply(
@@ -292,8 +348,3 @@ def _usable_supplier(session: Session, supplier_id: int) -> Supplier:
     if not supplier.is_active:
         raise ConflictError(f'Pemasok {supplier.name} sudah nonaktif.')
     return supplier
-
-
-def _user_name(session: Session, user_id: int | None) -> str | None:
-    user = session.get(User, user_id) if user_id else None
-    return user.full_name if user else None

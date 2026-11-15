@@ -1,6 +1,11 @@
 """Every table model is imported here so SQLModel.metadata is complete."""
 
-from opname360.models.activity_log import ActivityLog
+from opname360.models.activity_log import (
+    ActivityLog,
+    ActivityLogEntry,
+    ActivityLogFilter,
+    ActivityLogPage,
+)
 from opname360.models.catalogue import (
     Category,
     CategoryCreate,
@@ -22,8 +27,13 @@ from opname360.models.catalogue import (
     SubCategoryPublic,
     SubCategorySave,
 )
-from opname360.models.goods_receipt import (
+from opname360.models.document import (
     DocumentStatus,
+    Reversal,
+    ReversalCreate,
+    ReversalPublic,
+)
+from opname360.models.goods_receipt import (
     GoodsReceipt,
     GoodsReceiptFilter,
     GoodsReceiptLine,
@@ -34,6 +44,17 @@ from opname360.models.goods_receipt import (
     GoodsReceiptSave,
     GoodsReceiptSummary,
     PaymentStatus,
+)
+from opname360.models.production_receipt import (
+    ProductionReceipt,
+    ProductionReceiptFilter,
+    ProductionReceiptLine,
+    ProductionReceiptLinePublic,
+    ProductionReceiptLineSave,
+    ProductionReceiptPage,
+    ProductionReceiptPublic,
+    ProductionReceiptSave,
+    ProductionReceiptSummary,
 )
 from opname360.models.stock import (
     CostLayer,
@@ -55,6 +76,17 @@ from opname360.models.supplier import (
     SupplierPublic,
     SupplierUpdate,
 )
+from opname360.models.supplier_return import (
+    SupplierReturn,
+    SupplierReturnFilter,
+    SupplierReturnLine,
+    SupplierReturnLinePublic,
+    SupplierReturnLineSave,
+    SupplierReturnPage,
+    SupplierReturnPublic,
+    SupplierReturnSave,
+    SupplierReturnSummary,
+)
 from opname360.models.user import (
     LoginRequest,
     PasswordReset,
@@ -70,6 +102,9 @@ from opname360.models.user import (
 
 __all__ = [
     'ActivityLog',
+    'ActivityLogEntry',
+    'ActivityLogFilter',
+    'ActivityLogPage',
     'Category',
     'CategoryCreate',
     'CategoryPublic',
@@ -98,6 +133,18 @@ __all__ = [
     'ProductPage',
     'ProductPublic',
     'ProductSave',
+    'ProductionReceipt',
+    'ProductionReceiptFilter',
+    'ProductionReceiptLine',
+    'ProductionReceiptLinePublic',
+    'ProductionReceiptLineSave',
+    'ProductionReceiptPage',
+    'ProductionReceiptPublic',
+    'ProductionReceiptSave',
+    'ProductionReceiptSummary',
+    'Reversal',
+    'ReversalCreate',
+    'ReversalPublic',
     'Role',
     'Sku',
     'SkuOption',
@@ -118,6 +165,15 @@ __all__ = [
     'Supplier',
     'SupplierCreate',
     'SupplierPublic',
+    'SupplierReturn',
+    'SupplierReturnFilter',
+    'SupplierReturnLine',
+    'SupplierReturnLinePublic',
+    'SupplierReturnLineSave',
+    'SupplierReturnPage',
+    'SupplierReturnPublic',
+    'SupplierReturnSave',
+    'SupplierReturnSummary',
     'SupplierUpdate',
     'User',
     'UserBase',

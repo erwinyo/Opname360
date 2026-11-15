@@ -9,6 +9,7 @@ from opname360.models import (
     GoodsReceiptPage,
     GoodsReceiptPublic,
     GoodsReceiptSave,
+    ReversalCreate,
 )
 from opname360.services import goods_receipts as receipts
 
@@ -74,4 +75,15 @@ def complete_receipt(
     session: SessionDep, admin: AdminDep, receipt: ReceiptDep
 ) -> GoodsReceiptPublic:
     receipt = receipts.complete(session, receipt, actor=admin)
+    return receipts.receipt_public(session, receipt)
+
+
+@router.post('/{receipt_id}/reverse')
+def reverse_receipt(
+    session: SessionDep,
+    admin: AdminDep,
+    receipt: ReceiptDep,
+    body: ReversalCreate,
+) -> GoodsReceiptPublic:
+    receipt = receipts.reverse(session, receipt, body.reason, actor=admin)
     return receipts.receipt_public(session, receipt)

@@ -5,16 +5,10 @@ import { Link, useNavigate } from 'react-router'
 
 import type { DocumentStatus } from '@/client'
 import { goodsReceiptsListReceiptsOptions } from '@/client/@tanstack/react-query.gen'
+import { StatusBadge } from '@/components/documents'
 import { Pager } from '@/components/Pager'
-import { Badge } from '@/components/ui/badge'
+import { StatusFilter } from '@/components/StatusFilter'
 import { Button } from '@/components/ui/button'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 import {
   Table,
   TableBody,
@@ -25,27 +19,18 @@ import {
 } from '@/components/ui/table'
 import { errorMessage } from '@/lib/api'
 import { formatDate, money } from '@/lib/format'
-import { PAYMENT_LABELS, STATUS_LABELS } from '@/lib/labels'
+import { PAYMENT_LABELS } from '@/lib/labels'
 
 const PAGE_SIZE = 50
-const ALL = 'all'
-
-export function StatusBadge({ status }: { status: DocumentStatus }) {
-  return (
-    <Badge variant={status === 'completed' ? 'secondary' : 'outline'}>
-      {STATUS_LABELS[status]}
-    </Badge>
-  )
-}
 
 export function GoodsReceiptsPage() {
   const navigate = useNavigate()
-  const [status, setStatus] = useState(ALL)
+  const [status, setStatus] = useState<DocumentStatus | null>(null)
   const [offset, setOffset] = useState(0)
   const receipts = useQuery({
     ...goodsReceiptsListReceiptsOptions({
       query: {
-        status: status === ALL ? undefined : (status as DocumentStatus),
+        status,
         offset,
         limit: PAGE_SIZE,
       },
@@ -74,32 +59,20 @@ export function GoodsReceiptsPage() {
         </Button>
       </div>
 
-      <div className="mt-6">
-        <Select
-          value={status}
-          onValueChange={(value) => {
-            setStatus(value)
-            setOffset(0)
-          }}
-        >
-          <SelectTrigger className="bg-card" aria-label="Status">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value={ALL}>Semua status</SelectItem>
-            <SelectItem value="draft">{STATUS_LABELS.draft}</SelectItem>
-            <SelectItem value="completed">{STATUS_LABELS.completed}</SelectItem>
-            <SelectItem value="reversed">{STATUS_LABELS.reversed}</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
+      <StatusFilter
+        value={status}
+        onChange={(value) => {
+          setStatus(value)
+          setOffset(0)
+        }}
+      />
 
       {receipts.isError && (
         <p className="mt-6 text-destructive">{errorMessage(receipts.error)}</p>
       )}
       {receipts.data && total === 0 && (
         <p className="mt-4 rounded-xl border border-dashed p-6 text-muted-foreground">
-          {status === ALL
+          {status === null
             ? 'Belum ada barang masuk.'
             : 'Tidak ada barang masuk dengan status ini.'}
         </p>

@@ -1,13 +1,16 @@
 import { useMutation } from '@tanstack/react-query'
 import {
   BoxesIcon,
+  HistoryIcon,
   HouseIcon,
   LogOutIcon,
   MenuIcon,
   PackageIcon,
   PackagePlusIcon,
+  ScissorsIcon,
   TagsIcon,
   TruckIcon,
+  Undo2Icon,
   UsersIcon,
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
@@ -55,6 +58,18 @@ const NAV: NavGroup[] = [
         icon: PackagePlusIcon,
         roles: BACK_OFFICE,
       },
+      {
+        to: '/hasil-produksi',
+        label: 'Hasil Produksi',
+        icon: ScissorsIcon,
+        roles: BACK_OFFICE,
+      },
+      {
+        to: '/retur-pembelian',
+        label: 'Retur Pembelian',
+        icon: Undo2Icon,
+        roles: BACK_OFFICE,
+      },
     ],
   },
   {
@@ -69,6 +84,12 @@ const NAV: NavGroup[] = [
     label: 'Pengaturan',
     items: [
       { to: '/pengguna', label: 'Pengguna', icon: UsersIcon, roles: ['owner'] },
+      {
+        to: '/log-aktivitas',
+        label: 'Log Aktivitas',
+        icon: HistoryIcon,
+        roles: ['owner'],
+      },
     ],
   },
 ]

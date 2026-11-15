@@ -7,9 +7,14 @@ import { CategoriesPage } from '@/pages/catalogue/CategoriesPage'
 import { ProductFormPage } from '@/pages/catalogue/ProductFormPage'
 import { ProductsPage } from '@/pages/catalogue/ProductsPage'
 import { HomePage } from '@/pages/HomePage'
+import { ActivityLogPage } from '@/pages/ActivityLogPage'
 import { LoginPage } from '@/pages/LoginPage'
+import { ProductionReceiptPage } from '@/pages/production/ProductionReceiptPage'
+import { ProductionReceiptsPage } from '@/pages/production/ProductionReceiptsPage'
 import { GoodsReceiptPage } from '@/pages/purchasing/GoodsReceiptPage'
 import { GoodsReceiptsPage } from '@/pages/purchasing/GoodsReceiptsPage'
+import { SupplierReturnPage } from '@/pages/purchasing/SupplierReturnPage'
+import { SupplierReturnsPage } from '@/pages/purchasing/SupplierReturnsPage'
 import { SuppliersPage } from '@/pages/purchasing/SuppliersPage'
 import { StockCardPage } from '@/pages/stock/StockCardPage'
 import { StockPage } from '@/pages/stock/StockPage'
@@ -55,11 +60,32 @@ export function App() {
               path="barang-masuk/:receiptId"
               element={<GoodsReceiptPage />}
             />
+            <Route path="hasil-produksi" element={<ProductionReceiptsPage />} />
+            <Route
+              path="hasil-produksi/baru"
+              element={<ProductionReceiptPage />}
+            />
+            <Route
+              path="hasil-produksi/:receiptId"
+              element={<ProductionReceiptPage />}
+            />
+            <Route path="retur-pembelian" element={<SupplierReturnsPage />} />
+            <Route
+              path="retur-pembelian/baru"
+              element={<SupplierReturnPage />}
+            />
+            <Route
+              path="retur-pembelian/:returnId"
+              element={<SupplierReturnPage />}
+            />
             <Route path="pemasok" element={<SuppliersPage />} />
           </>
         )}
         {user.role === 'owner' && (
-          <Route path="pengguna" element={<UsersPage me={user} />} />
+          <>
+            <Route path="pengguna" element={<UsersPage me={user} />} />
+            <Route path="log-aktivitas" element={<ActivityLogPage />} />
+          </>
         )}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Route>

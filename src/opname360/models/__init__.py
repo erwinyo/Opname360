@@ -1,3 +1,28 @@
-from opname360.models.item import Item, ItemCreate, ItemPublic, ItemUpdate
+"""Every table model is imported here so SQLModel.metadata is complete."""
 
-__all__ = ["Item", "ItemCreate", "ItemPublic", "ItemUpdate"]
+from opname360.models.activity_log import ActivityLog
+from opname360.models.user import (
+    LoginRequest,
+    PasswordReset,
+    Role,
+    User,
+    UserBase,
+    UserCreate,
+    UserPublic,
+    UserSession,
+    UserUpdate,
+)
+
+
+__all__ = [
+    'ActivityLog',
+    'LoginRequest',
+    'PasswordReset',
+    'Role',
+    'User',
+    'UserBase',
+    'UserCreate',
+    'UserPublic',
+    'UserSession',
+    'UserUpdate',
+]

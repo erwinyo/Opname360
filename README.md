@@ -1,66 +1,80 @@
 # Opname360
 
-FastAPI + SQLModel API, laid out to grow into a large application.
+Stock, POS and bookkeeping for a retail shop, built so the owner can trust the numbers from anywhere. FastAPI + SQLModel + PostgreSQL, with a React frontend served by the same app.
+
+- What is being built, and in what order: [docs/plan.md](docs/plan.md)
+- The words used in the code and the shop: [GLOSSARY.md](GLOSSARY.md)
+- Why things are the way they are: [docs/adr/](docs/adr/)
+
+## Set up
+
+Needs [uv](https://docs.astral.sh/uv/), Docker and Node.js.
+
+```bash
+cp .env.example .env
+docker compose up -d                 # PostgreSQL on port 5433
+uv sync
+uv run alembic upgrade head          # create the tables
+uv run opname360 create-owner        # the first account; asks for a password
+(cd frontend && npm install && npm run build)
+uvx library-skills --all --claude    # link the libraries' agent skills
+```
 
 ## Run
 
 ```bash
-uv sync
-cp .env.example .env      # optional; defaults work without it
-uv run fastapi dev        # http://127.0.0.1:8000/docs
+uv run fastapi dev                   # http://127.0.0.1:8000, API docs at /docs
 ```
 
-Production: `uv run fastapi run`. The entrypoint is set in `pyproject.toml` (`[tool.fastapi]`).
+FastAPI serves the built frontend from `frontend/dist`. While working on the frontend, run `npm run dev` in `frontend/` as well and open http://localhost:5173 for hot reload; it forwards `/api` to FastAPI.
+
+Production: `ENVIRONMENT=production uv run fastapi run`.
 
 ## Check
 
 ```bash
-uv run pytest
+uv run pytest                        # needs the database from compose.yaml
 uv run ruff check . && uv run ruff format .
 uv run ty check
+(cd frontend && npm run lint && npm run e2e)   # e2e builds, then drives a real browser
 ```
+
+Tests run against a real PostgreSQL database (`opname360_test`), rebuilt from the migrations on every run. Each test's changes are rolled back.
+
+The browser tests in `frontend/e2e/` start their own server on port 8765 against that same test database, wiped and seeded first. First time only: `npx playwright install chromium` in `frontend/`.
+
+## After changing the API
+
+```bash
+uv run alembic revision --autogenerate -m "what changed"   # if tables changed
+uv run alembic upgrade head
+(cd frontend && npm run generate-client)                   # if endpoints or schemas changed
+```
+
+`frontend/src/client/` is generated from the API's OpenAPI schema. Don't edit it by hand.
 
 ## Layout
 
 ```
 src/opname360/
-├── main.py              # creates the FastAPI app, lifespan, mounts api_router
-├── core/
-│   ├── config.py        # Settings, read from env / .env
-│   └── db.py            # engine, table creation, get_session
+├── main.py              # the FastAPI app: API under /api/v1, then the frontend
+├── cli.py               # `opname360` setup commands
+├── core/                # config (.env), db engine, password and token hashing, errors
 ├── api/
-│   ├── main.py          # api_router (/api/v1): includes every feature router
-│   ├── deps.py          # shared dependencies (SessionDep, later CurrentUserDep, ...)
+│   ├── main.py          # api_router: includes every feature router
+│   ├── deps.py          # SessionDep, CurrentUserDep, OwnerDep
 │   └── routes/          # one module per feature: HTTP only, no business logic
-│       ├── health.py
-│       └── items.py
 ├── models/              # SQLModel tables + request/response schemas, one module per feature
-│   └── item.py
-└── services/            # business logic and DB queries, no FastAPI imports
-    └── items.py
-tests/                   # pytest, in-memory SQLite via dependency override
+└── services/            # business rules and queries, no FastAPI imports
+alembic/                 # migrations
+frontend/                # React + Vite + TypeScript + Tailwind + shadcn/ui
+tests/                   # one test per business rule
 ```
 
-Requests flow `routes` → `services` → `models`. Routes handle HTTP concerns (status codes, 404s, params), services hold the logic and can be called from anywhere (CLI, background jobs, tests).
-
-## Adding a feature
-
-Using `items` as the pattern, for a feature called `locations`:
-
-1. `models/location.py`: `LocationBase`, `Location(table=True)`, `LocationCreate`, `LocationUpdate`, `LocationPublic`. Export them from `models/__init__.py`.
-2. `services/locations.py`: functions taking a `Session`.
-3. `api/routes/locations.py`: `router = APIRouter(prefix="/locations", tags=["locations"])`.
-4. Register it in `api/main.py`: `api_router.include_router(locations.router)`.
-5. `tests/test_locations.py`.
+Requests flow `routes` → `services` → `models`. A service that has to refuse raises an `AppError` (`core/errors.py`) with a message in Indonesian; the app turns it into the matching HTTP status and the frontend shows the message as is.
 
 ## Conventions
 
-The official agent skills for FastAPI, SQLModel and Typer are linked into `.claude/skills/` and `.agents/skills/` (via `uvx library-skills --all --claude`; rerun it after `uv sync` on a fresh clone). Backend code follows them; the full list of conventions is in [docs/plan.md](docs/plan.md). In short:
+Backend code follows the official agent skills for FastAPI, SQLModel and Typer, linked into `.claude/skills/` and `.agents/skills/`. The full list is in [docs/plan.md](docs/plan.md#conventions).
 
-- `Annotated[...]` for every parameter and dependency, with a reusable alias (`SessionDep`).
-- Router prefix, tags and shared dependencies go on the `APIRouter`, not in `include_router()`.
-- Plain `def` endpoints unless everything inside is truly async (SQLModel sessions are sync).
-- `response_model=...Public` when returning table models, so internal fields never leak.
-- No `...` defaults, no `RootModel`.
-
-Tables are created on startup with `create_all`. Once the schema needs to change on a live database, switch to Alembic migrations.
+The frontend stays on TypeScript 6: the API client generator needs TypeScript's JavaScript API, which version 7 no longer has.

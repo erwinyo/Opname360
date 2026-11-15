@@ -1,6 +1,6 @@
 # Build plan
 
-Status: **agreed on 2026-11-15, nothing built yet.**
+Status: **agreed on 2026-11-15. Slice 1 is built** (branch `slice-1-foundation`); slice 2 is next.
 
 Vocabulary is in [GLOSSARY.md](../GLOSSARY.md), decisions in [adr/](adr/), open client questions in [client-questions.md](client-questions.md).
 

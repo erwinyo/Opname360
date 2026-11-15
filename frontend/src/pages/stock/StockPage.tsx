@@ -81,7 +81,7 @@ export function StockPage() {
           </p>
         </div>
         {stock.data && (
-          <div className="text-right">
+          <div className="sm:text-right">
             <p className="text-sm text-muted-foreground">
               Nilai stok{filtered ? ' (sesuai filter)' : ''}
             </p>

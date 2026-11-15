@@ -18,7 +18,9 @@ test('the catalogue: categories, a product, its SKUs and prices', async ({
     await expect(page.getByText('HPP FIFO')).toBeVisible()
 
     await page.getByLabel('Sub-kategori baru di Seragam').fill('Kemeja')
-    await page.getByRole('button', { name: 'Tambah', exact: true }).click()
+    await page
+      .getByRole('button', { name: 'Tambah sub-kategori di Seragam' })
+      .click()
     await expect(page.getByText('0 produk')).toBeVisible()
     await shot(page, 'categories')
   })

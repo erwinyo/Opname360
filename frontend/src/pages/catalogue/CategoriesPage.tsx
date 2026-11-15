@@ -207,6 +207,7 @@ function AddSubCategory({ category }: { category: CategoryPublic }) {
         type="submit"
         variant="outline"
         disabled={add.isPending || !name.trim()}
+        aria-label={`Tambah sub-kategori di ${category.name}`}
       >
         Tambah
       </Button>

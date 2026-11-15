@@ -1,5 +1,7 @@
 # Slice 1: Foundation
 
+**Status: built.** Every rule below has an API test in `tests/`, and the main path has a browser test (`frontend/e2e/main-path.spec.ts`).
+
 **When it's done:** staff sign in with their own accounts, the catalogue is in the system with a Barcode on every SKU, goods can be received, and anyone in the back office can see current stock and each SKU's Stock Card.
 
 Shared patterns (documents, costing rules, security) are in [plan.md](../plan.md).

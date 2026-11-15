@@ -78,3 +78,44 @@ def owner(session: Session) -> User:
 def owner_client(client: TestClient, owner: User) -> TestClient:
     assert sign_in(client, owner.username).status_code == 200
     return client
+
+
+def new_category(
+    client: TestClient,
+    name: str = 'Seragam',
+    sub_categories: tuple[str, ...] = ('Kemeja',),
+    costing_method: str = 'moving_average',
+) -> dict:
+    """Create a Category through the API and return it with its subs."""
+    category = client.post(
+        '/api/v1/categories/',
+        json={'name': name, 'costing_method': costing_method},
+    ).json()
+    for sub_category in sub_categories:
+        category = client.post(
+            f'/api/v1/categories/{category["id"]}/sub-categories',
+            json={'name': sub_category},
+        ).json()
+    return category
+
+
+def sku_row(**fields: object) -> dict:
+    return {'size': '10', 'selling_price': 85000, **fields}
+
+
+def new_product(
+    client: TestClient,
+    sub_category_id: int,
+    name: str = 'Kemeja Putih SD',
+    skus: list[dict] | None = None,
+) -> dict:
+    response = client.post(
+        '/api/v1/products/',
+        json={
+            'name': name,
+            'sub_category_id': sub_category_id,
+            'skus': skus or [sku_row()],
+        },
+    )
+    assert response.status_code == 201, response.text
+    return response.json()

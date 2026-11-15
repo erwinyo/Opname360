@@ -3,6 +3,9 @@ import { Navigate, Route, Routes } from 'react-router'
 import { AppLayout } from '@/components/AppLayout'
 import { Button } from '@/components/ui/button'
 import { useMe } from '@/lib/auth'
+import { CategoriesPage } from '@/pages/catalogue/CategoriesPage'
+import { ProductFormPage } from '@/pages/catalogue/ProductFormPage'
+import { ProductsPage } from '@/pages/catalogue/ProductsPage'
 import { HomePage } from '@/pages/HomePage'
 import { LoginPage } from '@/pages/LoginPage'
 import { UsersPage } from '@/pages/users/UsersPage'
@@ -33,6 +36,14 @@ export function App() {
     <Routes>
       <Route element={<AppLayout user={user} />}>
         <Route index element={<HomePage user={user} />} />
+        {user.role !== 'cashier' && (
+          <>
+            <Route path="produk" element={<ProductsPage />} />
+            <Route path="produk/baru" element={<ProductFormPage />} />
+            <Route path="produk/:productId" element={<ProductFormPage />} />
+            <Route path="kategori" element={<CategoriesPage />} />
+          </>
+        )}
         {user.role === 'owner' && (
           <Route path="pengguna" element={<UsersPage me={user} />} />
         )}

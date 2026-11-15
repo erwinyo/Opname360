@@ -2,7 +2,7 @@
 
 import type { Client, ClientMeta, Options as Options2, RequestResult, TDataShape } from './client';
 import { client } from './client.gen';
-import type { AuthLoginData, AuthLoginErrors, AuthLoginResponses, AuthLogoutData, AuthLogoutErrors, AuthLogoutResponses, AuthReadMeData, AuthReadMeErrors, AuthReadMeResponses, HealthHealthCheckData, HealthHealthCheckResponses, UsersCreateUserData, UsersCreateUserErrors, UsersCreateUserResponses, UsersListUsersData, UsersListUsersErrors, UsersListUsersResponses, UsersResetPasswordData, UsersResetPasswordErrors, UsersResetPasswordResponses, UsersUpdateUserData, UsersUpdateUserErrors, UsersUpdateUserResponses } from './types.gen';
+import type { AuthLoginData, AuthLoginErrors, AuthLoginResponses, AuthLogoutData, AuthLogoutErrors, AuthLogoutResponses, AuthReadMeData, AuthReadMeErrors, AuthReadMeResponses, CategoriesCreateCategoryData, CategoriesCreateCategoryErrors, CategoriesCreateCategoryResponses, CategoriesCreateSubCategoryData, CategoriesCreateSubCategoryErrors, CategoriesCreateSubCategoryResponses, CategoriesDeleteCategoryData, CategoriesDeleteCategoryErrors, CategoriesDeleteCategoryResponses, CategoriesDeleteSubCategoryData, CategoriesDeleteSubCategoryErrors, CategoriesDeleteSubCategoryResponses, CategoriesListCategoriesData, CategoriesListCategoriesErrors, CategoriesListCategoriesResponses, CategoriesRenameSubCategoryData, CategoriesRenameSubCategoryErrors, CategoriesRenameSubCategoryResponses, CategoriesUpdateCategoryData, CategoriesUpdateCategoryErrors, CategoriesUpdateCategoryResponses, HealthHealthCheckData, HealthHealthCheckResponses, ProductsCreateProductData, ProductsCreateProductErrors, ProductsCreateProductResponses, ProductsDeleteProductData, ProductsDeleteProductErrors, ProductsDeleteProductResponses, ProductsListPriceChangesData, ProductsListPriceChangesErrors, ProductsListPriceChangesResponses, ProductsListProductsData, ProductsListProductsErrors, ProductsListProductsResponses, ProductsReadProductData, ProductsReadProductErrors, ProductsReadProductResponses, ProductsUpdateProductData, ProductsUpdateProductErrors, ProductsUpdateProductResponses, UsersCreateUserData, UsersCreateUserErrors, UsersCreateUserResponses, UsersListUsersData, UsersListUsersErrors, UsersListUsersResponses, UsersResetPasswordData, UsersResetPasswordErrors, UsersResetPasswordResponses, UsersUpdateUserData, UsersUpdateUserErrors, UsersUpdateUserResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -85,3 +85,110 @@ export const usersResetPassword = <ThrowOnError extends boolean = false>(options
         ...options.headers
     }
 });
+
+/**
+ * List Categories
+ */
+export const categoriesListCategories = <ThrowOnError extends boolean = false>(options?: Options<CategoriesListCategoriesData, ThrowOnError>): RequestResult<CategoriesListCategoriesResponses, CategoriesListCategoriesErrors, ThrowOnError> => (options?.client ?? client).get<CategoriesListCategoriesResponses, CategoriesListCategoriesErrors, ThrowOnError>({ url: '/api/v1/categories/', ...options });
+
+/**
+ * Create Category
+ */
+export const categoriesCreateCategory = <ThrowOnError extends boolean = false>(options: Options<CategoriesCreateCategoryData, ThrowOnError>): RequestResult<CategoriesCreateCategoryResponses, CategoriesCreateCategoryErrors, ThrowOnError> => (options.client ?? client).post<CategoriesCreateCategoryResponses, CategoriesCreateCategoryErrors, ThrowOnError>({
+    url: '/api/v1/categories/',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Delete Category
+ */
+export const categoriesDeleteCategory = <ThrowOnError extends boolean = false>(options: Options<CategoriesDeleteCategoryData, ThrowOnError>): RequestResult<CategoriesDeleteCategoryResponses, CategoriesDeleteCategoryErrors, ThrowOnError> => (options.client ?? client).delete<CategoriesDeleteCategoryResponses, CategoriesDeleteCategoryErrors, ThrowOnError>({ url: '/api/v1/categories/{category_id}', ...options });
+
+/**
+ * Update Category
+ */
+export const categoriesUpdateCategory = <ThrowOnError extends boolean = false>(options: Options<CategoriesUpdateCategoryData, ThrowOnError>): RequestResult<CategoriesUpdateCategoryResponses, CategoriesUpdateCategoryErrors, ThrowOnError> => (options.client ?? client).patch<CategoriesUpdateCategoryResponses, CategoriesUpdateCategoryErrors, ThrowOnError>({
+    url: '/api/v1/categories/{category_id}',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Create Sub Category
+ */
+export const categoriesCreateSubCategory = <ThrowOnError extends boolean = false>(options: Options<CategoriesCreateSubCategoryData, ThrowOnError>): RequestResult<CategoriesCreateSubCategoryResponses, CategoriesCreateSubCategoryErrors, ThrowOnError> => (options.client ?? client).post<CategoriesCreateSubCategoryResponses, CategoriesCreateSubCategoryErrors, ThrowOnError>({
+    url: '/api/v1/categories/{category_id}/sub-categories',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Delete Sub Category
+ */
+export const categoriesDeleteSubCategory = <ThrowOnError extends boolean = false>(options: Options<CategoriesDeleteSubCategoryData, ThrowOnError>): RequestResult<CategoriesDeleteSubCategoryResponses, CategoriesDeleteSubCategoryErrors, ThrowOnError> => (options.client ?? client).delete<CategoriesDeleteSubCategoryResponses, CategoriesDeleteSubCategoryErrors, ThrowOnError>({ url: '/api/v1/categories/sub-categories/{sub_category_id}', ...options });
+
+/**
+ * Rename Sub Category
+ */
+export const categoriesRenameSubCategory = <ThrowOnError extends boolean = false>(options: Options<CategoriesRenameSubCategoryData, ThrowOnError>): RequestResult<CategoriesRenameSubCategoryResponses, CategoriesRenameSubCategoryErrors, ThrowOnError> => (options.client ?? client).patch<CategoriesRenameSubCategoryResponses, CategoriesRenameSubCategoryErrors, ThrowOnError>({
+    url: '/api/v1/categories/sub-categories/{sub_category_id}',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * List Products
+ */
+export const productsListProducts = <ThrowOnError extends boolean = false>(options?: Options<ProductsListProductsData, ThrowOnError>): RequestResult<ProductsListProductsResponses, ProductsListProductsErrors, ThrowOnError> => (options?.client ?? client).get<ProductsListProductsResponses, ProductsListProductsErrors, ThrowOnError>({ url: '/api/v1/products/', ...options });
+
+/**
+ * Create Product
+ */
+export const productsCreateProduct = <ThrowOnError extends boolean = false>(options: Options<ProductsCreateProductData, ThrowOnError>): RequestResult<ProductsCreateProductResponses, ProductsCreateProductErrors, ThrowOnError> => (options.client ?? client).post<ProductsCreateProductResponses, ProductsCreateProductErrors, ThrowOnError>({
+    url: '/api/v1/products/',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Delete Product
+ */
+export const productsDeleteProduct = <ThrowOnError extends boolean = false>(options: Options<ProductsDeleteProductData, ThrowOnError>): RequestResult<ProductsDeleteProductResponses, ProductsDeleteProductErrors, ThrowOnError> => (options.client ?? client).delete<ProductsDeleteProductResponses, ProductsDeleteProductErrors, ThrowOnError>({ url: '/api/v1/products/{product_id}', ...options });
+
+/**
+ * Read Product
+ */
+export const productsReadProduct = <ThrowOnError extends boolean = false>(options: Options<ProductsReadProductData, ThrowOnError>): RequestResult<ProductsReadProductResponses, ProductsReadProductErrors, ThrowOnError> => (options.client ?? client).get<ProductsReadProductResponses, ProductsReadProductErrors, ThrowOnError>({ url: '/api/v1/products/{product_id}', ...options });
+
+/**
+ * Update Product
+ */
+export const productsUpdateProduct = <ThrowOnError extends boolean = false>(options: Options<ProductsUpdateProductData, ThrowOnError>): RequestResult<ProductsUpdateProductResponses, ProductsUpdateProductErrors, ThrowOnError> => (options.client ?? client).put<ProductsUpdateProductResponses, ProductsUpdateProductErrors, ThrowOnError>({
+    url: '/api/v1/products/{product_id}',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * List Price Changes
+ */
+export const productsListPriceChanges = <ThrowOnError extends boolean = false>(options: Options<ProductsListPriceChangesData, ThrowOnError>): RequestResult<ProductsListPriceChangesResponses, ProductsListPriceChangesErrors, ThrowOnError> => (options.client ?? client).get<ProductsListPriceChangesResponses, ProductsListPriceChangesErrors, ThrowOnError>({ url: '/api/v1/products/skus/{sku_id}/price-changes', ...options });

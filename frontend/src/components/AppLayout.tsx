@@ -1,5 +1,12 @@
 import { useMutation } from '@tanstack/react-query'
-import { HouseIcon, LogOutIcon, MenuIcon, UsersIcon } from 'lucide-react'
+import {
+  HouseIcon,
+  LogOutIcon,
+  MenuIcon,
+  PackageIcon,
+  TagsIcon,
+  UsersIcon,
+} from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { NavLink, Outlet } from 'react-router'
 
@@ -20,19 +27,41 @@ import { ROLE_LABELS } from '@/lib/auth'
 import { cn } from '@/lib/utils'
 
 type NavItem = { to: string; label: string; icon: LucideIcon; roles: Role[] }
+type NavGroup = { label?: string; items: NavItem[] }
 
-const NAV: NavItem[] = [
+const BACK_OFFICE: Role[] = ['owner', 'admin']
+
+const NAV: NavGroup[] = [
   {
-    to: '/',
-    label: 'Beranda',
-    icon: HouseIcon,
-    roles: ['owner', 'admin', 'cashier'],
+    items: [
+      {
+        to: '/',
+        label: 'Beranda',
+        icon: HouseIcon,
+        roles: ['owner', 'admin', 'cashier'],
+      },
+    ],
   },
-  { to: '/pengguna', label: 'Pengguna', icon: UsersIcon, roles: ['owner'] },
+  {
+    label: 'Katalog',
+    items: [
+      { to: '/produk', label: 'Produk', icon: PackageIcon, roles: BACK_OFFICE },
+      { to: '/kategori', label: 'Kategori', icon: TagsIcon, roles: BACK_OFFICE },
+    ],
+  },
+  {
+    label: 'Pengaturan',
+    items: [
+      { to: '/pengguna', label: 'Pengguna', icon: UsersIcon, roles: ['owner'] },
+    ],
+  },
 ]
 
 export function AppLayout({ user }: { user: UserPublic }) {
-  const items = NAV.filter((item) => item.roles.includes(user.role))
+  const groups = NAV.map((group) => ({
+    ...group,
+    items: group.items.filter((item) => item.roles.includes(user.role)),
+  })).filter((group) => group.items.length > 0)
   const logout = useMutation({
     ...authLogoutMutation(),
     onSettled: () => setSignedInUser(null),
@@ -43,23 +72,32 @@ export function AppLayout({ user }: { user: UserPublic }) {
     <div className="min-h-svh md:grid md:grid-cols-[15rem_1fr]">
       <aside className="sticky top-0 hidden h-svh flex-col border-r bg-sidebar md:flex">
         <Brand className="h-14 px-4" />
-        <nav className="flex flex-1 flex-col gap-0.5 px-2 py-2">
-          {items.map((item) => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              end
-              className={({ isActive }) =>
-                cn(
-                  'flex items-center gap-2.5 rounded-md px-2.5 py-2 text-sm font-medium text-sidebar-foreground/75 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground',
-                  isActive &&
-                    'bg-sidebar-accent text-sidebar-accent-foreground',
-                )
-              }
-            >
-              <item.icon className="size-4" />
-              {item.label}
-            </NavLink>
+        <nav className="flex-1 overflow-y-auto px-2 py-2">
+          {groups.map((group) => (
+            <div key={group.label ?? 'top'} className="mb-3 grid gap-0.5">
+              {group.label && (
+                <p className="px-2.5 pt-2 pb-1 text-xs font-medium text-muted-foreground">
+                  {group.label}
+                </p>
+              )}
+              {group.items.map((item) => (
+                <NavLink
+                  key={item.to}
+                  to={item.to}
+                  end={item.to === '/'}
+                  className={({ isActive }) =>
+                    cn(
+                      'flex items-center gap-2.5 rounded-md px-2.5 py-2 text-sm font-medium text-sidebar-foreground/75 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground',
+                      isActive &&
+                        'bg-sidebar-accent text-sidebar-accent-foreground',
+                    )
+                  }
+                >
+                  <item.icon className="size-4" />
+                  {item.label}
+                </NavLink>
+              ))}
+            </div>
           ))}
         </nav>
         <div className="flex items-center gap-2 border-t p-3">
@@ -97,14 +135,16 @@ export function AppLayout({ user }: { user: UserPublic }) {
               </span>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            {items.map((item) => (
-              <DropdownMenuItem key={item.to} asChild>
-                <NavLink to={item.to}>
-                  <item.icon />
-                  {item.label}
-                </NavLink>
-              </DropdownMenuItem>
-            ))}
+            {groups.flatMap((group) =>
+              group.items.map((item) => (
+                <DropdownMenuItem key={item.to} asChild>
+                  <NavLink to={item.to}>
+                    <item.icon />
+                    {item.label}
+                  </NavLink>
+                </DropdownMenuItem>
+              )),
+            )}
             <DropdownMenuSeparator />
             <DropdownMenuItem onSelect={signOut}>
               <LogOutIcon />

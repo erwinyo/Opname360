@@ -1,6 +1,5 @@
 import { useMutation } from '@tanstack/react-query'
 import { useState } from 'react'
-import type { FormEvent, ReactNode } from 'react'
 import { toast } from 'sonner'
 
 import type { Role, UserPublic } from '@/client'
@@ -10,17 +9,8 @@ import {
   usersResetPasswordMutation,
   usersUpdateUserMutation,
 } from '@/client/@tanstack/react-query.gen'
-import { Button } from '@/components/ui/button'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
+import { Field, FormDialog } from '@/components/FormDialog'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import {
   Select,
   SelectContent,
@@ -28,7 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { errorMessage, queryClient } from '@/lib/api'
+import { queryClient } from '@/lib/api'
 import { ROLE_DESCRIPTIONS, ROLE_LABELS } from '@/lib/auth'
 
 const ROLES: Role[] = ['owner', 'admin', 'cashier']
@@ -39,32 +29,6 @@ const PASSWORD_RULE = 'Minimal 8 karakter.'
 
 const refreshUsers = () =>
   queryClient.invalidateQueries({ queryKey: usersListUsersQueryKey() })
-
-function Field({
-  id,
-  label,
-  hint,
-  error,
-  children,
-}: {
-  id: string
-  label: string
-  hint?: string
-  error?: string
-  children: ReactNode
-}) {
-  return (
-    <div className="grid gap-2">
-      <Label htmlFor={id}>{label}</Label>
-      {children}
-      {error ? (
-        <p className="text-sm text-destructive">{error}</p>
-      ) : (
-        hint && <p className="text-sm text-muted-foreground">{hint}</p>
-      )}
-    </div>
-  )
-}
 
 function RoleSelect({
   value,
@@ -86,65 +50,6 @@ function RoleSelect({
         ))}
       </SelectContent>
     </Select>
-  )
-}
-
-function FormDialog({
-  title,
-  description,
-  submitLabel,
-  pending,
-  error,
-  destructive,
-  onSubmit,
-  onClose,
-  children,
-}: {
-  title: string
-  description?: string
-  submitLabel: string
-  pending: boolean
-  error: unknown
-  destructive?: boolean
-  onSubmit: () => void
-  onClose: () => void
-  children?: ReactNode
-}) {
-  const submit = (event: FormEvent) => {
-    event.preventDefault()
-    onSubmit()
-  }
-  return (
-    <Dialog open onOpenChange={(open) => !open && onClose()}>
-      <DialogContent>
-        <form onSubmit={submit} className="grid gap-5" noValidate>
-          <DialogHeader>
-            <DialogTitle>{title}</DialogTitle>
-            {description && (
-              <DialogDescription>{description}</DialogDescription>
-            )}
-          </DialogHeader>
-          {children}
-          {error != null && (
-            <p role="alert" className="text-sm text-destructive">
-              {errorMessage(error)}
-            </p>
-          )}
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={onClose}>
-              Batal
-            </Button>
-            <Button
-              type="submit"
-              variant={destructive ? 'destructive' : 'default'}
-              disabled={pending}
-            >
-              {pending ? 'Menyimpan…' : submitLabel}
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
   )
 }
 

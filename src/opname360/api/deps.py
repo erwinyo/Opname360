@@ -53,3 +53,16 @@ def require_owner(user: CurrentUserDep) -> User:
 
 
 OwnerDep = Annotated[User, Depends(require_owner)]
+
+
+def require_admin(user: CurrentUserDep) -> User:
+    """The back office: Owner or Admin."""
+    if user.role not in (Role.owner, Role.admin):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail='Menu ini hanya untuk Pemilik dan Admin.',
+        )
+    return user
+
+
+AdminDep = Annotated[User, Depends(require_admin)]

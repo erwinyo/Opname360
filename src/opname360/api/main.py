@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from opname360.api.deps import verify_same_origin
-from opname360.api.routes import auth, health, users
+from opname360.api.routes import auth, categories, health, products, users
 
 
 api_router = APIRouter(
@@ -10,6 +10,8 @@ api_router = APIRouter(
 api_router.include_router(health.router)
 api_router.include_router(auth.router)
 api_router.include_router(users.router)
+api_router.include_router(categories.router)
+api_router.include_router(products.router)
 
 
 # Last on purpose: without it an unknown API path would fall through to the

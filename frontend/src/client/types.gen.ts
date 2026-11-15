@@ -5,6 +5,52 @@ export type ClientOptions = {
 };
 
 /**
+ * CategoryCreate
+ */
+export type CategoryCreate = {
+    /**
+     * Name
+     */
+    name: string;
+    costing_method?: CostingMethod;
+};
+
+/**
+ * CategoryPublic
+ */
+export type CategoryPublic = {
+    /**
+     * Id
+     */
+    id: number;
+    /**
+     * Name
+     */
+    name: string;
+    costing_method: CostingMethod;
+    /**
+     * Sub Categories
+     */
+    sub_categories: Array<SubCategoryPublic>;
+};
+
+/**
+ * CategoryUpdate
+ */
+export type CategoryUpdate = {
+    /**
+     * Name
+     */
+    name?: string | null;
+    costing_method?: CostingMethod | null;
+};
+
+/**
+ * CostingMethod
+ */
+export type CostingMethod = 'moving_average' | 'fifo';
+
+/**
  * HTTPValidationError
  */
 export type HttpValidationError = {
@@ -39,9 +85,233 @@ export type PasswordReset = {
 };
 
 /**
+ * ProductPage
+ */
+export type ProductPage = {
+    /**
+     * Items
+     */
+    items: Array<ProductPublic>;
+    /**
+     * Total
+     */
+    total: number;
+};
+
+/**
+ * ProductPublic
+ */
+export type ProductPublic = {
+    /**
+     * Id
+     */
+    id: number;
+    /**
+     * Name
+     */
+    name: string;
+    /**
+     * Sub Category Id
+     */
+    sub_category_id: number;
+    /**
+     * Sub Category Name
+     */
+    sub_category_name: string;
+    /**
+     * Category Id
+     */
+    category_id: number;
+    /**
+     * Category Name
+     */
+    category_name: string;
+    /**
+     * Skus
+     */
+    skus: Array<SkuPublic>;
+};
+
+/**
+ * ProductSave
+ *
+ * A Product with all its SKUs, saved together.
+ */
+export type ProductSave = {
+    /**
+     * Name
+     */
+    name: string;
+    /**
+     * Sub Category Id
+     */
+    sub_category_id: number;
+    /**
+     * Skus
+     */
+    skus: Array<SkuSave>;
+};
+
+/**
  * Role
  */
 export type Role = 'owner' | 'admin' | 'cashier';
+
+/**
+ * SkuPriceChangePublic
+ */
+export type SkuPriceChangePublic = {
+    /**
+     * Id
+     */
+    id: number;
+    /**
+     * Old Price
+     */
+    old_price: number | null;
+    /**
+     * New Price
+     */
+    new_price: number;
+    /**
+     * Changed By Name
+     */
+    changed_by_name: string | null;
+    /**
+     * Changed At
+     */
+    changed_at: string;
+};
+
+/**
+ * SkuPublic
+ */
+export type SkuPublic = {
+    /**
+     * Id
+     */
+    id: number;
+    /**
+     * Product Id
+     */
+    product_id: number;
+    /**
+     * Code
+     */
+    code: string;
+    /**
+     * Barcode
+     */
+    barcode: string;
+    /**
+     * Size
+     */
+    size: string | null;
+    /**
+     * Color
+     */
+    color: string | null;
+    /**
+     * Stock Unit
+     */
+    stock_unit: string;
+    /**
+     * Purchase Pack Name
+     */
+    purchase_pack_name: string | null;
+    /**
+     * Purchase Pack Size
+     */
+    purchase_pack_size: string | null;
+    /**
+     * Selling Price
+     */
+    selling_price: number;
+    /**
+     * Is Active
+     */
+    is_active: boolean;
+};
+
+/**
+ * SkuSave
+ *
+ * One SKU row of a Product form. Without an `id` it is a new SKU.
+ */
+export type SkuSave = {
+    /**
+     * Id
+     */
+    id?: number | null;
+    /**
+     * Code
+     */
+    code?: string | null;
+    /**
+     * Barcode
+     */
+    barcode?: string | null;
+    /**
+     * Size
+     */
+    size?: string | null;
+    /**
+     * Color
+     */
+    color?: string | null;
+    /**
+     * Stock Unit
+     */
+    stock_unit?: string;
+    /**
+     * Purchase Pack Name
+     */
+    purchase_pack_name?: string | null;
+    /**
+     * Purchase Pack Size
+     */
+    purchase_pack_size?: number | string | null;
+    /**
+     * Selling Price
+     */
+    selling_price: number;
+    /**
+     * Is Active
+     */
+    is_active?: boolean;
+};
+
+/**
+ * SubCategoryPublic
+ */
+export type SubCategoryPublic = {
+    /**
+     * Id
+     */
+    id: number;
+    /**
+     * Category Id
+     */
+    category_id: number;
+    /**
+     * Name
+     */
+    name: string;
+    /**
+     * Product Count
+     */
+    product_count: number;
+};
+
+/**
+ * SubCategorySave
+ */
+export type SubCategorySave = {
+    /**
+     * Name
+     */
+    name: string;
+};
 
 /**
  * UserCreate
@@ -342,3 +612,398 @@ export type UsersResetPasswordResponses = {
 };
 
 export type UsersResetPasswordResponse = UsersResetPasswordResponses[keyof UsersResetPasswordResponses];
+
+export type CategoriesListCategoriesData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/categories/';
+};
+
+export type CategoriesListCategoriesErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type CategoriesListCategoriesError = CategoriesListCategoriesErrors[keyof CategoriesListCategoriesErrors];
+
+export type CategoriesListCategoriesResponses = {
+    /**
+     * Response Categories-List Categories
+     *
+     * Successful Response
+     */
+    200: Array<CategoryPublic>;
+};
+
+export type CategoriesListCategoriesResponse = CategoriesListCategoriesResponses[keyof CategoriesListCategoriesResponses];
+
+export type CategoriesCreateCategoryData = {
+    body: CategoryCreate;
+    path?: never;
+    query?: never;
+    url: '/api/v1/categories/';
+};
+
+export type CategoriesCreateCategoryErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type CategoriesCreateCategoryError = CategoriesCreateCategoryErrors[keyof CategoriesCreateCategoryErrors];
+
+export type CategoriesCreateCategoryResponses = {
+    /**
+     * Successful Response
+     */
+    201: CategoryPublic;
+};
+
+export type CategoriesCreateCategoryResponse = CategoriesCreateCategoryResponses[keyof CategoriesCreateCategoryResponses];
+
+export type CategoriesDeleteCategoryData = {
+    body?: never;
+    path: {
+        /**
+         * Category Id
+         */
+        category_id: number;
+    };
+    query?: never;
+    url: '/api/v1/categories/{category_id}';
+};
+
+export type CategoriesDeleteCategoryErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type CategoriesDeleteCategoryError = CategoriesDeleteCategoryErrors[keyof CategoriesDeleteCategoryErrors];
+
+export type CategoriesDeleteCategoryResponses = {
+    /**
+     * Successful Response
+     */
+    204: void;
+};
+
+export type CategoriesDeleteCategoryResponse = CategoriesDeleteCategoryResponses[keyof CategoriesDeleteCategoryResponses];
+
+export type CategoriesUpdateCategoryData = {
+    body: CategoryUpdate;
+    path: {
+        /**
+         * Category Id
+         */
+        category_id: number;
+    };
+    query?: never;
+    url: '/api/v1/categories/{category_id}';
+};
+
+export type CategoriesUpdateCategoryErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type CategoriesUpdateCategoryError = CategoriesUpdateCategoryErrors[keyof CategoriesUpdateCategoryErrors];
+
+export type CategoriesUpdateCategoryResponses = {
+    /**
+     * Successful Response
+     */
+    200: CategoryPublic;
+};
+
+export type CategoriesUpdateCategoryResponse = CategoriesUpdateCategoryResponses[keyof CategoriesUpdateCategoryResponses];
+
+export type CategoriesCreateSubCategoryData = {
+    body: SubCategorySave;
+    path: {
+        /**
+         * Category Id
+         */
+        category_id: number;
+    };
+    query?: never;
+    url: '/api/v1/categories/{category_id}/sub-categories';
+};
+
+export type CategoriesCreateSubCategoryErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type CategoriesCreateSubCategoryError = CategoriesCreateSubCategoryErrors[keyof CategoriesCreateSubCategoryErrors];
+
+export type CategoriesCreateSubCategoryResponses = {
+    /**
+     * Successful Response
+     */
+    201: CategoryPublic;
+};
+
+export type CategoriesCreateSubCategoryResponse = CategoriesCreateSubCategoryResponses[keyof CategoriesCreateSubCategoryResponses];
+
+export type CategoriesDeleteSubCategoryData = {
+    body?: never;
+    path: {
+        /**
+         * Sub Category Id
+         */
+        sub_category_id: number;
+    };
+    query?: never;
+    url: '/api/v1/categories/sub-categories/{sub_category_id}';
+};
+
+export type CategoriesDeleteSubCategoryErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type CategoriesDeleteSubCategoryError = CategoriesDeleteSubCategoryErrors[keyof CategoriesDeleteSubCategoryErrors];
+
+export type CategoriesDeleteSubCategoryResponses = {
+    /**
+     * Successful Response
+     */
+    204: void;
+};
+
+export type CategoriesDeleteSubCategoryResponse = CategoriesDeleteSubCategoryResponses[keyof CategoriesDeleteSubCategoryResponses];
+
+export type CategoriesRenameSubCategoryData = {
+    body: SubCategorySave;
+    path: {
+        /**
+         * Sub Category Id
+         */
+        sub_category_id: number;
+    };
+    query?: never;
+    url: '/api/v1/categories/sub-categories/{sub_category_id}';
+};
+
+export type CategoriesRenameSubCategoryErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type CategoriesRenameSubCategoryError = CategoriesRenameSubCategoryErrors[keyof CategoriesRenameSubCategoryErrors];
+
+export type CategoriesRenameSubCategoryResponses = {
+    /**
+     * Successful Response
+     */
+    200: CategoryPublic;
+};
+
+export type CategoriesRenameSubCategoryResponse = CategoriesRenameSubCategoryResponses[keyof CategoriesRenameSubCategoryResponses];
+
+export type ProductsListProductsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Search
+         */
+        search?: string | null;
+        /**
+         * Category Id
+         */
+        category_id?: number | null;
+        /**
+         * Sub Category Id
+         */
+        sub_category_id?: number | null;
+        /**
+         * Offset
+         */
+        offset?: number;
+        /**
+         * Limit
+         */
+        limit?: number;
+    };
+    url: '/api/v1/products/';
+};
+
+export type ProductsListProductsErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type ProductsListProductsError = ProductsListProductsErrors[keyof ProductsListProductsErrors];
+
+export type ProductsListProductsResponses = {
+    /**
+     * Successful Response
+     */
+    200: ProductPage;
+};
+
+export type ProductsListProductsResponse = ProductsListProductsResponses[keyof ProductsListProductsResponses];
+
+export type ProductsCreateProductData = {
+    body: ProductSave;
+    path?: never;
+    query?: never;
+    url: '/api/v1/products/';
+};
+
+export type ProductsCreateProductErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type ProductsCreateProductError = ProductsCreateProductErrors[keyof ProductsCreateProductErrors];
+
+export type ProductsCreateProductResponses = {
+    /**
+     * Successful Response
+     */
+    201: ProductPublic;
+};
+
+export type ProductsCreateProductResponse = ProductsCreateProductResponses[keyof ProductsCreateProductResponses];
+
+export type ProductsDeleteProductData = {
+    body?: never;
+    path: {
+        /**
+         * Product Id
+         */
+        product_id: number;
+    };
+    query?: never;
+    url: '/api/v1/products/{product_id}';
+};
+
+export type ProductsDeleteProductErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type ProductsDeleteProductError = ProductsDeleteProductErrors[keyof ProductsDeleteProductErrors];
+
+export type ProductsDeleteProductResponses = {
+    /**
+     * Successful Response
+     */
+    204: void;
+};
+
+export type ProductsDeleteProductResponse = ProductsDeleteProductResponses[keyof ProductsDeleteProductResponses];
+
+export type ProductsReadProductData = {
+    body?: never;
+    path: {
+        /**
+         * Product Id
+         */
+        product_id: number;
+    };
+    query?: never;
+    url: '/api/v1/products/{product_id}';
+};
+
+export type ProductsReadProductErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type ProductsReadProductError = ProductsReadProductErrors[keyof ProductsReadProductErrors];
+
+export type ProductsReadProductResponses = {
+    /**
+     * Successful Response
+     */
+    200: ProductPublic;
+};
+
+export type ProductsReadProductResponse = ProductsReadProductResponses[keyof ProductsReadProductResponses];
+
+export type ProductsUpdateProductData = {
+    body: ProductSave;
+    path: {
+        /**
+         * Product Id
+         */
+        product_id: number;
+    };
+    query?: never;
+    url: '/api/v1/products/{product_id}';
+};
+
+export type ProductsUpdateProductErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type ProductsUpdateProductError = ProductsUpdateProductErrors[keyof ProductsUpdateProductErrors];
+
+export type ProductsUpdateProductResponses = {
+    /**
+     * Successful Response
+     */
+    200: ProductPublic;
+};
+
+export type ProductsUpdateProductResponse = ProductsUpdateProductResponses[keyof ProductsUpdateProductResponses];
+
+export type ProductsListPriceChangesData = {
+    body?: never;
+    path: {
+        /**
+         * Sku Id
+         */
+        sku_id: number;
+    };
+    query?: never;
+    url: '/api/v1/products/skus/{sku_id}/price-changes';
+};
+
+export type ProductsListPriceChangesErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type ProductsListPriceChangesError = ProductsListPriceChangesErrors[keyof ProductsListPriceChangesErrors];
+
+export type ProductsListPriceChangesResponses = {
+    /**
+     * Response Products-List Price Changes
+     *
+     * Successful Response
+     */
+    200: Array<SkuPriceChangePublic>;
+};
+
+export type ProductsListPriceChangesResponse = ProductsListPriceChangesResponses[keyof ProductsListPriceChangesResponses];

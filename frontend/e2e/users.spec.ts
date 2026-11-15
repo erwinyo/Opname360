@@ -1,14 +1,6 @@
 import { expect, test } from '@playwright/test'
-import type { Page } from '@playwright/test'
 
-// The Owner account created by tests/e2e_seed.py.
-const OWNER = { username: 'demo', password: 'demo-pemilik-1' }
-
-async function signIn(page: Page, username: string, password: string) {
-  await page.getByLabel('Nama pengguna').fill(username)
-  await page.getByLabel('Kata sandi').fill(password)
-  await page.getByRole('button', { name: 'Masuk' }).click()
-}
+import { OWNER, signIn } from './helpers'
 
 test('the Owner manages staff accounts', async ({ page, browser }) => {
   const sari = page.getByRole('row', { name: /Sari Dewi/ })

@@ -53,6 +53,26 @@ export type ActivityLogPage = {
 };
 
 /**
+ * Body_products-preview_import
+ */
+export type BodyProductsPreviewImport = {
+    /**
+     * File
+     */
+    file: Blob | File;
+};
+
+/**
+ * Body_products-run_import
+ */
+export type BodyProductsRunImport = {
+    /**
+     * File
+     */
+    file: Blob | File;
+};
+
+/**
  * CategoryCreate
  */
 export type CategoryCreate = {
@@ -359,6 +379,74 @@ export type HttpValidationError = {
      * Detail
      */
     detail?: Array<ValidationError>;
+};
+
+/**
+ * ImportPreview
+ */
+export type ImportPreview = {
+    /**
+     * Product Count
+     */
+    product_count: number;
+    /**
+     * Sku Count
+     */
+    sku_count: number;
+    /**
+     * New Categories
+     */
+    new_categories: Array<string>;
+    /**
+     * New Sub Categories
+     */
+    new_sub_categories: Array<string>;
+    /**
+     * Problems
+     */
+    problems: Array<ImportProblem>;
+};
+
+/**
+ * ImportProblem
+ *
+ * One thing wrong in an import file. Row numbers are Excel's own.
+ */
+export type ImportProblem = {
+    /**
+     * Row
+     */
+    row: number | null;
+    /**
+     * Column
+     */
+    column: string | null;
+    /**
+     * Message
+     */
+    message: string;
+};
+
+/**
+ * ImportResult
+ */
+export type ImportResult = {
+    /**
+     * Product Count
+     */
+    product_count: number;
+    /**
+     * Sku Count
+     */
+    sku_count: number;
+    /**
+     * Category Count
+     */
+    category_count: number;
+    /**
+     * Sub Category Count
+     */
+    sub_category_count: number;
 };
 
 /**
@@ -1941,6 +2029,111 @@ export type ProductsSearchSkusResponses = {
 };
 
 export type ProductsSearchSkusResponse = ProductsSearchSkusResponses[keyof ProductsSearchSkusResponses];
+
+export type ProductsListSkusData = {
+    body?: never;
+    path?: never;
+    query: {
+        /**
+         * Ids
+         */
+        ids: Array<number>;
+    };
+    url: '/api/v1/products/skus';
+};
+
+export type ProductsListSkusErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type ProductsListSkusError = ProductsListSkusErrors[keyof ProductsListSkusErrors];
+
+export type ProductsListSkusResponses = {
+    /**
+     * Response Products-List Skus
+     *
+     * Successful Response
+     */
+    200: Array<SkuOption>;
+};
+
+export type ProductsListSkusResponse = ProductsListSkusResponses[keyof ProductsListSkusResponses];
+
+export type ProductsDownloadImportTemplateData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/products/import/template';
+};
+
+export type ProductsDownloadImportTemplateErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type ProductsDownloadImportTemplateError = ProductsDownloadImportTemplateErrors[keyof ProductsDownloadImportTemplateErrors];
+
+export type ProductsDownloadImportTemplateResponses = {
+    /**
+     * Successful Response
+     */
+    200: unknown;
+};
+
+export type ProductsPreviewImportData = {
+    body: BodyProductsPreviewImport;
+    path?: never;
+    query?: never;
+    url: '/api/v1/products/import/preview';
+};
+
+export type ProductsPreviewImportErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type ProductsPreviewImportError = ProductsPreviewImportErrors[keyof ProductsPreviewImportErrors];
+
+export type ProductsPreviewImportResponses = {
+    /**
+     * Successful Response
+     */
+    200: ImportPreview;
+};
+
+export type ProductsPreviewImportResponse = ProductsPreviewImportResponses[keyof ProductsPreviewImportResponses];
+
+export type ProductsRunImportData = {
+    body: BodyProductsRunImport;
+    path?: never;
+    query?: never;
+    url: '/api/v1/products/import';
+};
+
+export type ProductsRunImportErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type ProductsRunImportError = ProductsRunImportErrors[keyof ProductsRunImportErrors];
+
+export type ProductsRunImportResponses = {
+    /**
+     * Successful Response
+     */
+    200: ImportResult;
+};
+
+export type ProductsRunImportResponse = ProductsRunImportResponses[keyof ProductsRunImportResponses];
 
 export type ProductsDeleteProductData = {
     body?: never;

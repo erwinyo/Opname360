@@ -95,3 +95,18 @@
     @apply font-sans;
     }
 }
+/* Label printing: only the label sheet prints, one label per page. */
+.print-only {
+  display: none;
+}
+
+@media print {
+  #root,
+  [data-sonner-toaster] {
+    display: none !important;
+  }
+
+  .print-only {
+    display: block;
+  }
+}

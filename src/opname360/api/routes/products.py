@@ -1,9 +1,20 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Path, Query, status
+from fastapi import (
+    APIRouter,
+    Depends,
+    Path,
+    Query,
+    Response,
+    UploadFile,
+    status,
+)
 
 from opname360.api.deps import AdminDep, SessionDep, require_admin
+from opname360.core.errors import AppError
 from opname360.models import (
+    ImportPreview,
+    ImportResult,
     Product,
     ProductFilter,
     ProductPage,
@@ -13,7 +24,11 @@ from opname360.models import (
     SkuOption,
     SkuPriceChangePublic,
 )
-from opname360.services import catalogue
+from opname360.services import catalogue, product_import
+
+
+XLSX = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+MAX_UPLOAD = 5 * 1024 * 1024
 
 
 router = APIRouter(
@@ -61,6 +76,56 @@ def search_skus(
     limit: Annotated[int, Query(ge=1, le=50)] = 10,
 ) -> list[SkuOption]:
     return catalogue.search_skus(session, query, limit=limit)
+
+
+@router.get('/skus')
+def list_skus(
+    session: SessionDep,
+    ids: Annotated[list[int], Query(max_length=500)],
+) -> list[SkuOption]:
+    """The given SKUs, for printing their labels."""
+    return catalogue.skus_by_id(session, ids)
+
+
+@router.get(
+    '/import/template',
+    response_class=Response,
+    responses={200: {'content': {XLSX: {}}}},
+)
+def download_import_template() -> Response:
+    return Response(
+        product_import.template(),
+        media_type=XLSX,
+        headers={
+            'Content-Disposition': (
+                'attachment; filename="template-impor-produk.xlsx"'
+            )
+        },
+    )
+
+
+@router.post('/import/preview')
+def preview_import(session: SessionDep, file: UploadFile) -> ImportPreview:
+    return product_import.preview(session, _read_upload(file))
+
+
+@router.post('/import')
+def run_import(
+    session: SessionDep, admin: AdminDep, file: UploadFile
+) -> ImportResult:
+    return product_import.run(
+        session,
+        _read_upload(file),
+        filename=file.filename or 'file Excel',
+        actor=admin,
+    )
+
+
+def _read_upload(file: UploadFile) -> bytes:
+    data = file.file.read(MAX_UPLOAD + 1)
+    if len(data) > MAX_UPLOAD:
+        raise AppError('File terlalu besar (paling besar 5 MB).')
+    return data
 
 
 @router.get('/{product_id}')

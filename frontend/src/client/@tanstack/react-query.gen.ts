@@ -3,8 +3,8 @@
 import { type DefaultError, type InfiniteData, infiniteQueryOptions, queryOptions, type UseMutationOptions } from '@tanstack/react-query';
 
 import { client } from '../client.gen';
-import { activityLogListEntries, authLogin, authLogout, authReadMe, categoriesCreateCategory, categoriesCreateSubCategory, categoriesDeleteCategory, categoriesDeleteSubCategory, categoriesListCategories, categoriesRenameSubCategory, categoriesUpdateCategory, goodsReceiptsCompleteReceipt, goodsReceiptsCreateReceipt, goodsReceiptsDiscardReceipt, goodsReceiptsListReceipts, goodsReceiptsReadReceipt, goodsReceiptsReverseReceipt, goodsReceiptsUpdateReceipt, healthHealthCheck, type Options, productionReceiptsCompleteReceipt, productionReceiptsCreateReceipt, productionReceiptsDiscardReceipt, productionReceiptsListReceipts, productionReceiptsReadReceipt, productionReceiptsReverseReceipt, productionReceiptsUpdateReceipt, productsCreateProduct, productsDeleteProduct, productsListPriceChanges, productsListProducts, productsReadProduct, productsSearchSkus, productsUpdateProduct, stockListLocations, stockListStock, stockReadStockCard, supplierReturnsCompleteReturn, supplierReturnsCreateReturn, supplierReturnsDiscardReturn, supplierReturnsListReturns, supplierReturnsReadReturn, supplierReturnsReverseReturn, supplierReturnsUpdateReturn, suppliersCreateSupplier, suppliersListSuppliers, suppliersUpdateSupplier, usersCreateUser, usersListUsers, usersResetPassword, usersUpdateUser } from '../sdk.gen';
-import type { ActivityLogListEntriesData, ActivityLogListEntriesError, ActivityLogListEntriesResponse, AuthLoginData, AuthLoginError, AuthLoginResponse, AuthLogoutData, AuthLogoutError, AuthLogoutResponse, AuthReadMeData, AuthReadMeError, AuthReadMeResponse, CategoriesCreateCategoryData, CategoriesCreateCategoryError, CategoriesCreateCategoryResponse, CategoriesCreateSubCategoryData, CategoriesCreateSubCategoryError, CategoriesCreateSubCategoryResponse, CategoriesDeleteCategoryData, CategoriesDeleteCategoryError, CategoriesDeleteCategoryResponse, CategoriesDeleteSubCategoryData, CategoriesDeleteSubCategoryError, CategoriesDeleteSubCategoryResponse, CategoriesListCategoriesData, CategoriesListCategoriesError, CategoriesListCategoriesResponse, CategoriesRenameSubCategoryData, CategoriesRenameSubCategoryError, CategoriesRenameSubCategoryResponse, CategoriesUpdateCategoryData, CategoriesUpdateCategoryError, CategoriesUpdateCategoryResponse, GoodsReceiptsCompleteReceiptData, GoodsReceiptsCompleteReceiptError, GoodsReceiptsCompleteReceiptResponse, GoodsReceiptsCreateReceiptData, GoodsReceiptsCreateReceiptError, GoodsReceiptsCreateReceiptResponse, GoodsReceiptsDiscardReceiptData, GoodsReceiptsDiscardReceiptError, GoodsReceiptsDiscardReceiptResponse, GoodsReceiptsListReceiptsData, GoodsReceiptsListReceiptsError, GoodsReceiptsListReceiptsResponse, GoodsReceiptsReadReceiptData, GoodsReceiptsReadReceiptError, GoodsReceiptsReadReceiptResponse, GoodsReceiptsReverseReceiptData, GoodsReceiptsReverseReceiptError, GoodsReceiptsReverseReceiptResponse, GoodsReceiptsUpdateReceiptData, GoodsReceiptsUpdateReceiptError, GoodsReceiptsUpdateReceiptResponse, HealthHealthCheckData, HealthHealthCheckResponse, ProductionReceiptsCompleteReceiptData, ProductionReceiptsCompleteReceiptError, ProductionReceiptsCompleteReceiptResponse, ProductionReceiptsCreateReceiptData, ProductionReceiptsCreateReceiptError, ProductionReceiptsCreateReceiptResponse, ProductionReceiptsDiscardReceiptData, ProductionReceiptsDiscardReceiptError, ProductionReceiptsDiscardReceiptResponse, ProductionReceiptsListReceiptsData, ProductionReceiptsListReceiptsError, ProductionReceiptsListReceiptsResponse, ProductionReceiptsReadReceiptData, ProductionReceiptsReadReceiptError, ProductionReceiptsReadReceiptResponse, ProductionReceiptsReverseReceiptData, ProductionReceiptsReverseReceiptError, ProductionReceiptsReverseReceiptResponse, ProductionReceiptsUpdateReceiptData, ProductionReceiptsUpdateReceiptError, ProductionReceiptsUpdateReceiptResponse, ProductsCreateProductData, ProductsCreateProductError, ProductsCreateProductResponse, ProductsDeleteProductData, ProductsDeleteProductError, ProductsDeleteProductResponse, ProductsListPriceChangesData, ProductsListPriceChangesError, ProductsListPriceChangesResponse, ProductsListProductsData, ProductsListProductsError, ProductsListProductsResponse, ProductsReadProductData, ProductsReadProductError, ProductsReadProductResponse, ProductsSearchSkusData, ProductsSearchSkusError, ProductsSearchSkusResponse, ProductsUpdateProductData, ProductsUpdateProductError, ProductsUpdateProductResponse, StockListLocationsData, StockListLocationsError, StockListLocationsResponse, StockListStockData, StockListStockError, StockListStockResponse, StockReadStockCardData, StockReadStockCardError, StockReadStockCardResponse, SupplierReturnsCompleteReturnData, SupplierReturnsCompleteReturnError, SupplierReturnsCompleteReturnResponse, SupplierReturnsCreateReturnData, SupplierReturnsCreateReturnError, SupplierReturnsCreateReturnResponse, SupplierReturnsDiscardReturnData, SupplierReturnsDiscardReturnError, SupplierReturnsDiscardReturnResponse, SupplierReturnsListReturnsData, SupplierReturnsListReturnsError, SupplierReturnsListReturnsResponse, SupplierReturnsReadReturnData, SupplierReturnsReadReturnError, SupplierReturnsReadReturnResponse, SupplierReturnsReverseReturnData, SupplierReturnsReverseReturnError, SupplierReturnsReverseReturnResponse, SupplierReturnsUpdateReturnData, SupplierReturnsUpdateReturnError, SupplierReturnsUpdateReturnResponse, SuppliersCreateSupplierData, SuppliersCreateSupplierError, SuppliersCreateSupplierResponse, SuppliersListSuppliersData, SuppliersListSuppliersError, SuppliersListSuppliersResponse, SuppliersUpdateSupplierData, SuppliersUpdateSupplierError, SuppliersUpdateSupplierResponse, UsersCreateUserData, UsersCreateUserError, UsersCreateUserResponse, UsersListUsersData, UsersListUsersError, UsersListUsersResponse, UsersResetPasswordData, UsersResetPasswordError, UsersResetPasswordResponse, UsersUpdateUserData, UsersUpdateUserError, UsersUpdateUserResponse } from '../types.gen';
+import { activityLogListEntries, authLogin, authLogout, authReadMe, categoriesCreateCategory, categoriesCreateSubCategory, categoriesDeleteCategory, categoriesDeleteSubCategory, categoriesListCategories, categoriesRenameSubCategory, categoriesUpdateCategory, goodsReceiptsCompleteReceipt, goodsReceiptsCreateReceipt, goodsReceiptsDiscardReceipt, goodsReceiptsListReceipts, goodsReceiptsReadReceipt, goodsReceiptsReverseReceipt, goodsReceiptsUpdateReceipt, healthHealthCheck, type Options, productionReceiptsCompleteReceipt, productionReceiptsCreateReceipt, productionReceiptsDiscardReceipt, productionReceiptsListReceipts, productionReceiptsReadReceipt, productionReceiptsReverseReceipt, productionReceiptsUpdateReceipt, productsCreateProduct, productsDeleteProduct, productsDownloadImportTemplate, productsListPriceChanges, productsListProducts, productsListSkus, productsPreviewImport, productsReadProduct, productsRunImport, productsSearchSkus, productsUpdateProduct, stockListLocations, stockListStock, stockReadStockCard, supplierReturnsCompleteReturn, supplierReturnsCreateReturn, supplierReturnsDiscardReturn, supplierReturnsListReturns, supplierReturnsReadReturn, supplierReturnsReverseReturn, supplierReturnsUpdateReturn, suppliersCreateSupplier, suppliersListSuppliers, suppliersUpdateSupplier, usersCreateUser, usersListUsers, usersResetPassword, usersUpdateUser } from '../sdk.gen';
+import type { ActivityLogListEntriesData, ActivityLogListEntriesError, ActivityLogListEntriesResponse, AuthLoginData, AuthLoginError, AuthLoginResponse, AuthLogoutData, AuthLogoutError, AuthLogoutResponse, AuthReadMeData, AuthReadMeError, AuthReadMeResponse, CategoriesCreateCategoryData, CategoriesCreateCategoryError, CategoriesCreateCategoryResponse, CategoriesCreateSubCategoryData, CategoriesCreateSubCategoryError, CategoriesCreateSubCategoryResponse, CategoriesDeleteCategoryData, CategoriesDeleteCategoryError, CategoriesDeleteCategoryResponse, CategoriesDeleteSubCategoryData, CategoriesDeleteSubCategoryError, CategoriesDeleteSubCategoryResponse, CategoriesListCategoriesData, CategoriesListCategoriesError, CategoriesListCategoriesResponse, CategoriesRenameSubCategoryData, CategoriesRenameSubCategoryError, CategoriesRenameSubCategoryResponse, CategoriesUpdateCategoryData, CategoriesUpdateCategoryError, CategoriesUpdateCategoryResponse, GoodsReceiptsCompleteReceiptData, GoodsReceiptsCompleteReceiptError, GoodsReceiptsCompleteReceiptResponse, GoodsReceiptsCreateReceiptData, GoodsReceiptsCreateReceiptError, GoodsReceiptsCreateReceiptResponse, GoodsReceiptsDiscardReceiptData, GoodsReceiptsDiscardReceiptError, GoodsReceiptsDiscardReceiptResponse, GoodsReceiptsListReceiptsData, GoodsReceiptsListReceiptsError, GoodsReceiptsListReceiptsResponse, GoodsReceiptsReadReceiptData, GoodsReceiptsReadReceiptError, GoodsReceiptsReadReceiptResponse, GoodsReceiptsReverseReceiptData, GoodsReceiptsReverseReceiptError, GoodsReceiptsReverseReceiptResponse, GoodsReceiptsUpdateReceiptData, GoodsReceiptsUpdateReceiptError, GoodsReceiptsUpdateReceiptResponse, HealthHealthCheckData, HealthHealthCheckResponse, ProductionReceiptsCompleteReceiptData, ProductionReceiptsCompleteReceiptError, ProductionReceiptsCompleteReceiptResponse, ProductionReceiptsCreateReceiptData, ProductionReceiptsCreateReceiptError, ProductionReceiptsCreateReceiptResponse, ProductionReceiptsDiscardReceiptData, ProductionReceiptsDiscardReceiptError, ProductionReceiptsDiscardReceiptResponse, ProductionReceiptsListReceiptsData, ProductionReceiptsListReceiptsError, ProductionReceiptsListReceiptsResponse, ProductionReceiptsReadReceiptData, ProductionReceiptsReadReceiptError, ProductionReceiptsReadReceiptResponse, ProductionReceiptsReverseReceiptData, ProductionReceiptsReverseReceiptError, ProductionReceiptsReverseReceiptResponse, ProductionReceiptsUpdateReceiptData, ProductionReceiptsUpdateReceiptError, ProductionReceiptsUpdateReceiptResponse, ProductsCreateProductData, ProductsCreateProductError, ProductsCreateProductResponse, ProductsDeleteProductData, ProductsDeleteProductError, ProductsDeleteProductResponse, ProductsDownloadImportTemplateData, ProductsDownloadImportTemplateError, ProductsListPriceChangesData, ProductsListPriceChangesError, ProductsListPriceChangesResponse, ProductsListProductsData, ProductsListProductsError, ProductsListProductsResponse, ProductsListSkusData, ProductsListSkusError, ProductsListSkusResponse, ProductsPreviewImportData, ProductsPreviewImportError, ProductsPreviewImportResponse, ProductsReadProductData, ProductsReadProductError, ProductsReadProductResponse, ProductsRunImportData, ProductsRunImportError, ProductsRunImportResponse, ProductsSearchSkusData, ProductsSearchSkusError, ProductsSearchSkusResponse, ProductsUpdateProductData, ProductsUpdateProductError, ProductsUpdateProductResponse, StockListLocationsData, StockListLocationsError, StockListLocationsResponse, StockListStockData, StockListStockError, StockListStockResponse, StockReadStockCardData, StockReadStockCardError, StockReadStockCardResponse, SupplierReturnsCompleteReturnData, SupplierReturnsCompleteReturnError, SupplierReturnsCompleteReturnResponse, SupplierReturnsCreateReturnData, SupplierReturnsCreateReturnError, SupplierReturnsCreateReturnResponse, SupplierReturnsDiscardReturnData, SupplierReturnsDiscardReturnError, SupplierReturnsDiscardReturnResponse, SupplierReturnsListReturnsData, SupplierReturnsListReturnsError, SupplierReturnsListReturnsResponse, SupplierReturnsReadReturnData, SupplierReturnsReadReturnError, SupplierReturnsReadReturnResponse, SupplierReturnsReverseReturnData, SupplierReturnsReverseReturnError, SupplierReturnsReverseReturnResponse, SupplierReturnsUpdateReturnData, SupplierReturnsUpdateReturnError, SupplierReturnsUpdateReturnResponse, SuppliersCreateSupplierData, SuppliersCreateSupplierError, SuppliersCreateSupplierResponse, SuppliersListSuppliersData, SuppliersListSuppliersError, SuppliersListSuppliersResponse, SuppliersUpdateSupplierData, SuppliersUpdateSupplierError, SuppliersUpdateSupplierResponse, UsersCreateUserData, UsersCreateUserError, UsersCreateUserResponse, UsersListUsersData, UsersListUsersError, UsersListUsersResponse, UsersResetPasswordData, UsersResetPasswordError, UsersResetPasswordResponse, UsersUpdateUserData, UsersUpdateUserError, UsersUpdateUserResponse } from '../types.gen';
 
 export type QueryKey<TOptions extends Options> = [
     Pick<TOptions, 'baseUrl' | 'body' | 'headers' | 'path' | 'query'> & {
@@ -409,6 +409,78 @@ export const productsSearchSkusOptions = (options: Options<ProductsSearchSkusDat
     },
     queryKey: productsSearchSkusQueryKey(options)
 });
+
+export const productsListSkusQueryKey = (options: Options<ProductsListSkusData>) => createQueryKey('productsListSkus', options);
+
+/**
+ * List Skus
+ *
+ * The given SKUs, for printing their labels.
+ */
+export const productsListSkusOptions = (options: Options<ProductsListSkusData>) => queryOptions<ProductsListSkusResponse, ProductsListSkusError, ProductsListSkusResponse, ReturnType<typeof productsListSkusQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await productsListSkus({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: productsListSkusQueryKey(options)
+});
+
+export const productsDownloadImportTemplateQueryKey = (options?: Options<ProductsDownloadImportTemplateData>) => createQueryKey('productsDownloadImportTemplate', options);
+
+/**
+ * Download Import Template
+ */
+export const productsDownloadImportTemplateOptions = (options?: Options<ProductsDownloadImportTemplateData>) => queryOptions<unknown, ProductsDownloadImportTemplateError, unknown, ReturnType<typeof productsDownloadImportTemplateQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await productsDownloadImportTemplate({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: productsDownloadImportTemplateQueryKey(options)
+});
+
+/**
+ * Preview Import
+ */
+export const productsPreviewImportMutation = (options?: Partial<Options<ProductsPreviewImportData>>): UseMutationOptions<ProductsPreviewImportResponse, ProductsPreviewImportError, Options<ProductsPreviewImportData>> => {
+    const mutationOptions: UseMutationOptions<ProductsPreviewImportResponse, ProductsPreviewImportError, Options<ProductsPreviewImportData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await productsPreviewImport({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Run Import
+ */
+export const productsRunImportMutation = (options?: Partial<Options<ProductsRunImportData>>): UseMutationOptions<ProductsRunImportResponse, ProductsRunImportError, Options<ProductsRunImportData>> => {
+    const mutationOptions: UseMutationOptions<ProductsRunImportResponse, ProductsRunImportError, Options<ProductsRunImportData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await productsRunImport({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
 
 /**
  * Delete Product

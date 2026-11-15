@@ -38,6 +38,19 @@ METHOD_LABELS = {
 SKU_ID_SEQUENCE = Sequence('sku_id_seq')
 
 
+def generated_code(sku_id: int) -> str:
+    return f'S{sku_id:06d}'
+
+
+def generated_barcode(sku_id: int) -> str:
+    """Eight digits starting with 2: the range kept free for in-store codes."""
+    return f'2{sku_id:07d}'
+
+
+def next_sku_id(session: Session) -> int:
+    return session.exec(select(SKU_ID_SEQUENCE.next_value())).one()
+
+
 def _clean(value: str | None) -> str | None:
     return (value or '').strip() or None
 
@@ -440,12 +453,9 @@ def _save_product(
     # a clash with another Product is refused with a clear message.
     rows = []
     for row in product_in.skus:
-        sku_id = (
-            row.id or session.exec(select(SKU_ID_SEQUENCE.next_value())).one()
-        )
-        code = _clean(row.code) or f'S{sku_id:06d}'
-        # Eight digits starting with 2: the range kept free for in-store codes.
-        barcode = _clean(row.barcode) or f'2{sku_id:07d}'
+        sku_id = row.id or next_sku_id(session)
+        code = _clean(row.code) or generated_code(sku_id)
+        barcode = _clean(row.barcode) or generated_barcode(sku_id)
         rows.append((row, sku_id, code, barcode))
     _check_codes_are_free(
         session,
@@ -689,4 +699,21 @@ def _sku_ids(
         query = query.where(Sku.product_id == product.id)
     return [
         sku_id for sku_id in session.exec(query).all() if sku_id is not None
+    ]
+
+
+def skus_by_id(session: Session, sku_ids: list[int]) -> list[SkuOption]:
+    """The given SKUs, in the order asked for; unknown ids are skipped."""
+    found = {
+        sku.id: sku
+        for sku in session.exec(
+            select(Sku).where(col(Sku.id).in_(sku_ids))
+        ).all()
+    }
+    return [
+        SkuOption.model_validate(
+            found[sku_id], update={'product_name': found[sku_id].product.name}
+        )
+        for sku_id in dict.fromkeys(sku_ids)
+        if sku_id in found
     ]

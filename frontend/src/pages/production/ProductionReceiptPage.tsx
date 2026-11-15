@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { Trash2Icon } from 'lucide-react'
+import { PrinterIcon, Trash2Icon } from 'lucide-react'
 import { useRef, useState } from 'react'
 import type { FormEvent } from 'react'
 import { Link, useNavigate, useParams } from 'react-router'
@@ -429,13 +429,21 @@ function ProductionView({ receipt }: { receipt: ProductionReceiptPublic }) {
         </h1>
         <StatusBadge status={receipt.status} />
         {receipt.status === 'completed' && (
-          <Button
-            variant="ghost"
-            className="ml-auto text-destructive hover:text-destructive"
-            onClick={() => setReversing(true)}
-          >
-            Batalkan
-          </Button>
+          <span className="ml-auto flex flex-wrap gap-2">
+            <Button variant="outline" asChild>
+              <Link to={`/label?hasil-produksi=${receipt.id}`}>
+                <PrinterIcon />
+                Cetak label
+              </Link>
+            </Button>
+            <Button
+              variant="ghost"
+              className="text-destructive hover:text-destructive"
+              onClick={() => setReversing(true)}
+            >
+              Batalkan
+            </Button>
+          </span>
         )}
       </div>
 

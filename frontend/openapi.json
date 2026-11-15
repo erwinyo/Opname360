@@ -1073,6 +1073,236 @@
         }
       }
     },
+    "/api/v1/products/skus": {
+      "get": {
+        "tags": [
+          "products"
+        ],
+        "summary": "List Skus",
+        "description": "The given SKUs, for printing their labels.",
+        "operationId": "products-list_skus",
+        "parameters": [
+          {
+            "name": "ids",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              },
+              "maxItems": 500,
+              "title": "Ids"
+            }
+          },
+          {
+            "name": "opname360_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Opname360 Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SkuOption"
+                  },
+                  "title": "Response Products-List Skus"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/products/import/template": {
+      "get": {
+        "tags": [
+          "products"
+        ],
+        "summary": "Download Import Template",
+        "operationId": "products-download_import_template",
+        "parameters": [
+          {
+            "name": "opname360_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Opname360 Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {}
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/products/import/preview": {
+      "post": {
+        "tags": [
+          "products"
+        ],
+        "summary": "Preview Import",
+        "operationId": "products-preview_import",
+        "parameters": [
+          {
+            "name": "opname360_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Opname360 Session"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_products-preview_import"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportPreview"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/products/import": {
+      "post": {
+        "tags": [
+          "products"
+        ],
+        "summary": "Run Import",
+        "operationId": "products-run_import",
+        "parameters": [
+          {
+            "name": "opname360_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Opname360 Session"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_products-run_import"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportResult"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/products/{product_id}": {
       "get": {
         "tags": [
@@ -3346,6 +3576,34 @@
         ],
         "title": "ActivityLogPage"
       },
+      "Body_products-preview_import": {
+        "properties": {
+          "file": {
+            "type": "string",
+            "contentMediaType": "application/octet-stream",
+            "title": "File"
+          }
+        },
+        "type": "object",
+        "required": [
+          "file"
+        ],
+        "title": "Body_products-preview_import"
+      },
+      "Body_products-run_import": {
+        "properties": {
+          "file": {
+            "type": "string",
+            "contentMediaType": "application/octet-stream",
+            "title": "File"
+          }
+        },
+        "type": "object",
+        "required": [
+          "file"
+        ],
+        "title": "Body_products-run_import"
+      },
       "CategoryCreate": {
         "properties": {
           "name": {
@@ -3943,6 +4201,114 @@
         },
         "type": "object",
         "title": "HTTPValidationError"
+      },
+      "ImportPreview": {
+        "properties": {
+          "product_count": {
+            "type": "integer",
+            "title": "Product Count"
+          },
+          "sku_count": {
+            "type": "integer",
+            "title": "Sku Count"
+          },
+          "new_categories": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "New Categories"
+          },
+          "new_sub_categories": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "New Sub Categories"
+          },
+          "problems": {
+            "items": {
+              "$ref": "#/components/schemas/ImportProblem"
+            },
+            "type": "array",
+            "title": "Problems"
+          }
+        },
+        "type": "object",
+        "required": [
+          "product_count",
+          "sku_count",
+          "new_categories",
+          "new_sub_categories",
+          "problems"
+        ],
+        "title": "ImportPreview"
+      },
+      "ImportProblem": {
+        "properties": {
+          "row": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Row"
+          },
+          "column": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Column"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          }
+        },
+        "type": "object",
+        "required": [
+          "row",
+          "column",
+          "message"
+        ],
+        "title": "ImportProblem",
+        "description": "One thing wrong in an import file. Row numbers are Excel's own."
+      },
+      "ImportResult": {
+        "properties": {
+          "product_count": {
+            "type": "integer",
+            "title": "Product Count"
+          },
+          "sku_count": {
+            "type": "integer",
+            "title": "Sku Count"
+          },
+          "category_count": {
+            "type": "integer",
+            "title": "Category Count"
+          },
+          "sub_category_count": {
+            "type": "integer",
+            "title": "Sub Category Count"
+          }
+        },
+        "type": "object",
+        "required": [
+          "product_count",
+          "sku_count",
+          "category_count",
+          "sub_category_count"
+        ],
+        "title": "ImportResult"
       },
       "LocationPublic": {
         "properties": {

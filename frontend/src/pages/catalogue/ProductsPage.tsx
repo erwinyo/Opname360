@@ -1,5 +1,5 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
-import { PlusIcon, SearchIcon } from 'lucide-react'
+import { FileSpreadsheetIcon, PlusIcon, SearchIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router'
 
@@ -94,12 +94,20 @@ export function ProductsPage() {
             barcode sendiri.
           </p>
         </div>
-        <Button asChild>
-          <Link to="/produk/baru">
-            <PlusIcon />
-            Tambah produk
-          </Link>
-        </Button>
+        <span className="flex flex-wrap gap-2">
+          <Button variant="outline" asChild>
+            <Link to="/produk/impor">
+              <FileSpreadsheetIcon />
+              Impor dari Excel
+            </Link>
+          </Button>
+          <Button asChild>
+            <Link to="/produk/baru">
+              <PlusIcon />
+              Tambah produk
+            </Link>
+          </Button>
+        </span>
       </div>
 
       <div className="mt-6 flex flex-wrap gap-2">

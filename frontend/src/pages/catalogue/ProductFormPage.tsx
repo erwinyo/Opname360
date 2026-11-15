@@ -4,6 +4,7 @@ import {
   CopyIcon,
   HistoryIcon,
   PlusIcon,
+  PrinterIcon,
   Trash2Icon,
 } from 'lucide-react'
 import { useState } from 'react'
@@ -247,9 +248,21 @@ function ProductForm({ product }: { product?: ProductPublic }) {
     <>
     <form onSubmit={submit} noValidate>
       <BackLink />
-      <h1 className="mt-3 text-2xl font-semibold tracking-tight">
-        {product ? product.name : 'Produk baru'}
-      </h1>
+      <div className="mt-3 flex flex-wrap items-center gap-3">
+        <h1 className="text-2xl font-semibold tracking-tight">
+          {product ? product.name : 'Produk baru'}
+        </h1>
+        {product && (
+          <Button variant="outline" className="ml-auto" asChild>
+            <Link
+              to={`/label?sku=${product.skus.map((sku) => sku.id).join(',')}`}
+            >
+              <PrinterIcon />
+              Cetak label
+            </Link>
+          </Button>
+        )}
+      </div>
 
       <section className="mt-6 grid gap-4 rounded-xl border bg-card p-4 sm:grid-cols-2">
         <Field

@@ -4,10 +4,12 @@ import { AppLayout } from '@/components/AppLayout'
 import { Button } from '@/components/ui/button'
 import { useMe } from '@/lib/auth'
 import { CategoriesPage } from '@/pages/catalogue/CategoriesPage'
+import { ImportPage } from '@/pages/catalogue/ImportPage'
 import { ProductFormPage } from '@/pages/catalogue/ProductFormPage'
 import { ProductsPage } from '@/pages/catalogue/ProductsPage'
 import { HomePage } from '@/pages/HomePage'
 import { ActivityLogPage } from '@/pages/ActivityLogPage'
+import { LabelsPage } from '@/pages/labels/LabelsPage'
 import { LoginPage } from '@/pages/LoginPage'
 import { ProductionReceiptPage } from '@/pages/production/ProductionReceiptPage'
 import { ProductionReceiptsPage } from '@/pages/production/ProductionReceiptsPage'
@@ -50,6 +52,8 @@ export function App() {
           <>
             <Route path="produk" element={<ProductsPage />} />
             <Route path="produk/baru" element={<ProductFormPage />} />
+            <Route path="produk/impor" element={<ImportPage />} />
+            <Route path="label" element={<LabelsPage />} />
             <Route path="produk/:productId" element={<ProductFormPage />} />
             <Route path="kategori" element={<CategoriesPage />} />
             <Route path="stok" element={<StockPage />} />

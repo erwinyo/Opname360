@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { PlusIcon, Trash2Icon, Undo2Icon } from 'lucide-react'
+import { PlusIcon, PrinterIcon, Trash2Icon, Undo2Icon } from 'lucide-react'
 import { useRef, useState } from 'react'
 import type { FormEvent } from 'react'
 import { Link, useNavigate, useParams } from 'react-router'
@@ -580,6 +580,12 @@ function ReceiptView({ receipt }: { receipt: GoodsReceiptPublic }) {
         <StatusBadge status={receipt.status} />
         {receipt.status === 'completed' && (
           <span className="ml-auto flex flex-wrap gap-2">
+            <Button variant="outline" asChild>
+              <Link to={`/label?barang-masuk=${receipt.id}`}>
+                <PrinterIcon />
+                Cetak label
+              </Link>
+            </Button>
             {returnable && (
               <Button variant="outline" asChild>
                 <Link to={`/retur-pembelian/baru?dari=${receipt.id}`}>

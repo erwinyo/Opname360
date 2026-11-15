@@ -7,6 +7,7 @@ import {
   MenuIcon,
   PackageIcon,
   PackagePlusIcon,
+  PrinterIcon,
   ScissorsIcon,
   TagsIcon,
   TruckIcon,
@@ -77,6 +78,12 @@ const NAV: NavGroup[] = [
     items: [
       { to: '/produk', label: 'Produk', icon: PackageIcon, roles: BACK_OFFICE },
       { to: '/kategori', label: 'Kategori', icon: TagsIcon, roles: BACK_OFFICE },
+      {
+        to: '/label',
+        label: 'Cetak Label',
+        icon: PrinterIcon,
+        roles: BACK_OFFICE,
+      },
       { to: '/pemasok', label: 'Pemasok', icon: TruckIcon, roles: BACK_OFFICE },
     ],
   },

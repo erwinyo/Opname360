@@ -227,3 +227,27 @@ class SkuOption(SQLModel):
     purchase_pack_size: Decimal | None
     selling_price: int
     latest_unit_cost: Decimal | None
+
+
+class ImportProblem(SQLModel):
+    """One thing wrong in an import file. Row numbers are Excel's own."""
+
+    row: int | None
+    column: str | None
+    message: str
+
+
+class ImportPreview(SQLModel):
+    product_count: int
+    sku_count: int
+    new_categories: list[str]
+    # Category and Sub-category: "Seragam > Topi" with an angle quote.
+    new_sub_categories: list[str]
+    problems: list[ImportProblem]
+
+
+class ImportResult(SQLModel):
+    product_count: int
+    sku_count: int
+    category_count: int
+    sub_category_count: int

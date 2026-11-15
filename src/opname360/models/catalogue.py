@@ -76,6 +76,10 @@ class Sku(SQLModel, table=True):
     # Whole rupiah.
     selling_price: int = Field(sa_type=BigInteger)
     is_active: bool = True
+    # What one Stock Unit cost the last time goods came in.
+    latest_unit_cost: Decimal | None = Field(
+        default=None, max_digits=18, decimal_places=4
+    )
     created_at: datetime = Field(default_factory=utc_now)
 
     product: Product = Relationship(back_populates='skus')
@@ -175,6 +179,7 @@ class SkuPublic(SQLModel):
     purchase_pack_size: Decimal | None
     selling_price: int
     is_active: bool
+    latest_unit_cost: Decimal | None
 
 
 class ProductPublic(SQLModel):
@@ -206,3 +211,19 @@ class SkuPriceChangePublic(SQLModel):
     new_price: int
     changed_by_name: str | None
     changed_at: datetime
+
+
+class SkuOption(SQLModel):
+    """A SKU as offered when scanning or searching to add a document line."""
+
+    id: int
+    product_name: str
+    size: str | None
+    color: str | None
+    code: str
+    barcode: str
+    stock_unit: str
+    purchase_pack_name: str | None
+    purchase_pack_size: Decimal | None
+    selling_price: int
+    latest_unit_cost: Decimal | None

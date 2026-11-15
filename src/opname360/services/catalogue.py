@@ -17,6 +17,7 @@ from opname360.models import (
     ProductPublic,
     ProductSave,
     Sku,
+    SkuOption,
     SkuPriceChange,
     SkuPriceChangePublic,
     SkuSave,
@@ -24,7 +25,7 @@ from opname360.models import (
     SubCategoryPublic,
     User,
 )
-from opname360.services import activity_log
+from opname360.services import activity_log, stock
 
 
 METHOD_LABELS = {
@@ -117,6 +118,11 @@ def update_category(
             category.name = name
     method = category_in.costing_method
     if method is not None and method != category.costing_method:
+        if stock.has_movements(session, _sku_ids(session, category=category)):
+            raise ConflictError(
+                f'Metode HPP {category.name} tidak bisa diubah '
+                'karena stoknya sudah bergerak.'
+            )
         changes.append(f'metode HPP menjadi {METHOD_LABELS[method]}')
         category.costing_method = method
 
@@ -375,6 +381,11 @@ def update_product(
 
 
 def delete_product(session: Session, product: Product, *, actor: User) -> None:
+    if stock.has_movements(session, _sku_ids(session, product=product)):
+        raise ConflictError(
+            f'{product.name} sudah punya riwayat stok dan tidak bisa dihapus. '
+            'Nonaktifkan SKU-nya saja.'
+        )
     activity_log.record(
         session,
         actor=actor,
@@ -453,9 +464,18 @@ def _save_product(
     try:
         # Removed SKUs go first, freeing their code and Barcode for reuse.
         kept = {row.id for row in product_in.skus}
-        for sku_id, sku in existing.items():
-            if sku_id not in kept:
-                session.delete(sku)
+        removed = [
+            sku for sku_id, sku in existing.items() if sku_id not in kept
+        ]
+        for sku in removed:
+            if stock.has_movements(session, [sku.id or 0]):
+                label = sku_label(product.name, sku.size, sku.color)
+                session.rollback()
+                raise ConflictError(
+                    f'{label} sudah punya riwayat stok dan tidak bisa '
+                    'dihapus. Nonaktifkan saja.'
+                )
+            session.delete(sku)
         session.flush()
         assert product.id is not None
 
@@ -615,3 +635,58 @@ def _check_codes_are_free(
             f'Barcode {clash.barcode} sudah dipakai oleh {owner}.'
         )
     raise ConflictError(f'Kode {clash.code} sudah dipakai oleh {owner}.')
+
+
+def search_skus(
+    session: Session, query: str, *, limit: int
+) -> list[SkuOption]:
+    """Active SKUs for a scan or a typed search, exact Barcode or code first."""
+    query = query.strip()
+    if not query:
+        return []
+    exact = session.exec(
+        select(Sku).where(
+            col(Sku.is_active).is_(True),
+            or_(Sku.barcode == query, func.lower(Sku.code) == query.lower()),
+        )
+    ).all()
+    found = list(exact)
+    if not found:
+        found = list(
+            session.exec(
+                select(Sku)
+                .join(Product)
+                .where(
+                    col(Sku.is_active).is_(True),
+                    or_(
+                        col(Product.name).icontains(query, autoescape=True),
+                        col(Sku.code).icontains(query, autoescape=True),
+                        col(Sku.barcode).icontains(query, autoescape=True),
+                    ),
+                )
+                .order_by(col(Product.name), col(Sku.id))
+                .limit(limit)
+            ).all()
+        )
+    return [
+        SkuOption.model_validate(
+            sku, update={'product_name': sku.product.name}
+        )
+        for sku in found
+    ]
+
+
+def _sku_ids(
+    session: Session,
+    *,
+    category: Category | None = None,
+    product: Product | None = None,
+) -> list[int]:
+    query = select(Sku.id).join(Product).join(SubCategory)
+    if category is not None:
+        query = query.where(SubCategory.category_id == category.id)
+    if product is not None:
+        query = query.where(Sku.product_id == product.id)
+    return [
+        sku_id for sku_id in session.exec(query).all() if sku_id is not None
+    ]

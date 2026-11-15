@@ -1,4 +1,10 @@
-import { PackageIcon, TagsIcon, UsersIcon } from 'lucide-react'
+import {
+  BoxesIcon,
+  PackageIcon,
+  PackagePlusIcon,
+  TagsIcon,
+  UsersIcon,
+} from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { Link } from 'react-router'
 
@@ -14,6 +20,20 @@ type Shortcut = {
 }
 
 const SHORTCUTS: Shortcut[] = [
+  {
+    to: '/stok',
+    title: 'Stok',
+    description: 'Jumlah dan nilai stok tiap SKU, dan kartu stoknya.',
+    icon: BoxesIcon,
+    roles: ['owner', 'admin'],
+  },
+  {
+    to: '/barang-masuk',
+    title: 'Barang Masuk',
+    description: 'Catat barang yang diterima dari pemasok.',
+    icon: PackagePlusIcon,
+    roles: ['owner', 'admin'],
+  },
   {
     to: '/produk',
     title: 'Produk',

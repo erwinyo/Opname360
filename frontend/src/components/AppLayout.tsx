@@ -1,10 +1,13 @@
 import { useMutation } from '@tanstack/react-query'
 import {
+  BoxesIcon,
   HouseIcon,
   LogOutIcon,
   MenuIcon,
   PackageIcon,
+  PackagePlusIcon,
   TagsIcon,
+  TruckIcon,
   UsersIcon,
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
@@ -43,10 +46,23 @@ const NAV: NavGroup[] = [
     ],
   },
   {
+    label: 'Stok',
+    items: [
+      { to: '/stok', label: 'Stok', icon: BoxesIcon, roles: BACK_OFFICE },
+      {
+        to: '/barang-masuk',
+        label: 'Barang Masuk',
+        icon: PackagePlusIcon,
+        roles: BACK_OFFICE,
+      },
+    ],
+  },
+  {
     label: 'Katalog',
     items: [
       { to: '/produk', label: 'Produk', icon: PackageIcon, roles: BACK_OFFICE },
       { to: '/kategori', label: 'Kategori', icon: TagsIcon, roles: BACK_OFFICE },
+      { to: '/pemasok', label: 'Pemasok', icon: TruckIcon, roles: BACK_OFFICE },
     ],
   },
   {

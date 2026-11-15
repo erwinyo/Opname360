@@ -14,3 +14,11 @@ export async function shot(page: Page, name: string) {
   const folder = process.env.E2E_SHOTS
   if (folder) await page.screenshot({ path: `${folder}/${name}.png` })
 }
+
+/** Open a screen from the sidebar. */
+export async function openMenu(page: Page, name: string) {
+  await page
+    .getByRole('navigation')
+    .getByRole('link', { name, exact: true })
+    .click()
+}

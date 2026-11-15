@@ -12,6 +12,8 @@ const PORT = 8765
 
 export default defineConfig({
   testDir: './e2e',
+  // One test database for every spec: run them one at a time.
+  workers: 1,
   use: { baseURL: `http://127.0.0.1:${PORT}` },
   webServer: {
     command: `uv run python -m tests.e2e_seed && uv run fastapi run --host 127.0.0.1 --port ${PORT}`,

@@ -998,6 +998,81 @@
         }
       }
     },
+    "/api/v1/products/skus/search": {
+      "get": {
+        "tags": [
+          "products"
+        ],
+        "summary": "Search Skus",
+        "operationId": "products-search_skus",
+        "parameters": [
+          {
+            "name": "query",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 100,
+              "title": "Query"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 50,
+              "minimum": 1,
+              "default": 10,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "opname360_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Opname360 Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SkuOption"
+                  },
+                  "title": "Response Products-Search Skus"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/products/{product_id}": {
       "get": {
         "tags": [
@@ -1236,6 +1311,880 @@
           }
         }
       }
+    },
+    "/api/v1/suppliers/": {
+      "get": {
+        "tags": [
+          "suppliers"
+        ],
+        "summary": "List Suppliers",
+        "operationId": "suppliers-list_suppliers",
+        "parameters": [
+          {
+            "name": "opname360_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Opname360 Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SupplierPublic"
+                  },
+                  "title": "Response Suppliers-List Suppliers"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "suppliers"
+        ],
+        "summary": "Create Supplier",
+        "operationId": "suppliers-create_supplier",
+        "parameters": [
+          {
+            "name": "opname360_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Opname360 Session"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SupplierCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SupplierPublic"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/suppliers/{supplier_id}": {
+      "patch": {
+        "tags": [
+          "suppliers"
+        ],
+        "summary": "Update Supplier",
+        "operationId": "suppliers-update_supplier",
+        "parameters": [
+          {
+            "name": "supplier_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "title": "Supplier Id"
+            }
+          },
+          {
+            "name": "opname360_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Opname360 Session"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SupplierUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SupplierPublic"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/goods-receipts/": {
+      "get": {
+        "tags": [
+          "goods_receipts"
+        ],
+        "summary": "List Receipts",
+        "operationId": "goods_receipts-list_receipts",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/DocumentStatus"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status"
+            }
+          },
+          {
+            "name": "supplier_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Supplier Id"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "title": "Offset"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "opname360_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Opname360 Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GoodsReceiptPage"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "goods_receipts"
+        ],
+        "summary": "Create Receipt",
+        "operationId": "goods_receipts-create_receipt",
+        "parameters": [
+          {
+            "name": "opname360_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Opname360 Session"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GoodsReceiptSave"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GoodsReceiptPublic"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/goods-receipts/{receipt_id}": {
+      "get": {
+        "tags": [
+          "goods_receipts"
+        ],
+        "summary": "Read Receipt",
+        "operationId": "goods_receipts-read_receipt",
+        "parameters": [
+          {
+            "name": "receipt_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "title": "Receipt Id"
+            }
+          },
+          {
+            "name": "opname360_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Opname360 Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GoodsReceiptPublic"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "goods_receipts"
+        ],
+        "summary": "Update Receipt",
+        "operationId": "goods_receipts-update_receipt",
+        "parameters": [
+          {
+            "name": "receipt_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "title": "Receipt Id"
+            }
+          },
+          {
+            "name": "opname360_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Opname360 Session"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GoodsReceiptSave"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GoodsReceiptPublic"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "goods_receipts"
+        ],
+        "summary": "Discard Receipt",
+        "operationId": "goods_receipts-discard_receipt",
+        "parameters": [
+          {
+            "name": "receipt_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "title": "Receipt Id"
+            }
+          },
+          {
+            "name": "opname360_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Opname360 Session"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/goods-receipts/{receipt_id}/complete": {
+      "post": {
+        "tags": [
+          "goods_receipts"
+        ],
+        "summary": "Complete Receipt",
+        "operationId": "goods_receipts-complete_receipt",
+        "parameters": [
+          {
+            "name": "receipt_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "title": "Receipt Id"
+            }
+          },
+          {
+            "name": "opname360_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Opname360 Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GoodsReceiptPublic"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/stock/": {
+      "get": {
+        "tags": [
+          "stock"
+        ],
+        "summary": "List Stock",
+        "operationId": "stock-list_stock",
+        "parameters": [
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 100
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Search"
+            }
+          },
+          {
+            "name": "category_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Category Id"
+            }
+          },
+          {
+            "name": "sub_category_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Sub Category Id"
+            }
+          },
+          {
+            "name": "location_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Location Id"
+            }
+          },
+          {
+            "name": "negative_only",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false,
+              "title": "Negative Only"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "title": "Offset"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "opname360_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Opname360 Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StockPage"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/stock/locations": {
+      "get": {
+        "tags": [
+          "stock"
+        ],
+        "summary": "List Locations",
+        "operationId": "stock-list_locations",
+        "parameters": [
+          {
+            "name": "opname360_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Opname360 Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/LocationPublic"
+                  },
+                  "title": "Response Stock-List Locations"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/stock/skus/{sku_id}/card": {
+      "get": {
+        "tags": [
+          "stock"
+        ],
+        "summary": "Read Stock Card",
+        "operationId": "stock-read_stock_card",
+        "parameters": [
+          {
+            "name": "sku_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "title": "Sku Id"
+            }
+          },
+          {
+            "name": "location_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Location Id"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "title": "Offset"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "opname360_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Opname360 Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StockCard"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -1326,6 +2275,489 @@
         ],
         "title": "CostingMethod"
       },
+      "DocumentStatus": {
+        "type": "string",
+        "enum": [
+          "draft",
+          "completed",
+          "reversed"
+        ],
+        "title": "DocumentStatus"
+      },
+      "GoodsReceiptLinePublic": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "sku_id": {
+            "type": "integer",
+            "title": "Sku Id"
+          },
+          "product_name": {
+            "type": "string",
+            "title": "Product Name"
+          },
+          "size": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Size"
+          },
+          "color": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Color"
+          },
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "barcode": {
+            "type": "string",
+            "title": "Barcode"
+          },
+          "stock_unit": {
+            "type": "string",
+            "title": "Stock Unit"
+          },
+          "purchase_pack_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Purchase Pack Name"
+          },
+          "purchase_pack_size": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Purchase Pack Size"
+          },
+          "quantity": {
+            "type": "string",
+            "title": "Quantity"
+          },
+          "unit_cost": {
+            "type": "string",
+            "title": "Unit Cost"
+          },
+          "total_cost": {
+            "type": "string",
+            "title": "Total Cost"
+          },
+          "pack_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pack Name"
+          },
+          "pack_size": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pack Size"
+          },
+          "pack_quantity": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pack Quantity"
+          },
+          "pack_cost": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pack Cost"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "sku_id",
+          "product_name",
+          "size",
+          "color",
+          "code",
+          "barcode",
+          "stock_unit",
+          "purchase_pack_name",
+          "purchase_pack_size",
+          "quantity",
+          "unit_cost",
+          "total_cost",
+          "pack_name",
+          "pack_size",
+          "pack_quantity",
+          "pack_cost"
+        ],
+        "title": "GoodsReceiptLinePublic"
+      },
+      "GoodsReceiptLineSave": {
+        "properties": {
+          "sku_id": {
+            "type": "integer",
+            "title": "Sku Id"
+          },
+          "quantity": {
+            "anyOf": [
+              {
+                "type": "number",
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "title": "Quantity"
+          },
+          "unit_cost": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0.0
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "title": "Unit Cost"
+          },
+          "in_packs": {
+            "type": "boolean",
+            "title": "In Packs",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "sku_id",
+          "quantity",
+          "unit_cost"
+        ],
+        "title": "GoodsReceiptLineSave"
+      },
+      "GoodsReceiptPage": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/GoodsReceiptSummary"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "total"
+        ],
+        "title": "GoodsReceiptPage"
+      },
+      "GoodsReceiptPublic": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "number": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Number"
+          },
+          "status": {
+            "$ref": "#/components/schemas/DocumentStatus"
+          },
+          "supplier_id": {
+            "type": "integer",
+            "title": "Supplier Id"
+          },
+          "supplier_name": {
+            "type": "string",
+            "title": "Supplier Name"
+          },
+          "location_id": {
+            "type": "integer",
+            "title": "Location Id"
+          },
+          "location_name": {
+            "type": "string",
+            "title": "Location Name"
+          },
+          "received_on": {
+            "type": "string",
+            "format": "date",
+            "title": "Received On"
+          },
+          "supplier_invoice": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Supplier Invoice"
+          },
+          "payment_status": {
+            "$ref": "#/components/schemas/PaymentStatus"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "total_cost": {
+            "type": "string",
+            "title": "Total Cost"
+          },
+          "created_by_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created By Name"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "completed_by_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Completed By Name"
+          },
+          "completed_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Completed At"
+          },
+          "lines": {
+            "items": {
+              "$ref": "#/components/schemas/GoodsReceiptLinePublic"
+            },
+            "type": "array",
+            "title": "Lines"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "number",
+          "status",
+          "supplier_id",
+          "supplier_name",
+          "location_id",
+          "location_name",
+          "received_on",
+          "supplier_invoice",
+          "payment_status",
+          "note",
+          "total_cost",
+          "created_by_name",
+          "created_at",
+          "completed_by_name",
+          "completed_at",
+          "lines"
+        ],
+        "title": "GoodsReceiptPublic"
+      },
+      "GoodsReceiptSave": {
+        "properties": {
+          "supplier_id": {
+            "type": "integer",
+            "title": "Supplier Id"
+          },
+          "location_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Location Id"
+          },
+          "received_on": {
+            "type": "string",
+            "format": "date",
+            "title": "Received On"
+          },
+          "supplier_invoice": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 50
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Supplier Invoice"
+          },
+          "payment_status": {
+            "$ref": "#/components/schemas/PaymentStatus",
+            "default": "paid"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 500
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "lines": {
+            "items": {
+              "$ref": "#/components/schemas/GoodsReceiptLineSave"
+            },
+            "type": "array",
+            "title": "Lines",
+            "default": []
+          }
+        },
+        "type": "object",
+        "required": [
+          "supplier_id",
+          "received_on"
+        ],
+        "title": "GoodsReceiptSave",
+        "description": "A draft Goods Receipt with all its lines, saved together."
+      },
+      "GoodsReceiptSummary": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "number": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Number"
+          },
+          "status": {
+            "$ref": "#/components/schemas/DocumentStatus"
+          },
+          "supplier_name": {
+            "type": "string",
+            "title": "Supplier Name"
+          },
+          "received_on": {
+            "type": "string",
+            "format": "date",
+            "title": "Received On"
+          },
+          "payment_status": {
+            "$ref": "#/components/schemas/PaymentStatus"
+          },
+          "total_cost": {
+            "type": "string",
+            "title": "Total Cost"
+          },
+          "line_count": {
+            "type": "integer",
+            "title": "Line Count"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "number",
+          "status",
+          "supplier_name",
+          "received_on",
+          "payment_status",
+          "total_cost",
+          "line_count"
+        ],
+        "title": "GoodsReceiptSummary"
+      },
       "HTTPValidationError": {
         "properties": {
           "detail": {
@@ -1338,6 +2770,24 @@
         },
         "type": "object",
         "title": "HTTPValidationError"
+      },
+      "LocationPublic": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name"
+        ],
+        "title": "LocationPublic"
       },
       "LoginRequest": {
         "properties": {
@@ -1357,6 +2807,17 @@
         ],
         "title": "LoginRequest"
       },
+      "MovementReason": {
+        "type": "string",
+        "enum": [
+          "goods_receipt",
+          "production_receipt",
+          "supplier_return",
+          "reversal",
+          "cost_adjustment"
+        ],
+        "title": "MovementReason"
+      },
       "PasswordReset": {
         "properties": {
           "password": {
@@ -1371,6 +2832,14 @@
           "password"
         ],
         "title": "PasswordReset"
+      },
+      "PaymentStatus": {
+        "type": "string",
+        "enum": [
+          "paid",
+          "owed"
+        ],
+        "title": "PaymentStatus"
       },
       "ProductPage": {
         "properties": {
@@ -1477,6 +2946,105 @@
           "cashier"
         ],
         "title": "Role"
+      },
+      "SkuOption": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "product_name": {
+            "type": "string",
+            "title": "Product Name"
+          },
+          "size": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Size"
+          },
+          "color": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Color"
+          },
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "barcode": {
+            "type": "string",
+            "title": "Barcode"
+          },
+          "stock_unit": {
+            "type": "string",
+            "title": "Stock Unit"
+          },
+          "purchase_pack_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Purchase Pack Name"
+          },
+          "purchase_pack_size": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Purchase Pack Size"
+          },
+          "selling_price": {
+            "type": "integer",
+            "title": "Selling Price"
+          },
+          "latest_unit_cost": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latest Unit Cost"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "product_name",
+          "size",
+          "color",
+          "code",
+          "barcode",
+          "stock_unit",
+          "purchase_pack_name",
+          "purchase_pack_size",
+          "selling_price",
+          "latest_unit_cost"
+        ],
+        "title": "SkuOption",
+        "description": "A SKU as offered when scanning or searching to add a document line."
       },
       "SkuPriceChangePublic": {
         "properties": {
@@ -1599,6 +3167,17 @@
           "is_active": {
             "type": "boolean",
             "title": "Is Active"
+          },
+          "latest_unit_cost": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latest Unit Cost"
           }
         },
         "type": "object",
@@ -1613,7 +3192,8 @@
           "purchase_pack_name",
           "purchase_pack_size",
           "selling_price",
-          "is_active"
+          "is_active",
+          "latest_unit_cost"
         ],
         "title": "SkuPublic"
       },
@@ -1730,6 +3310,223 @@
         "title": "SkuSave",
         "description": "One SKU row of a Product form. Without an `id` it is a new SKU."
       },
+      "StockCard": {
+        "properties": {
+          "sku": {
+            "$ref": "#/components/schemas/StockRow"
+          },
+          "location": {
+            "$ref": "#/components/schemas/LocationPublic"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/StockCardEntry"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          }
+        },
+        "type": "object",
+        "required": [
+          "sku",
+          "location",
+          "items",
+          "total"
+        ],
+        "title": "StockCard"
+      },
+      "StockCardEntry": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "reason": {
+            "$ref": "#/components/schemas/MovementReason"
+          },
+          "document_type": {
+            "type": "string",
+            "title": "Document Type"
+          },
+          "document_id": {
+            "type": "integer",
+            "title": "Document Id"
+          },
+          "document_number": {
+            "type": "string",
+            "title": "Document Number"
+          },
+          "quantity": {
+            "type": "string",
+            "title": "Quantity"
+          },
+          "unit_cost": {
+            "type": "string",
+            "title": "Unit Cost"
+          },
+          "value": {
+            "type": "string",
+            "title": "Value"
+          },
+          "quantity_after": {
+            "type": "string",
+            "title": "Quantity After"
+          },
+          "value_after": {
+            "type": "string",
+            "title": "Value After"
+          },
+          "created_by_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created By Name"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "created_at",
+          "reason",
+          "document_type",
+          "document_id",
+          "document_number",
+          "quantity",
+          "unit_cost",
+          "value",
+          "quantity_after",
+          "value_after",
+          "created_by_name"
+        ],
+        "title": "StockCardEntry"
+      },
+      "StockPage": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/StockRow"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "total_value": {
+            "type": "string",
+            "title": "Total Value"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "total",
+          "total_value"
+        ],
+        "title": "StockPage"
+      },
+      "StockRow": {
+        "properties": {
+          "sku_id": {
+            "type": "integer",
+            "title": "Sku Id"
+          },
+          "product_id": {
+            "type": "integer",
+            "title": "Product Id"
+          },
+          "product_name": {
+            "type": "string",
+            "title": "Product Name"
+          },
+          "size": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Size"
+          },
+          "color": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Color"
+          },
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "barcode": {
+            "type": "string",
+            "title": "Barcode"
+          },
+          "stock_unit": {
+            "type": "string",
+            "title": "Stock Unit"
+          },
+          "is_active": {
+            "type": "boolean",
+            "title": "Is Active"
+          },
+          "category_name": {
+            "type": "string",
+            "title": "Category Name"
+          },
+          "sub_category_name": {
+            "type": "string",
+            "title": "Sub Category Name"
+          },
+          "quantity": {
+            "type": "string",
+            "title": "Quantity"
+          },
+          "value": {
+            "type": "string",
+            "title": "Value"
+          }
+        },
+        "type": "object",
+        "required": [
+          "sku_id",
+          "product_id",
+          "product_name",
+          "size",
+          "color",
+          "code",
+          "barcode",
+          "stock_unit",
+          "is_active",
+          "category_name",
+          "sub_category_name",
+          "quantity",
+          "value"
+        ],
+        "title": "StockRow"
+      },
       "SubCategoryPublic": {
         "properties": {
           "id": {
@@ -1772,6 +3569,148 @@
           "name"
         ],
         "title": "SubCategorySave"
+      },
+      "SupplierCreate": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 150,
+            "minLength": 1,
+            "title": "Name"
+          },
+          "phone": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 30
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phone"
+          },
+          "address": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 300
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Address"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "title": "SupplierCreate"
+      },
+      "SupplierPublic": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 150,
+            "minLength": 1,
+            "title": "Name"
+          },
+          "phone": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 30
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phone"
+          },
+          "address": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 300
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Address"
+          },
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "is_active": {
+            "type": "boolean",
+            "title": "Is Active"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "id",
+          "is_active"
+        ],
+        "title": "SupplierPublic"
+      },
+      "SupplierUpdate": {
+        "properties": {
+          "name": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 150,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "phone": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 30
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phone"
+          },
+          "address": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 300
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Address"
+          },
+          "is_active": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Is Active"
+          }
+        },
+        "type": "object",
+        "title": "SupplierUpdate"
       },
       "UserCreate": {
         "properties": {

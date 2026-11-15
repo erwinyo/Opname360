@@ -14,6 +14,8 @@ class Settings(BaseSettings):
     database_url: str
     test_database_url: str | None = None
     frontend_dist: Path = Path('frontend/dist')
+    # The shop's clock: decides which day and month a document belongs to.
+    timezone: str = 'Asia/Jakarta'
 
 
 settings = Settings()

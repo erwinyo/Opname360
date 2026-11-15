@@ -8,6 +8,11 @@ import { ProductFormPage } from '@/pages/catalogue/ProductFormPage'
 import { ProductsPage } from '@/pages/catalogue/ProductsPage'
 import { HomePage } from '@/pages/HomePage'
 import { LoginPage } from '@/pages/LoginPage'
+import { GoodsReceiptPage } from '@/pages/purchasing/GoodsReceiptPage'
+import { GoodsReceiptsPage } from '@/pages/purchasing/GoodsReceiptsPage'
+import { SuppliersPage } from '@/pages/purchasing/SuppliersPage'
+import { StockCardPage } from '@/pages/stock/StockCardPage'
+import { StockPage } from '@/pages/stock/StockPage'
 import { UsersPage } from '@/pages/users/UsersPage'
 
 export function App() {
@@ -42,6 +47,15 @@ export function App() {
             <Route path="produk/baru" element={<ProductFormPage />} />
             <Route path="produk/:productId" element={<ProductFormPage />} />
             <Route path="kategori" element={<CategoriesPage />} />
+            <Route path="stok" element={<StockPage />} />
+            <Route path="stok/:skuId" element={<StockCardPage />} />
+            <Route path="barang-masuk" element={<GoodsReceiptsPage />} />
+            <Route path="barang-masuk/baru" element={<GoodsReceiptPage />} />
+            <Route
+              path="barang-masuk/:receiptId"
+              element={<GoodsReceiptPage />}
+            />
+            <Route path="pemasok" element={<SuppliersPage />} />
           </>
         )}
         {user.role === 'owner' && (

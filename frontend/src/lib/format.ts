@@ -37,3 +37,29 @@ export function variantLabel(sku: {
 }): string {
   return [sku.size, sku.color].filter(Boolean).join(', ')
 }
+
+const dateOnly = new Intl.DateTimeFormat('id-ID', { dateStyle: 'medium' })
+
+/** "2026-11-15" -> "15 Nov 2026" */
+export function formatDate(isoDate: string): string {
+  return dateOnly.format(new Date(`${isoDate}T00:00:00`))
+}
+
+/** A money amount as the API sends it ("120000.0000") -> "Rp 120.000". */
+export function money(value: string | number): string {
+  return rupiah(Math.round(Number(value)))
+}
+
+/** What was typed as a quantity ("1,5") as a number, or NaN. */
+export function parseQuantity(text: string): number {
+  const cleaned = text.trim().replace(',', '.')
+  return cleaned === '' ? NaN : Number(cleaned)
+}
+
+/** Today in the browser's timezone as "2026-11-15", for date inputs. */
+export function today(): string {
+  const now = new Date()
+  const month = String(now.getMonth() + 1).padStart(2, '0')
+  const day = String(now.getDate()).padStart(2, '0')
+  return `${now.getFullYear()}-${month}-${day}`
+}

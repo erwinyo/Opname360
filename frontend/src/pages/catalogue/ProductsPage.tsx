@@ -8,6 +8,7 @@ import {
   categoriesListCategoriesOptions,
   productsListProductsOptions,
 } from '@/client/@tanstack/react-query.gen'
+import { Pager } from '@/components/Pager'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -233,32 +234,13 @@ export function ProductsPage() {
               </TableBody>
             </Table>
           </div>
-          <div className="mt-3 flex items-center justify-between gap-4 text-sm text-muted-foreground">
-            <span className="tabular-nums">
-              {offset + 1}–{Math.min(offset + PAGE_SIZE, total)} dari {total}{' '}
-              produk
-            </span>
-            {total > PAGE_SIZE && (
-              <span className="flex gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  disabled={offset === 0}
-                  onClick={() => setOffset(offset - PAGE_SIZE)}
-                >
-                  Sebelumnya
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  disabled={offset + PAGE_SIZE >= total}
-                  onClick={() => setOffset(offset + PAGE_SIZE)}
-                >
-                  Berikutnya
-                </Button>
-              </span>
-            )}
-          </div>
+          <Pager
+            offset={offset}
+            pageSize={PAGE_SIZE}
+            total={total}
+            unit="produk"
+            onChange={setOffset}
+          />
         </>
       )}
     </>

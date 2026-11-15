@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
 
-import { OWNER, shot, signIn } from './helpers'
+import { OWNER, openMenu, shot, signIn } from './helpers'
 
 test('the catalogue: categories, a product, its SKUs and prices', async ({
   page,
@@ -9,7 +9,6 @@ test('the catalogue: categories, a product, its SKUs and prices', async ({
   await signIn(page, OWNER.username, OWNER.password)
 
   await test.step('create a category with a sub-category', async () => {
-    await expect(page.getByText('Belum ada kategori.')).toBeVisible()
     await page.getByRole('button', { name: 'Tambah kategori' }).click()
     await page.getByLabel('Nama kategori').fill('Seragam')
     await page.getByLabel('Metode HPP').click()
@@ -27,8 +26,7 @@ test('the catalogue: categories, a product, its SKUs and prices', async ({
   const skus = page.locator('fieldset')
 
   await test.step('create a product with two sizes', async () => {
-    await page.getByRole('link', { name: 'Produk' }).click()
-    await expect(page.getByText('Belum ada produk.')).toBeVisible()
+    await openMenu(page, 'Produk')
     await page.getByRole('link', { name: 'Tambah produk' }).click()
 
     await page.getByRole('button', { name: 'Simpan produk' }).click()
@@ -85,7 +83,7 @@ test('the catalogue: categories, a product, its SKUs and prices', async ({
   })
 
   await test.step('a category in use cannot be deleted', async () => {
-    await page.getByRole('link', { name: 'Kategori' }).click()
+    await openMenu(page, 'Kategori')
     await expect(page.getByText('1 produk')).toBeVisible()
     await page.getByRole('button', { name: 'Tindakan untuk Seragam' }).click()
     await page.getByRole('menuitem', { name: 'Hapus kategori' }).click()

@@ -1,4 +1,5 @@
 from collections.abc import Iterator
+from itertools import count
 
 import pytest
 
@@ -12,10 +13,11 @@ from opname360.core.config import settings
 from opname360.core.db import get_session
 from opname360.core.security import hash_password
 from opname360.main import app
-from opname360.models import Role, User
+from opname360.models import Role, Sku, User
 
 
 PASSWORD = 'rahasia-123'
+_names = count(1)
 
 
 @pytest.fixture(scope='session')
@@ -119,3 +121,58 @@ def new_product(
     )
     assert response.status_code == 201, response.text
     return response.json()
+
+
+def new_sku(
+    client: TestClient,
+    session: Session,
+    costing_method: str = 'moving_average',
+    **sku_fields: object,
+) -> Sku:
+    """A SKU in its own Category with the given Costing Method."""
+    name = f'{costing_method}-{next(_names)}'
+    category = new_category(client, name, ('Sub',), costing_method)
+    product = new_product(
+        client,
+        category['sub_categories'][0]['id'],
+        f'Produk {name}',
+        [sku_row(**sku_fields)],
+    )
+    sku = session.get(Sku, product['skus'][0]['id'])
+    assert sku is not None
+    return sku
+
+
+def new_supplier(client: TestClient, name: str = 'CV Sumber Jaya') -> dict:
+    response = client.post('/api/v1/suppliers/', json={'name': name})
+    assert response.status_code == 201, response.text
+    return response.json()
+
+
+def new_receipt(
+    client: TestClient,
+    supplier_id: int,
+    lines: list[dict],
+    *,
+    complete: bool = True,
+    **header: object,
+) -> dict:
+    """A Goods Receipt through the API, completed unless told otherwise."""
+    response = client.post(
+        '/api/v1/goods-receipts/',
+        json={
+            'supplier_id': supplier_id,
+            'received_on': '2026-11-15',
+            'lines': lines,
+            **header,
+        },
+    )
+    assert response.status_code == 201, response.text
+    receipt = response.json()
+    if complete:
+        response = client.post(
+            f'/api/v1/goods-receipts/{receipt["id"]}/complete'
+        )
+        assert response.status_code == 200, response.text
+        receipt = response.json()
+    return receipt

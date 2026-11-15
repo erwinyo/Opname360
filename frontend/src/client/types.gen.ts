@@ -51,6 +51,254 @@ export type CategoryUpdate = {
 export type CostingMethod = 'moving_average' | 'fifo';
 
 /**
+ * DocumentStatus
+ */
+export type DocumentStatus = 'draft' | 'completed' | 'reversed';
+
+/**
+ * GoodsReceiptLinePublic
+ */
+export type GoodsReceiptLinePublic = {
+    /**
+     * Id
+     */
+    id: number;
+    /**
+     * Sku Id
+     */
+    sku_id: number;
+    /**
+     * Product Name
+     */
+    product_name: string;
+    /**
+     * Size
+     */
+    size: string | null;
+    /**
+     * Color
+     */
+    color: string | null;
+    /**
+     * Code
+     */
+    code: string;
+    /**
+     * Barcode
+     */
+    barcode: string;
+    /**
+     * Stock Unit
+     */
+    stock_unit: string;
+    /**
+     * Purchase Pack Name
+     */
+    purchase_pack_name: string | null;
+    /**
+     * Purchase Pack Size
+     */
+    purchase_pack_size: string | null;
+    /**
+     * Quantity
+     */
+    quantity: string;
+    /**
+     * Unit Cost
+     */
+    unit_cost: string;
+    /**
+     * Total Cost
+     */
+    total_cost: string;
+    /**
+     * Pack Name
+     */
+    pack_name: string | null;
+    /**
+     * Pack Size
+     */
+    pack_size: string | null;
+    /**
+     * Pack Quantity
+     */
+    pack_quantity: string | null;
+    /**
+     * Pack Cost
+     */
+    pack_cost: string | null;
+};
+
+/**
+ * GoodsReceiptLineSave
+ */
+export type GoodsReceiptLineSave = {
+    /**
+     * Sku Id
+     */
+    sku_id: number;
+    /**
+     * Quantity
+     */
+    quantity: number | string;
+    /**
+     * Unit Cost
+     */
+    unit_cost: number | string;
+    /**
+     * In Packs
+     */
+    in_packs?: boolean;
+};
+
+/**
+ * GoodsReceiptPage
+ */
+export type GoodsReceiptPage = {
+    /**
+     * Items
+     */
+    items: Array<GoodsReceiptSummary>;
+    /**
+     * Total
+     */
+    total: number;
+};
+
+/**
+ * GoodsReceiptPublic
+ */
+export type GoodsReceiptPublic = {
+    /**
+     * Id
+     */
+    id: number;
+    /**
+     * Number
+     */
+    number: string | null;
+    status: DocumentStatus;
+    /**
+     * Supplier Id
+     */
+    supplier_id: number;
+    /**
+     * Supplier Name
+     */
+    supplier_name: string;
+    /**
+     * Location Id
+     */
+    location_id: number;
+    /**
+     * Location Name
+     */
+    location_name: string;
+    /**
+     * Received On
+     */
+    received_on: string;
+    /**
+     * Supplier Invoice
+     */
+    supplier_invoice: string | null;
+    payment_status: PaymentStatus;
+    /**
+     * Note
+     */
+    note: string | null;
+    /**
+     * Total Cost
+     */
+    total_cost: string;
+    /**
+     * Created By Name
+     */
+    created_by_name: string | null;
+    /**
+     * Created At
+     */
+    created_at: string;
+    /**
+     * Completed By Name
+     */
+    completed_by_name: string | null;
+    /**
+     * Completed At
+     */
+    completed_at: string | null;
+    /**
+     * Lines
+     */
+    lines: Array<GoodsReceiptLinePublic>;
+};
+
+/**
+ * GoodsReceiptSave
+ *
+ * A draft Goods Receipt with all its lines, saved together.
+ */
+export type GoodsReceiptSave = {
+    /**
+     * Supplier Id
+     */
+    supplier_id: number;
+    /**
+     * Location Id
+     */
+    location_id?: number | null;
+    /**
+     * Received On
+     */
+    received_on: string;
+    /**
+     * Supplier Invoice
+     */
+    supplier_invoice?: string | null;
+    payment_status?: PaymentStatus;
+    /**
+     * Note
+     */
+    note?: string | null;
+    /**
+     * Lines
+     */
+    lines?: Array<GoodsReceiptLineSave>;
+};
+
+/**
+ * GoodsReceiptSummary
+ */
+export type GoodsReceiptSummary = {
+    /**
+     * Id
+     */
+    id: number;
+    /**
+     * Number
+     */
+    number: string | null;
+    status: DocumentStatus;
+    /**
+     * Supplier Name
+     */
+    supplier_name: string;
+    /**
+     * Received On
+     */
+    received_on: string;
+    payment_status: PaymentStatus;
+    /**
+     * Total Cost
+     */
+    total_cost: string;
+    /**
+     * Line Count
+     */
+    line_count: number;
+};
+
+/**
  * HTTPValidationError
  */
 export type HttpValidationError = {
@@ -58,6 +306,20 @@ export type HttpValidationError = {
      * Detail
      */
     detail?: Array<ValidationError>;
+};
+
+/**
+ * LocationPublic
+ */
+export type LocationPublic = {
+    /**
+     * Id
+     */
+    id: number;
+    /**
+     * Name
+     */
+    name: string;
 };
 
 /**
@@ -75,6 +337,11 @@ export type LoginRequest = {
 };
 
 /**
+ * MovementReason
+ */
+export type MovementReason = 'goods_receipt' | 'production_receipt' | 'supplier_return' | 'reversal' | 'cost_adjustment';
+
+/**
  * PasswordReset
  */
 export type PasswordReset = {
@@ -83,6 +350,11 @@ export type PasswordReset = {
      */
     password: string;
 };
+
+/**
+ * PaymentStatus
+ */
+export type PaymentStatus = 'paid' | 'owed';
 
 /**
  * ProductPage
@@ -158,6 +430,58 @@ export type ProductSave = {
 export type Role = 'owner' | 'admin' | 'cashier';
 
 /**
+ * SkuOption
+ *
+ * A SKU as offered when scanning or searching to add a document line.
+ */
+export type SkuOption = {
+    /**
+     * Id
+     */
+    id: number;
+    /**
+     * Product Name
+     */
+    product_name: string;
+    /**
+     * Size
+     */
+    size: string | null;
+    /**
+     * Color
+     */
+    color: string | null;
+    /**
+     * Code
+     */
+    code: string;
+    /**
+     * Barcode
+     */
+    barcode: string;
+    /**
+     * Stock Unit
+     */
+    stock_unit: string;
+    /**
+     * Purchase Pack Name
+     */
+    purchase_pack_name: string | null;
+    /**
+     * Purchase Pack Size
+     */
+    purchase_pack_size: string | null;
+    /**
+     * Selling Price
+     */
+    selling_price: number;
+    /**
+     * Latest Unit Cost
+     */
+    latest_unit_cost: string | null;
+};
+
+/**
  * SkuPriceChangePublic
  */
 export type SkuPriceChangePublic = {
@@ -231,6 +555,10 @@ export type SkuPublic = {
      * Is Active
      */
     is_active: boolean;
+    /**
+     * Latest Unit Cost
+     */
+    latest_unit_cost: string | null;
 };
 
 /**
@@ -282,6 +610,149 @@ export type SkuSave = {
 };
 
 /**
+ * StockCard
+ */
+export type StockCard = {
+    sku: StockRow;
+    location: LocationPublic;
+    /**
+     * Items
+     */
+    items: Array<StockCardEntry>;
+    /**
+     * Total
+     */
+    total: number;
+};
+
+/**
+ * StockCardEntry
+ */
+export type StockCardEntry = {
+    /**
+     * Id
+     */
+    id: number;
+    /**
+     * Created At
+     */
+    created_at: string;
+    reason: MovementReason;
+    /**
+     * Document Type
+     */
+    document_type: string;
+    /**
+     * Document Id
+     */
+    document_id: number;
+    /**
+     * Document Number
+     */
+    document_number: string;
+    /**
+     * Quantity
+     */
+    quantity: string;
+    /**
+     * Unit Cost
+     */
+    unit_cost: string;
+    /**
+     * Value
+     */
+    value: string;
+    /**
+     * Quantity After
+     */
+    quantity_after: string;
+    /**
+     * Value After
+     */
+    value_after: string;
+    /**
+     * Created By Name
+     */
+    created_by_name: string | null;
+};
+
+/**
+ * StockPage
+ */
+export type StockPage = {
+    /**
+     * Items
+     */
+    items: Array<StockRow>;
+    /**
+     * Total
+     */
+    total: number;
+    /**
+     * Total Value
+     */
+    total_value: string;
+};
+
+/**
+ * StockRow
+ */
+export type StockRow = {
+    /**
+     * Sku Id
+     */
+    sku_id: number;
+    /**
+     * Product Id
+     */
+    product_id: number;
+    /**
+     * Product Name
+     */
+    product_name: string;
+    /**
+     * Size
+     */
+    size: string | null;
+    /**
+     * Color
+     */
+    color: string | null;
+    /**
+     * Code
+     */
+    code: string;
+    /**
+     * Barcode
+     */
+    barcode: string;
+    /**
+     * Stock Unit
+     */
+    stock_unit: string;
+    /**
+     * Is Active
+     */
+    is_active: boolean;
+    /**
+     * Category Name
+     */
+    category_name: string;
+    /**
+     * Sub Category Name
+     */
+    sub_category_name: string;
+    /**
+     * Quantity
+     */
+    quantity: string;
+    /**
+     * Value
+     */
+    value: string;
+};
+
+/**
  * SubCategoryPublic
  */
 export type SubCategoryPublic = {
@@ -311,6 +782,72 @@ export type SubCategorySave = {
      * Name
      */
     name: string;
+};
+
+/**
+ * SupplierCreate
+ */
+export type SupplierCreate = {
+    /**
+     * Name
+     */
+    name: string;
+    /**
+     * Phone
+     */
+    phone?: string | null;
+    /**
+     * Address
+     */
+    address?: string | null;
+};
+
+/**
+ * SupplierPublic
+ */
+export type SupplierPublic = {
+    /**
+     * Name
+     */
+    name: string;
+    /**
+     * Phone
+     */
+    phone?: string | null;
+    /**
+     * Address
+     */
+    address?: string | null;
+    /**
+     * Id
+     */
+    id: number;
+    /**
+     * Is Active
+     */
+    is_active: boolean;
+};
+
+/**
+ * SupplierUpdate
+ */
+export type SupplierUpdate = {
+    /**
+     * Name
+     */
+    name?: string | null;
+    /**
+     * Phone
+     */
+    phone?: string | null;
+    /**
+     * Address
+     */
+    address?: string | null;
+    /**
+     * Is Active
+     */
+    is_active?: boolean | null;
 };
 
 /**
@@ -886,6 +1423,42 @@ export type ProductsCreateProductResponses = {
 
 export type ProductsCreateProductResponse = ProductsCreateProductResponses[keyof ProductsCreateProductResponses];
 
+export type ProductsSearchSkusData = {
+    body?: never;
+    path?: never;
+    query: {
+        /**
+         * Query
+         */
+        query: string;
+        /**
+         * Limit
+         */
+        limit?: number;
+    };
+    url: '/api/v1/products/skus/search';
+};
+
+export type ProductsSearchSkusErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type ProductsSearchSkusError = ProductsSearchSkusErrors[keyof ProductsSearchSkusErrors];
+
+export type ProductsSearchSkusResponses = {
+    /**
+     * Response Products-Search Skus
+     *
+     * Successful Response
+     */
+    200: Array<SkuOption>;
+};
+
+export type ProductsSearchSkusResponse = ProductsSearchSkusResponses[keyof ProductsSearchSkusResponses];
+
 export type ProductsDeleteProductData = {
     body?: never;
     path: {
@@ -1007,3 +1580,396 @@ export type ProductsListPriceChangesResponses = {
 };
 
 export type ProductsListPriceChangesResponse = ProductsListPriceChangesResponses[keyof ProductsListPriceChangesResponses];
+
+export type SuppliersListSuppliersData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/suppliers/';
+};
+
+export type SuppliersListSuppliersErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type SuppliersListSuppliersError = SuppliersListSuppliersErrors[keyof SuppliersListSuppliersErrors];
+
+export type SuppliersListSuppliersResponses = {
+    /**
+     * Response Suppliers-List Suppliers
+     *
+     * Successful Response
+     */
+    200: Array<SupplierPublic>;
+};
+
+export type SuppliersListSuppliersResponse = SuppliersListSuppliersResponses[keyof SuppliersListSuppliersResponses];
+
+export type SuppliersCreateSupplierData = {
+    body: SupplierCreate;
+    path?: never;
+    query?: never;
+    url: '/api/v1/suppliers/';
+};
+
+export type SuppliersCreateSupplierErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type SuppliersCreateSupplierError = SuppliersCreateSupplierErrors[keyof SuppliersCreateSupplierErrors];
+
+export type SuppliersCreateSupplierResponses = {
+    /**
+     * Successful Response
+     */
+    201: SupplierPublic;
+};
+
+export type SuppliersCreateSupplierResponse = SuppliersCreateSupplierResponses[keyof SuppliersCreateSupplierResponses];
+
+export type SuppliersUpdateSupplierData = {
+    body: SupplierUpdate;
+    path: {
+        /**
+         * Supplier Id
+         */
+        supplier_id: number;
+    };
+    query?: never;
+    url: '/api/v1/suppliers/{supplier_id}';
+};
+
+export type SuppliersUpdateSupplierErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type SuppliersUpdateSupplierError = SuppliersUpdateSupplierErrors[keyof SuppliersUpdateSupplierErrors];
+
+export type SuppliersUpdateSupplierResponses = {
+    /**
+     * Successful Response
+     */
+    200: SupplierPublic;
+};
+
+export type SuppliersUpdateSupplierResponse = SuppliersUpdateSupplierResponses[keyof SuppliersUpdateSupplierResponses];
+
+export type GoodsReceiptsListReceiptsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Status
+         */
+        status?: DocumentStatus | null;
+        /**
+         * Supplier Id
+         */
+        supplier_id?: number | null;
+        /**
+         * Offset
+         */
+        offset?: number;
+        /**
+         * Limit
+         */
+        limit?: number;
+    };
+    url: '/api/v1/goods-receipts/';
+};
+
+export type GoodsReceiptsListReceiptsErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type GoodsReceiptsListReceiptsError = GoodsReceiptsListReceiptsErrors[keyof GoodsReceiptsListReceiptsErrors];
+
+export type GoodsReceiptsListReceiptsResponses = {
+    /**
+     * Successful Response
+     */
+    200: GoodsReceiptPage;
+};
+
+export type GoodsReceiptsListReceiptsResponse = GoodsReceiptsListReceiptsResponses[keyof GoodsReceiptsListReceiptsResponses];
+
+export type GoodsReceiptsCreateReceiptData = {
+    body: GoodsReceiptSave;
+    path?: never;
+    query?: never;
+    url: '/api/v1/goods-receipts/';
+};
+
+export type GoodsReceiptsCreateReceiptErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type GoodsReceiptsCreateReceiptError = GoodsReceiptsCreateReceiptErrors[keyof GoodsReceiptsCreateReceiptErrors];
+
+export type GoodsReceiptsCreateReceiptResponses = {
+    /**
+     * Successful Response
+     */
+    201: GoodsReceiptPublic;
+};
+
+export type GoodsReceiptsCreateReceiptResponse = GoodsReceiptsCreateReceiptResponses[keyof GoodsReceiptsCreateReceiptResponses];
+
+export type GoodsReceiptsDiscardReceiptData = {
+    body?: never;
+    path: {
+        /**
+         * Receipt Id
+         */
+        receipt_id: number;
+    };
+    query?: never;
+    url: '/api/v1/goods-receipts/{receipt_id}';
+};
+
+export type GoodsReceiptsDiscardReceiptErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type GoodsReceiptsDiscardReceiptError = GoodsReceiptsDiscardReceiptErrors[keyof GoodsReceiptsDiscardReceiptErrors];
+
+export type GoodsReceiptsDiscardReceiptResponses = {
+    /**
+     * Successful Response
+     */
+    204: void;
+};
+
+export type GoodsReceiptsDiscardReceiptResponse = GoodsReceiptsDiscardReceiptResponses[keyof GoodsReceiptsDiscardReceiptResponses];
+
+export type GoodsReceiptsReadReceiptData = {
+    body?: never;
+    path: {
+        /**
+         * Receipt Id
+         */
+        receipt_id: number;
+    };
+    query?: never;
+    url: '/api/v1/goods-receipts/{receipt_id}';
+};
+
+export type GoodsReceiptsReadReceiptErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type GoodsReceiptsReadReceiptError = GoodsReceiptsReadReceiptErrors[keyof GoodsReceiptsReadReceiptErrors];
+
+export type GoodsReceiptsReadReceiptResponses = {
+    /**
+     * Successful Response
+     */
+    200: GoodsReceiptPublic;
+};
+
+export type GoodsReceiptsReadReceiptResponse = GoodsReceiptsReadReceiptResponses[keyof GoodsReceiptsReadReceiptResponses];
+
+export type GoodsReceiptsUpdateReceiptData = {
+    body: GoodsReceiptSave;
+    path: {
+        /**
+         * Receipt Id
+         */
+        receipt_id: number;
+    };
+    query?: never;
+    url: '/api/v1/goods-receipts/{receipt_id}';
+};
+
+export type GoodsReceiptsUpdateReceiptErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type GoodsReceiptsUpdateReceiptError = GoodsReceiptsUpdateReceiptErrors[keyof GoodsReceiptsUpdateReceiptErrors];
+
+export type GoodsReceiptsUpdateReceiptResponses = {
+    /**
+     * Successful Response
+     */
+    200: GoodsReceiptPublic;
+};
+
+export type GoodsReceiptsUpdateReceiptResponse = GoodsReceiptsUpdateReceiptResponses[keyof GoodsReceiptsUpdateReceiptResponses];
+
+export type GoodsReceiptsCompleteReceiptData = {
+    body?: never;
+    path: {
+        /**
+         * Receipt Id
+         */
+        receipt_id: number;
+    };
+    query?: never;
+    url: '/api/v1/goods-receipts/{receipt_id}/complete';
+};
+
+export type GoodsReceiptsCompleteReceiptErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type GoodsReceiptsCompleteReceiptError = GoodsReceiptsCompleteReceiptErrors[keyof GoodsReceiptsCompleteReceiptErrors];
+
+export type GoodsReceiptsCompleteReceiptResponses = {
+    /**
+     * Successful Response
+     */
+    200: GoodsReceiptPublic;
+};
+
+export type GoodsReceiptsCompleteReceiptResponse = GoodsReceiptsCompleteReceiptResponses[keyof GoodsReceiptsCompleteReceiptResponses];
+
+export type StockListStockData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Search
+         */
+        search?: string | null;
+        /**
+         * Category Id
+         */
+        category_id?: number | null;
+        /**
+         * Sub Category Id
+         */
+        sub_category_id?: number | null;
+        /**
+         * Location Id
+         */
+        location_id?: number | null;
+        /**
+         * Negative Only
+         */
+        negative_only?: boolean;
+        /**
+         * Offset
+         */
+        offset?: number;
+        /**
+         * Limit
+         */
+        limit?: number;
+    };
+    url: '/api/v1/stock/';
+};
+
+export type StockListStockErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type StockListStockError = StockListStockErrors[keyof StockListStockErrors];
+
+export type StockListStockResponses = {
+    /**
+     * Successful Response
+     */
+    200: StockPage;
+};
+
+export type StockListStockResponse = StockListStockResponses[keyof StockListStockResponses];
+
+export type StockListLocationsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/stock/locations';
+};
+
+export type StockListLocationsErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type StockListLocationsError = StockListLocationsErrors[keyof StockListLocationsErrors];
+
+export type StockListLocationsResponses = {
+    /**
+     * Response Stock-List Locations
+     *
+     * Successful Response
+     */
+    200: Array<LocationPublic>;
+};
+
+export type StockListLocationsResponse = StockListLocationsResponses[keyof StockListLocationsResponses];
+
+export type StockReadStockCardData = {
+    body?: never;
+    path: {
+        /**
+         * Sku Id
+         */
+        sku_id: number;
+    };
+    query?: {
+        /**
+         * Location Id
+         */
+        location_id?: number | null;
+        /**
+         * Offset
+         */
+        offset?: number;
+        /**
+         * Limit
+         */
+        limit?: number;
+    };
+    url: '/api/v1/stock/skus/{sku_id}/card';
+};
+
+export type StockReadStockCardErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type StockReadStockCardError = StockReadStockCardErrors[keyof StockReadStockCardErrors];
+
+export type StockReadStockCardResponses = {
+    /**
+     * Successful Response
+     */
+    200: StockCard;
+};
+
+export type StockReadStockCardResponse = StockReadStockCardResponses[keyof StockReadStockCardResponses];

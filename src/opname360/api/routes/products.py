@@ -10,6 +10,7 @@ from opname360.models import (
     ProductPublic,
     ProductSave,
     Sku,
+    SkuOption,
     SkuPriceChangePublic,
 )
 from opname360.services import catalogue
@@ -51,6 +52,15 @@ def create_product(
 ) -> ProductPublic:
     product = catalogue.create_product(session, product_in, actor=admin)
     return catalogue.product_public(product)
+
+
+@router.get('/skus/search')
+def search_skus(
+    session: SessionDep,
+    query: Annotated[str, Query(max_length=100)],
+    limit: Annotated[int, Query(ge=1, le=50)] = 10,
+) -> list[SkuOption]:
+    return catalogue.search_skus(session, query, limit=limit)
 
 
 @router.get('/{product_id}')

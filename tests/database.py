@@ -1,7 +1,7 @@
 from alembic import command
 from alembic.config import Config
-from sqlalchemy import text
-from sqlmodel import create_engine
+from sqlalchemy import Engine, text
+from sqlmodel import SQLModel, create_engine
 
 
 def rebuild(url: str) -> None:
@@ -18,3 +18,14 @@ def rebuild(url: str) -> None:
     config = Config('alembic.ini')
     config.set_main_option('sqlalchemy.url', url)
     command.upgrade(config, 'head')
+
+
+def wipe(engine: Engine) -> None:
+    """Delete every row a test committed, keeping the seeded Location."""
+    tables = ', '.join(
+        f'"{table.name}"'
+        for table in SQLModel.metadata.sorted_tables
+        if table.name != 'location'
+    )
+    with engine.begin() as connection:
+        connection.execute(text(f'TRUNCATE {tables} RESTART IDENTITY CASCADE'))

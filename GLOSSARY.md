@@ -202,7 +202,7 @@ _ID_: Stok opname
 _Avoid_: Stock take, stock count, audit
 
 **Scope**:
-The SKUs a Stock Opname covers: all of them, one Category, or a chosen list.
+The SKUs a Stock Opname covers: all of them, chosen Categories or Sub-categories, or a chosen list.
 
 **Partial Opname**:
 A Stock Opname whose Scope is less than all SKUs, typically the Fast-moving SKUs or ABC Class A.

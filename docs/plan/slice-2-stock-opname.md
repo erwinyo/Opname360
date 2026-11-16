@@ -1,5 +1,7 @@
 # Slice 2: Stock Opname
 
+**Status: built.** Every rule below has an API test in `tests/test_opname_*.py` and `tests/test_opening_opname.py`, and the main path has a browser test (`frontend/e2e/stock-opname.spec.ts`).
+
 **When it's done:** the shop can run its Opening Opname, count any part of its stock without closing, and the Owner can review the result on a phone, order Recounts, and decide who bears each Shortage.
 
 Needs slice 1. Shared patterns are in [plan.md](../plan.md); the reasoning for counting while open is in [ADR 0004](../adr/0004-opname-does-not-freeze-sales.md).
@@ -76,6 +78,21 @@ Each one gets a test.
 3. **Approval:** stock adjustments, Variance Resolution, Employee Charges, Reversal, Berita Acara.
 4. **Opening Opname.**
 5. **Browser test:** open a Partial Opname → two Checkers count → approve with one Company Loss and one Employee Charge → the Stock Card shows both adjustments.
+
+## Decided while building
+
+- **Numbers:** `SO-2611-0001`, given when the session opens, because Checkers see it from the start. A cancelled session keeps its number.
+- **Taking back a count:** a Checker can cancel their own entries while the line can still be counted (a double scan, a wrong SKU). A line left with no entries is uncounted again and takes a fresh snapshot at its next count.
+- **Confirming zero** is a Count Entry of 0 by the Admin, so it records the System Quantity the same way a count does. Lines can be confirmed one by one or all at once.
+- **Items without a Barcode:** Checkers find them by name, limited to the SKUs in Scope.
+- **Camera scanning** uses the browser's own barcode reader: Chrome on Android, not yet Safari on iPhone. A label held in view counts once until it has been out of view for a second.
+- **Blind Count for staff who count:** an Owner or Admin who is a Checker never sees that session's System Quantities or Variances, even after counting closes.
+- **Who decides what:** any Owner or Admin who did not count may review, recount, give reasons and approve. Only the Owner chooses an Employee Charge; an Admin can approve a session with the Owner's charges but not change them.
+- **Values in Review are estimates.** A Shortage is estimated at the average cost; approval takes it out by the Costing Method. An Employee Charge without an amount set takes what approval actually took out, rounded to whole rupiah.
+- **A Surplus of a SKU that never had a cost** sets the SKU's latest unit cost to the cost entered.
+- **Reversing an approved session** works like other documents: Owner or Admin, a reason, a `BTL` number.
+- **Unknown barcodes** are listed per code with how often and who scanned last. Adding the missing product is done by hand in the catalogue.
+- **The Opening Opname switch** only shows while no stock has moved at the Location.
 
 ## Not in this slice
 

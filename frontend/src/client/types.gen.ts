@@ -119,6 +119,134 @@ export type CategoryUpdate = {
 export type CostingMethod = 'moving_average' | 'fifo';
 
 /**
+ * CountCreate
+ *
+ * A scan (code, quantity 1) or a typed quantity for a code or SKU.
+ */
+export type CountCreate = {
+    /**
+     * Code
+     */
+    code?: string | null;
+    /**
+     * Sku Id
+     */
+    sku_id?: number | null;
+    /**
+     * Quantity
+     */
+    quantity?: number | string;
+};
+
+/**
+ * CountSheet
+ *
+ * What one Checker sees: their own entries, never a System Quantity.
+ */
+export type CountSheet = {
+    /**
+     * Id
+     */
+    id: number;
+    /**
+     * Number
+     */
+    number: string;
+    status: OpnameStatus;
+    /**
+     * Scope Label
+     */
+    scope_label: string;
+    /**
+     * Location Name
+     */
+    location_name: string;
+    /**
+     * Can Count
+     */
+    can_count: boolean;
+    /**
+     * Entries
+     */
+    entries: Array<MyCountEntry>;
+    /**
+     * Entry Count
+     */
+    entry_count: number;
+    /**
+     * Sku Count
+     */
+    sku_count: number;
+};
+
+/**
+ * CountSkuOption
+ *
+ * A SKU in Scope, found by name for typing a quantity.
+ */
+export type CountSkuOption = {
+    /**
+     * Id
+     */
+    id: number;
+    /**
+     * Product Name
+     */
+    product_name: string;
+    /**
+     * Size
+     */
+    size: string | null;
+    /**
+     * Color
+     */
+    color: string | null;
+    /**
+     * Code
+     */
+    code: string;
+    /**
+     * Barcode
+     */
+    barcode: string;
+    /**
+     * Stock Unit
+     */
+    stock_unit: string;
+};
+
+/**
+ * CountingSummary
+ */
+export type CountingSummary = {
+    /**
+     * Id
+     */
+    id: number;
+    /**
+     * Number
+     */
+    number: string;
+    status: OpnameStatus;
+    /**
+     * Scope Label
+     */
+    scope_label: string;
+    /**
+     * Location Name
+     */
+    location_name: string;
+    /**
+     * Opened At
+     */
+    opened_at: string;
+    /**
+     * Can Count
+     */
+    can_count: boolean;
+};
+
+/**
  * DocumentStatus
  */
 export type DocumentStatus = 'draft' | 'completed' | 'reversed';
@@ -450,6 +578,11 @@ export type ImportResult = {
 };
 
 /**
+ * LineShow
+ */
+export type LineShow = 'all' | 'uncounted' | 'counted' | 'variance' | 'needs_cost';
+
+/**
  * LocationPublic
  */
 export type LocationPublic = {
@@ -480,7 +613,371 @@ export type LoginRequest = {
 /**
  * MovementReason
  */
-export type MovementReason = 'goods_receipt' | 'production_receipt' | 'supplier_return' | 'reversal' | 'cost_adjustment';
+export type MovementReason = 'goods_receipt' | 'production_receipt' | 'supplier_return' | 'reversal' | 'opname' | 'opening' | 'cost_adjustment';
+
+/**
+ * MyCountEntry
+ */
+export type MyCountEntry = {
+    /**
+     * Id
+     */
+    id: number;
+    /**
+     * Sku Id
+     */
+    sku_id: number;
+    /**
+     * Product Name
+     */
+    product_name: string;
+    /**
+     * Size
+     */
+    size: string | null;
+    /**
+     * Color
+     */
+    color: string | null;
+    /**
+     * Code
+     */
+    code: string;
+    /**
+     * Stock Unit
+     */
+    stock_unit: string;
+    /**
+     * Quantity
+     */
+    quantity: string;
+    /**
+     * Counted At
+     */
+    counted_at: string;
+};
+
+/**
+ * OpnameLinePage
+ */
+export type OpnameLinePage = {
+    /**
+     * Items
+     */
+    items: Array<OpnameLinePublic>;
+    /**
+     * Total
+     */
+    total: number;
+};
+
+/**
+ * OpnameLinePublic
+ */
+export type OpnameLinePublic = {
+    /**
+     * Id
+     */
+    id: number;
+    /**
+     * Sku Id
+     */
+    sku_id: number;
+    /**
+     * Product Name
+     */
+    product_name: string;
+    /**
+     * Size
+     */
+    size: string | null;
+    /**
+     * Color
+     */
+    color: string | null;
+    /**
+     * Code
+     */
+    code: string;
+    /**
+     * Barcode
+     */
+    barcode: string;
+    /**
+     * Stock Unit
+     */
+    stock_unit: string;
+    /**
+     * Counted
+     */
+    counted: boolean;
+    /**
+     * Recount
+     */
+    recount: boolean;
+    /**
+     * System Quantity
+     */
+    system_quantity?: string | null;
+    /**
+     * Physical Quantity
+     */
+    physical_quantity?: string | null;
+    /**
+     * Variance
+     */
+    variance?: string | null;
+    /**
+     * Moved While Counting
+     */
+    moved_while_counting?: boolean | null;
+    /**
+     * Unit Cost
+     */
+    unit_cost?: string | null;
+    /**
+     * Needs Cost
+     */
+    needs_cost?: boolean | null;
+    /**
+     * Variance Value
+     */
+    variance_value?: string | null;
+    /**
+     * Entered Unit Cost
+     */
+    entered_unit_cost?: string | null;
+    shortage_reason?: ShortageReason | null;
+    resolution?: Resolution | null;
+    /**
+     * Charged User Id
+     */
+    charged_user_id?: number | null;
+    /**
+     * Charged User Name
+     */
+    charged_user_name?: string | null;
+    /**
+     * Charge Amount
+     */
+    charge_amount?: number | null;
+};
+
+/**
+ * OpnameOpen
+ */
+export type OpnameOpen = {
+    /**
+     * Location Id
+     */
+    location_id?: number | null;
+    scope?: OpnameScope;
+    /**
+     * Category Ids
+     */
+    category_ids?: Array<number>;
+    /**
+     * Sub Category Ids
+     */
+    sub_category_ids?: Array<number>;
+    /**
+     * Sku Ids
+     */
+    sku_ids?: Array<number>;
+    /**
+     * Checker Ids
+     */
+    checker_ids: Array<number>;
+    /**
+     * Is Opening
+     */
+    is_opening?: boolean;
+    /**
+     * Note
+     */
+    note?: string | null;
+};
+
+/**
+ * OpnamePage
+ */
+export type OpnamePage = {
+    /**
+     * Items
+     */
+    items: Array<OpnameSummary>;
+    /**
+     * Total
+     */
+    total: number;
+};
+
+/**
+ * OpnamePublic
+ */
+export type OpnamePublic = {
+    /**
+     * Id
+     */
+    id: number;
+    /**
+     * Number
+     */
+    number: string;
+    status: OpnameStatus;
+    scope: OpnameScope;
+    /**
+     * Scope Label
+     */
+    scope_label: string;
+    /**
+     * Is Opening
+     */
+    is_opening: boolean;
+    /**
+     * Location Id
+     */
+    location_id: number;
+    /**
+     * Location Name
+     */
+    location_name: string;
+    /**
+     * Note
+     */
+    note: string | null;
+    /**
+     * Opened By Name
+     */
+    opened_by_name: string | null;
+    /**
+     * Opened At
+     */
+    opened_at: string;
+    /**
+     * Counting Closed By Name
+     */
+    counting_closed_by_name: string | null;
+    /**
+     * Counting Closed At
+     */
+    counting_closed_at: string | null;
+    /**
+     * Approved By Name
+     */
+    approved_by_name: string | null;
+    /**
+     * Approved At
+     */
+    approved_at: string | null;
+    /**
+     * Cancelled By Name
+     */
+    cancelled_by_name: string | null;
+    /**
+     * Cancelled At
+     */
+    cancelled_at: string | null;
+    /**
+     * Checkers
+     */
+    checkers: Array<StaffOption>;
+    /**
+     * Line Count
+     */
+    line_count: number;
+    /**
+     * Counted Count
+     */
+    counted_count: number;
+    /**
+     * Recount Count
+     */
+    recount_count: number;
+    /**
+     * Revealed
+     */
+    revealed: boolean;
+    /**
+     * Can Approve
+     */
+    can_approve: boolean;
+    /**
+     * Shortage Count
+     */
+    shortage_count: number | null;
+    /**
+     * Shortage Value
+     */
+    shortage_value: string | null;
+    /**
+     * Surplus Count
+     */
+    surplus_count: number | null;
+    /**
+     * Surplus Value
+     */
+    surplus_value: string | null;
+    /**
+     * Unknown Barcodes
+     */
+    unknown_barcodes: Array<UnknownBarcodePublic>;
+    reversal: ReversalPublic | null;
+};
+
+/**
+ * OpnameScope
+ */
+export type OpnameScope = 'everything' | 'categories' | 'sub_categories' | 'skus';
+
+/**
+ * OpnameStatus
+ */
+export type OpnameStatus = 'counting' | 'review' | 'approved' | 'cancelled' | 'reversed';
+
+/**
+ * OpnameSummary
+ */
+export type OpnameSummary = {
+    /**
+     * Id
+     */
+    id: number;
+    /**
+     * Number
+     */
+    number: string;
+    status: OpnameStatus;
+    scope: OpnameScope;
+    /**
+     * Scope Label
+     */
+    scope_label: string;
+    /**
+     * Is Opening
+     */
+    is_opening: boolean;
+    /**
+     * Location Name
+     */
+    location_name: string;
+    /**
+     * Opened At
+     */
+    opened_at: string;
+    /**
+     * Opened By Name
+     */
+    opened_by_name: string | null;
+    /**
+     * Line Count
+     */
+    line_count: number;
+    /**
+     * Counted Count
+     */
+    counted_count: number;
+};
 
 /**
  * PasswordReset
@@ -753,6 +1250,11 @@ export type ProductionReceiptSummary = {
 };
 
 /**
+ * Resolution
+ */
+export type Resolution = 'company_loss' | 'employee_charge';
+
+/**
  * ReversalCreate
  */
 export type ReversalCreate = {
@@ -788,6 +1290,11 @@ export type ReversalPublic = {
  * Role
  */
 export type Role = 'owner' | 'admin' | 'cashier';
+
+/**
+ * ShortageReason
+ */
+export type ShortageReason = 'damaged' | 'lost' | 'miscounted' | 'unknown';
 
 /**
  * SkuOption
@@ -967,6 +1474,21 @@ export type SkuSave = {
      * Is Active
      */
     is_active?: boolean;
+};
+
+/**
+ * StaffOption
+ */
+export type StaffOption = {
+    /**
+     * Id
+     */
+    id: number;
+    /**
+     * Full Name
+     */
+    full_name: string;
+    role: Role;
 };
 
 /**
@@ -1419,6 +1941,28 @@ export type SupplierUpdate = {
      * Is Active
      */
     is_active?: boolean | null;
+};
+
+/**
+ * UnknownBarcodePublic
+ */
+export type UnknownBarcodePublic = {
+    /**
+     * Code
+     */
+    code: string;
+    /**
+     * Times
+     */
+    times: number;
+    /**
+     * Last Scanned By Name
+     */
+    last_scanned_by_name: string | null;
+    /**
+     * Last Scanned At
+     */
+    last_scanned_at: string;
 };
 
 /**
@@ -3109,6 +3653,358 @@ export type StockReadStockCardResponses = {
 };
 
 export type StockReadStockCardResponse = StockReadStockCardResponses[keyof StockReadStockCardResponses];
+
+export type OpnamesListOpnamesData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Status
+         */
+        status?: OpnameStatus | null;
+        /**
+         * Offset
+         */
+        offset?: number;
+        /**
+         * Limit
+         */
+        limit?: number;
+    };
+    url: '/api/v1/opnames/';
+};
+
+export type OpnamesListOpnamesErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type OpnamesListOpnamesError = OpnamesListOpnamesErrors[keyof OpnamesListOpnamesErrors];
+
+export type OpnamesListOpnamesResponses = {
+    /**
+     * Successful Response
+     */
+    200: OpnamePage;
+};
+
+export type OpnamesListOpnamesResponse = OpnamesListOpnamesResponses[keyof OpnamesListOpnamesResponses];
+
+export type OpnamesOpenOpnameData = {
+    body: OpnameOpen;
+    path?: never;
+    query?: never;
+    url: '/api/v1/opnames/';
+};
+
+export type OpnamesOpenOpnameErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type OpnamesOpenOpnameError = OpnamesOpenOpnameErrors[keyof OpnamesOpenOpnameErrors];
+
+export type OpnamesOpenOpnameResponses = {
+    /**
+     * Successful Response
+     */
+    201: OpnamePublic;
+};
+
+export type OpnamesOpenOpnameResponse = OpnamesOpenOpnameResponses[keyof OpnamesOpenOpnameResponses];
+
+export type OpnamesListStaffData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/opnames/staff';
+};
+
+export type OpnamesListStaffErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type OpnamesListStaffError = OpnamesListStaffErrors[keyof OpnamesListStaffErrors];
+
+export type OpnamesListStaffResponses = {
+    /**
+     * Response Opnames-List Staff
+     *
+     * Successful Response
+     */
+    200: Array<StaffOption>;
+};
+
+export type OpnamesListStaffResponse = OpnamesListStaffResponses[keyof OpnamesListStaffResponses];
+
+export type OpnamesReadOpnameData = {
+    body?: never;
+    path: {
+        /**
+         * Opname Id
+         */
+        opname_id: number;
+    };
+    query?: never;
+    url: '/api/v1/opnames/{opname_id}';
+};
+
+export type OpnamesReadOpnameErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type OpnamesReadOpnameError = OpnamesReadOpnameErrors[keyof OpnamesReadOpnameErrors];
+
+export type OpnamesReadOpnameResponses = {
+    /**
+     * Successful Response
+     */
+    200: OpnamePublic;
+};
+
+export type OpnamesReadOpnameResponse = OpnamesReadOpnameResponses[keyof OpnamesReadOpnameResponses];
+
+export type OpnamesListLinesData = {
+    body?: never;
+    path: {
+        /**
+         * Opname Id
+         */
+        opname_id: number;
+    };
+    query?: {
+        show?: LineShow;
+        /**
+         * Search
+         */
+        search?: string | null;
+        /**
+         * Offset
+         */
+        offset?: number;
+        /**
+         * Limit
+         */
+        limit?: number;
+    };
+    url: '/api/v1/opnames/{opname_id}/lines';
+};
+
+export type OpnamesListLinesErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type OpnamesListLinesError = OpnamesListLinesErrors[keyof OpnamesListLinesErrors];
+
+export type OpnamesListLinesResponses = {
+    /**
+     * Successful Response
+     */
+    200: OpnameLinePage;
+};
+
+export type OpnamesListLinesResponse = OpnamesListLinesResponses[keyof OpnamesListLinesResponses];
+
+export type OpnamesCancelOpnameData = {
+    body?: never;
+    path: {
+        /**
+         * Opname Id
+         */
+        opname_id: number;
+    };
+    query?: never;
+    url: '/api/v1/opnames/{opname_id}/cancel';
+};
+
+export type OpnamesCancelOpnameErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type OpnamesCancelOpnameError = OpnamesCancelOpnameErrors[keyof OpnamesCancelOpnameErrors];
+
+export type OpnamesCancelOpnameResponses = {
+    /**
+     * Successful Response
+     */
+    200: OpnamePublic;
+};
+
+export type OpnamesCancelOpnameResponse = OpnamesCancelOpnameResponses[keyof OpnamesCancelOpnameResponses];
+
+export type CountingListSessionsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/counting/';
+};
+
+export type CountingListSessionsErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type CountingListSessionsError = CountingListSessionsErrors[keyof CountingListSessionsErrors];
+
+export type CountingListSessionsResponses = {
+    /**
+     * Response Counting-List Sessions
+     *
+     * Successful Response
+     */
+    200: Array<CountingSummary>;
+};
+
+export type CountingListSessionsResponse = CountingListSessionsResponses[keyof CountingListSessionsResponses];
+
+export type CountingReadSheetData = {
+    body?: never;
+    path: {
+        /**
+         * Opname Id
+         */
+        opname_id: number;
+    };
+    query?: never;
+    url: '/api/v1/counting/{opname_id}';
+};
+
+export type CountingReadSheetErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type CountingReadSheetError = CountingReadSheetErrors[keyof CountingReadSheetErrors];
+
+export type CountingReadSheetResponses = {
+    /**
+     * Successful Response
+     */
+    200: CountSheet;
+};
+
+export type CountingReadSheetResponse = CountingReadSheetResponses[keyof CountingReadSheetResponses];
+
+export type CountingFindSkusData = {
+    body?: never;
+    path: {
+        /**
+         * Opname Id
+         */
+        opname_id: number;
+    };
+    query: {
+        /**
+         * Search
+         */
+        search: string;
+    };
+    url: '/api/v1/counting/{opname_id}/skus';
+};
+
+export type CountingFindSkusErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type CountingFindSkusError = CountingFindSkusErrors[keyof CountingFindSkusErrors];
+
+export type CountingFindSkusResponses = {
+    /**
+     * Response Counting-Find Skus
+     *
+     * Successful Response
+     */
+    200: Array<CountSkuOption>;
+};
+
+export type CountingFindSkusResponse = CountingFindSkusResponses[keyof CountingFindSkusResponses];
+
+export type CountingAddCountData = {
+    body: CountCreate;
+    path: {
+        /**
+         * Opname Id
+         */
+        opname_id: number;
+    };
+    query?: never;
+    url: '/api/v1/counting/{opname_id}/entries';
+};
+
+export type CountingAddCountErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type CountingAddCountError = CountingAddCountErrors[keyof CountingAddCountErrors];
+
+export type CountingAddCountResponses = {
+    /**
+     * Successful Response
+     */
+    201: MyCountEntry;
+};
+
+export type CountingAddCountResponse = CountingAddCountResponses[keyof CountingAddCountResponses];
+
+export type CountingCancelCountData = {
+    body?: never;
+    path: {
+        /**
+         * Entry Id
+         */
+        entry_id: number;
+        /**
+         * Opname Id
+         */
+        opname_id: number;
+    };
+    query?: never;
+    url: '/api/v1/counting/{opname_id}/entries/{entry_id}';
+};
+
+export type CountingCancelCountErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type CountingCancelCountError = CountingCancelCountErrors[keyof CountingCancelCountErrors];
+
+export type CountingCancelCountResponses = {
+    /**
+     * Successful Response
+     */
+    204: void;
+};
+
+export type CountingCancelCountResponse = CountingCancelCountResponses[keyof CountingCancelCountResponses];
 
 export type ActivityLogListEntriesData = {
     body?: never;

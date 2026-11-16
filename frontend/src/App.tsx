@@ -11,6 +11,11 @@ import { HomePage } from '@/pages/HomePage'
 import { ActivityLogPage } from '@/pages/ActivityLogPage'
 import { LabelsPage } from '@/pages/labels/LabelsPage'
 import { LoginPage } from '@/pages/LoginPage'
+import { CountingPage } from '@/pages/opname/CountingPage'
+import { CountPage } from '@/pages/opname/CountPage'
+import { OpenOpnamePage } from '@/pages/opname/OpenOpnamePage'
+import { OpnamePage } from '@/pages/opname/OpnamePage'
+import { OpnamesPage } from '@/pages/opname/OpnamesPage'
 import { ProductionReceiptPage } from '@/pages/production/ProductionReceiptPage'
 import { ProductionReceiptsPage } from '@/pages/production/ProductionReceiptsPage'
 import { GoodsReceiptPage } from '@/pages/purchasing/GoodsReceiptPage'
@@ -48,6 +53,8 @@ export function App() {
     <Routes>
       <Route element={<AppLayout user={user} />}>
         <Route index element={<HomePage user={user} />} />
+        <Route path="hitung" element={<CountingPage />} />
+        <Route path="hitung/:opnameId" element={<CountPage />} />
         {user.role !== 'cashier' && (
           <>
             <Route path="produk" element={<ProductsPage />} />
@@ -58,6 +65,9 @@ export function App() {
             <Route path="kategori" element={<CategoriesPage />} />
             <Route path="stok" element={<StockPage />} />
             <Route path="stok/:skuId" element={<StockCardPage />} />
+            <Route path="stok-opname" element={<OpnamesPage />} />
+            <Route path="stok-opname/baru" element={<OpenOpnamePage />} />
+            <Route path="stok-opname/:opnameId" element={<OpnamePage />} />
             <Route path="barang-masuk" element={<GoodsReceiptsPage />} />
             <Route path="barang-masuk/baru" element={<GoodsReceiptPage />} />
             <Route

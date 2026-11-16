@@ -3,8 +3,8 @@
 import { type DefaultError, type InfiniteData, infiniteQueryOptions, queryOptions, type UseMutationOptions } from '@tanstack/react-query';
 
 import { client } from '../client.gen';
-import { activityLogListEntries, authLogin, authLogout, authReadMe, categoriesCreateCategory, categoriesCreateSubCategory, categoriesDeleteCategory, categoriesDeleteSubCategory, categoriesListCategories, categoriesRenameSubCategory, categoriesUpdateCategory, goodsReceiptsCompleteReceipt, goodsReceiptsCreateReceipt, goodsReceiptsDiscardReceipt, goodsReceiptsListReceipts, goodsReceiptsReadReceipt, goodsReceiptsReverseReceipt, goodsReceiptsUpdateReceipt, healthHealthCheck, type Options, productionReceiptsCompleteReceipt, productionReceiptsCreateReceipt, productionReceiptsDiscardReceipt, productionReceiptsListReceipts, productionReceiptsReadReceipt, productionReceiptsReverseReceipt, productionReceiptsUpdateReceipt, productsCreateProduct, productsDeleteProduct, productsDownloadImportTemplate, productsListPriceChanges, productsListProducts, productsListSkus, productsPreviewImport, productsReadProduct, productsRunImport, productsSearchSkus, productsUpdateProduct, stockListLocations, stockListStock, stockReadStockCard, supplierReturnsCompleteReturn, supplierReturnsCreateReturn, supplierReturnsDiscardReturn, supplierReturnsListReturns, supplierReturnsReadReturn, supplierReturnsReverseReturn, supplierReturnsUpdateReturn, suppliersCreateSupplier, suppliersListSuppliers, suppliersUpdateSupplier, usersCreateUser, usersListUsers, usersResetPassword, usersUpdateUser } from '../sdk.gen';
-import type { ActivityLogListEntriesData, ActivityLogListEntriesError, ActivityLogListEntriesResponse, AuthLoginData, AuthLoginError, AuthLoginResponse, AuthLogoutData, AuthLogoutError, AuthLogoutResponse, AuthReadMeData, AuthReadMeError, AuthReadMeResponse, CategoriesCreateCategoryData, CategoriesCreateCategoryError, CategoriesCreateCategoryResponse, CategoriesCreateSubCategoryData, CategoriesCreateSubCategoryError, CategoriesCreateSubCategoryResponse, CategoriesDeleteCategoryData, CategoriesDeleteCategoryError, CategoriesDeleteCategoryResponse, CategoriesDeleteSubCategoryData, CategoriesDeleteSubCategoryError, CategoriesDeleteSubCategoryResponse, CategoriesListCategoriesData, CategoriesListCategoriesError, CategoriesListCategoriesResponse, CategoriesRenameSubCategoryData, CategoriesRenameSubCategoryError, CategoriesRenameSubCategoryResponse, CategoriesUpdateCategoryData, CategoriesUpdateCategoryError, CategoriesUpdateCategoryResponse, GoodsReceiptsCompleteReceiptData, GoodsReceiptsCompleteReceiptError, GoodsReceiptsCompleteReceiptResponse, GoodsReceiptsCreateReceiptData, GoodsReceiptsCreateReceiptError, GoodsReceiptsCreateReceiptResponse, GoodsReceiptsDiscardReceiptData, GoodsReceiptsDiscardReceiptError, GoodsReceiptsDiscardReceiptResponse, GoodsReceiptsListReceiptsData, GoodsReceiptsListReceiptsError, GoodsReceiptsListReceiptsResponse, GoodsReceiptsReadReceiptData, GoodsReceiptsReadReceiptError, GoodsReceiptsReadReceiptResponse, GoodsReceiptsReverseReceiptData, GoodsReceiptsReverseReceiptError, GoodsReceiptsReverseReceiptResponse, GoodsReceiptsUpdateReceiptData, GoodsReceiptsUpdateReceiptError, GoodsReceiptsUpdateReceiptResponse, HealthHealthCheckData, HealthHealthCheckResponse, ProductionReceiptsCompleteReceiptData, ProductionReceiptsCompleteReceiptError, ProductionReceiptsCompleteReceiptResponse, ProductionReceiptsCreateReceiptData, ProductionReceiptsCreateReceiptError, ProductionReceiptsCreateReceiptResponse, ProductionReceiptsDiscardReceiptData, ProductionReceiptsDiscardReceiptError, ProductionReceiptsDiscardReceiptResponse, ProductionReceiptsListReceiptsData, ProductionReceiptsListReceiptsError, ProductionReceiptsListReceiptsResponse, ProductionReceiptsReadReceiptData, ProductionReceiptsReadReceiptError, ProductionReceiptsReadReceiptResponse, ProductionReceiptsReverseReceiptData, ProductionReceiptsReverseReceiptError, ProductionReceiptsReverseReceiptResponse, ProductionReceiptsUpdateReceiptData, ProductionReceiptsUpdateReceiptError, ProductionReceiptsUpdateReceiptResponse, ProductsCreateProductData, ProductsCreateProductError, ProductsCreateProductResponse, ProductsDeleteProductData, ProductsDeleteProductError, ProductsDeleteProductResponse, ProductsDownloadImportTemplateData, ProductsDownloadImportTemplateError, ProductsListPriceChangesData, ProductsListPriceChangesError, ProductsListPriceChangesResponse, ProductsListProductsData, ProductsListProductsError, ProductsListProductsResponse, ProductsListSkusData, ProductsListSkusError, ProductsListSkusResponse, ProductsPreviewImportData, ProductsPreviewImportError, ProductsPreviewImportResponse, ProductsReadProductData, ProductsReadProductError, ProductsReadProductResponse, ProductsRunImportData, ProductsRunImportError, ProductsRunImportResponse, ProductsSearchSkusData, ProductsSearchSkusError, ProductsSearchSkusResponse, ProductsUpdateProductData, ProductsUpdateProductError, ProductsUpdateProductResponse, StockListLocationsData, StockListLocationsError, StockListLocationsResponse, StockListStockData, StockListStockError, StockListStockResponse, StockReadStockCardData, StockReadStockCardError, StockReadStockCardResponse, SupplierReturnsCompleteReturnData, SupplierReturnsCompleteReturnError, SupplierReturnsCompleteReturnResponse, SupplierReturnsCreateReturnData, SupplierReturnsCreateReturnError, SupplierReturnsCreateReturnResponse, SupplierReturnsDiscardReturnData, SupplierReturnsDiscardReturnError, SupplierReturnsDiscardReturnResponse, SupplierReturnsListReturnsData, SupplierReturnsListReturnsError, SupplierReturnsListReturnsResponse, SupplierReturnsReadReturnData, SupplierReturnsReadReturnError, SupplierReturnsReadReturnResponse, SupplierReturnsReverseReturnData, SupplierReturnsReverseReturnError, SupplierReturnsReverseReturnResponse, SupplierReturnsUpdateReturnData, SupplierReturnsUpdateReturnError, SupplierReturnsUpdateReturnResponse, SuppliersCreateSupplierData, SuppliersCreateSupplierError, SuppliersCreateSupplierResponse, SuppliersListSuppliersData, SuppliersListSuppliersError, SuppliersListSuppliersResponse, SuppliersUpdateSupplierData, SuppliersUpdateSupplierError, SuppliersUpdateSupplierResponse, UsersCreateUserData, UsersCreateUserError, UsersCreateUserResponse, UsersListUsersData, UsersListUsersError, UsersListUsersResponse, UsersResetPasswordData, UsersResetPasswordError, UsersResetPasswordResponse, UsersUpdateUserData, UsersUpdateUserError, UsersUpdateUserResponse } from '../types.gen';
+import { activityLogListEntries, authLogin, authLogout, authReadMe, categoriesCreateCategory, categoriesCreateSubCategory, categoriesDeleteCategory, categoriesDeleteSubCategory, categoriesListCategories, categoriesRenameSubCategory, categoriesUpdateCategory, countingAddCount, countingCancelCount, countingFindSkus, countingListSessions, countingReadSheet, goodsReceiptsCompleteReceipt, goodsReceiptsCreateReceipt, goodsReceiptsDiscardReceipt, goodsReceiptsListReceipts, goodsReceiptsReadReceipt, goodsReceiptsReverseReceipt, goodsReceiptsUpdateReceipt, healthHealthCheck, opnamesCancelOpname, opnamesListLines, opnamesListOpnames, opnamesListStaff, opnamesOpenOpname, opnamesReadOpname, type Options, productionReceiptsCompleteReceipt, productionReceiptsCreateReceipt, productionReceiptsDiscardReceipt, productionReceiptsListReceipts, productionReceiptsReadReceipt, productionReceiptsReverseReceipt, productionReceiptsUpdateReceipt, productsCreateProduct, productsDeleteProduct, productsDownloadImportTemplate, productsListPriceChanges, productsListProducts, productsListSkus, productsPreviewImport, productsReadProduct, productsRunImport, productsSearchSkus, productsUpdateProduct, stockListLocations, stockListStock, stockReadStockCard, supplierReturnsCompleteReturn, supplierReturnsCreateReturn, supplierReturnsDiscardReturn, supplierReturnsListReturns, supplierReturnsReadReturn, supplierReturnsReverseReturn, supplierReturnsUpdateReturn, suppliersCreateSupplier, suppliersListSuppliers, suppliersUpdateSupplier, usersCreateUser, usersListUsers, usersResetPassword, usersUpdateUser } from '../sdk.gen';
+import type { ActivityLogListEntriesData, ActivityLogListEntriesError, ActivityLogListEntriesResponse, AuthLoginData, AuthLoginError, AuthLoginResponse, AuthLogoutData, AuthLogoutError, AuthLogoutResponse, AuthReadMeData, AuthReadMeError, AuthReadMeResponse, CategoriesCreateCategoryData, CategoriesCreateCategoryError, CategoriesCreateCategoryResponse, CategoriesCreateSubCategoryData, CategoriesCreateSubCategoryError, CategoriesCreateSubCategoryResponse, CategoriesDeleteCategoryData, CategoriesDeleteCategoryError, CategoriesDeleteCategoryResponse, CategoriesDeleteSubCategoryData, CategoriesDeleteSubCategoryError, CategoriesDeleteSubCategoryResponse, CategoriesListCategoriesData, CategoriesListCategoriesError, CategoriesListCategoriesResponse, CategoriesRenameSubCategoryData, CategoriesRenameSubCategoryError, CategoriesRenameSubCategoryResponse, CategoriesUpdateCategoryData, CategoriesUpdateCategoryError, CategoriesUpdateCategoryResponse, CountingAddCountData, CountingAddCountError, CountingAddCountResponse, CountingCancelCountData, CountingCancelCountError, CountingCancelCountResponse, CountingFindSkusData, CountingFindSkusError, CountingFindSkusResponse, CountingListSessionsData, CountingListSessionsError, CountingListSessionsResponse, CountingReadSheetData, CountingReadSheetError, CountingReadSheetResponse, GoodsReceiptsCompleteReceiptData, GoodsReceiptsCompleteReceiptError, GoodsReceiptsCompleteReceiptResponse, GoodsReceiptsCreateReceiptData, GoodsReceiptsCreateReceiptError, GoodsReceiptsCreateReceiptResponse, GoodsReceiptsDiscardReceiptData, GoodsReceiptsDiscardReceiptError, GoodsReceiptsDiscardReceiptResponse, GoodsReceiptsListReceiptsData, GoodsReceiptsListReceiptsError, GoodsReceiptsListReceiptsResponse, GoodsReceiptsReadReceiptData, GoodsReceiptsReadReceiptError, GoodsReceiptsReadReceiptResponse, GoodsReceiptsReverseReceiptData, GoodsReceiptsReverseReceiptError, GoodsReceiptsReverseReceiptResponse, GoodsReceiptsUpdateReceiptData, GoodsReceiptsUpdateReceiptError, GoodsReceiptsUpdateReceiptResponse, HealthHealthCheckData, HealthHealthCheckResponse, OpnamesCancelOpnameData, OpnamesCancelOpnameError, OpnamesCancelOpnameResponse, OpnamesListLinesData, OpnamesListLinesError, OpnamesListLinesResponse, OpnamesListOpnamesData, OpnamesListOpnamesError, OpnamesListOpnamesResponse, OpnamesListStaffData, OpnamesListStaffError, OpnamesListStaffResponse, OpnamesOpenOpnameData, OpnamesOpenOpnameError, OpnamesOpenOpnameResponse, OpnamesReadOpnameData, OpnamesReadOpnameError, OpnamesReadOpnameResponse, ProductionReceiptsCompleteReceiptData, ProductionReceiptsCompleteReceiptError, ProductionReceiptsCompleteReceiptResponse, ProductionReceiptsCreateReceiptData, ProductionReceiptsCreateReceiptError, ProductionReceiptsCreateReceiptResponse, ProductionReceiptsDiscardReceiptData, ProductionReceiptsDiscardReceiptError, ProductionReceiptsDiscardReceiptResponse, ProductionReceiptsListReceiptsData, ProductionReceiptsListReceiptsError, ProductionReceiptsListReceiptsResponse, ProductionReceiptsReadReceiptData, ProductionReceiptsReadReceiptError, ProductionReceiptsReadReceiptResponse, ProductionReceiptsReverseReceiptData, ProductionReceiptsReverseReceiptError, ProductionReceiptsReverseReceiptResponse, ProductionReceiptsUpdateReceiptData, ProductionReceiptsUpdateReceiptError, ProductionReceiptsUpdateReceiptResponse, ProductsCreateProductData, ProductsCreateProductError, ProductsCreateProductResponse, ProductsDeleteProductData, ProductsDeleteProductError, ProductsDeleteProductResponse, ProductsDownloadImportTemplateData, ProductsDownloadImportTemplateError, ProductsListPriceChangesData, ProductsListPriceChangesError, ProductsListPriceChangesResponse, ProductsListProductsData, ProductsListProductsError, ProductsListProductsResponse, ProductsListSkusData, ProductsListSkusError, ProductsListSkusResponse, ProductsPreviewImportData, ProductsPreviewImportError, ProductsPreviewImportResponse, ProductsReadProductData, ProductsReadProductError, ProductsReadProductResponse, ProductsRunImportData, ProductsRunImportError, ProductsRunImportResponse, ProductsSearchSkusData, ProductsSearchSkusError, ProductsSearchSkusResponse, ProductsUpdateProductData, ProductsUpdateProductError, ProductsUpdateProductResponse, StockListLocationsData, StockListLocationsError, StockListLocationsResponse, StockListStockData, StockListStockError, StockListStockResponse, StockReadStockCardData, StockReadStockCardError, StockReadStockCardResponse, SupplierReturnsCompleteReturnData, SupplierReturnsCompleteReturnError, SupplierReturnsCompleteReturnResponse, SupplierReturnsCreateReturnData, SupplierReturnsCreateReturnError, SupplierReturnsCreateReturnResponse, SupplierReturnsDiscardReturnData, SupplierReturnsDiscardReturnError, SupplierReturnsDiscardReturnResponse, SupplierReturnsListReturnsData, SupplierReturnsListReturnsError, SupplierReturnsListReturnsResponse, SupplierReturnsReadReturnData, SupplierReturnsReadReturnError, SupplierReturnsReadReturnResponse, SupplierReturnsReverseReturnData, SupplierReturnsReverseReturnError, SupplierReturnsReverseReturnResponse, SupplierReturnsUpdateReturnData, SupplierReturnsUpdateReturnError, SupplierReturnsUpdateReturnResponse, SuppliersCreateSupplierData, SuppliersCreateSupplierError, SuppliersCreateSupplierResponse, SuppliersListSuppliersData, SuppliersListSuppliersError, SuppliersListSuppliersResponse, SuppliersUpdateSupplierData, SuppliersUpdateSupplierError, SuppliersUpdateSupplierResponse, UsersCreateUserData, UsersCreateUserError, UsersCreateUserResponse, UsersListUsersData, UsersListUsersError, UsersListUsersResponse, UsersResetPasswordData, UsersResetPasswordError, UsersResetPasswordResponse, UsersUpdateUserData, UsersUpdateUserError, UsersUpdateUserResponse } from '../types.gen';
 
 export type QueryKey<TOptions extends Options> = [
     Pick<TOptions, 'baseUrl' | 'body' | 'headers' | 'path' | 'query'> & {
@@ -1169,6 +1169,264 @@ export const stockReadStockCardInfiniteOptions = (options: Options<StockReadStoc
         queryKey: stockReadStockCardInfiniteQueryKey(options)
     });
     return opts as Omit<typeof opts, 'initialData'>;
+};
+
+export const opnamesListOpnamesQueryKey = (options?: Options<OpnamesListOpnamesData>) => createQueryKey('opnamesListOpnames', options);
+
+/**
+ * List Opnames
+ */
+export const opnamesListOpnamesOptions = (options?: Options<OpnamesListOpnamesData>) => queryOptions<OpnamesListOpnamesResponse, OpnamesListOpnamesError, OpnamesListOpnamesResponse, ReturnType<typeof opnamesListOpnamesQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await opnamesListOpnames({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: opnamesListOpnamesQueryKey(options)
+});
+
+export const opnamesListOpnamesInfiniteQueryKey = (options?: Options<OpnamesListOpnamesData>): QueryKey<Options<OpnamesListOpnamesData>> => createQueryKey('opnamesListOpnames', options, true);
+
+/**
+ * List Opnames
+ */
+export const opnamesListOpnamesInfiniteOptions = (options?: Options<OpnamesListOpnamesData>) => {
+    const opts = infiniteQueryOptions<OpnamesListOpnamesResponse, OpnamesListOpnamesError, InfiniteData<OpnamesListOpnamesResponse>, QueryKey<Options<OpnamesListOpnamesData>>, number | Pick<QueryKey<Options<OpnamesListOpnamesData>>[0], 'body' | 'headers' | 'path' | 'query'>>(
+    // @ts-ignore
+    {
+        queryFn: async ({ pageParam, queryKey, signal }) => {
+            // @ts-ignore
+            const page: Pick<QueryKey<Options<OpnamesListOpnamesData>>[0], 'body' | 'headers' | 'path' | 'query'> = typeof pageParam === 'object' ? pageParam : {
+                query: {
+                    offset: pageParam
+                }
+            };
+            const params = createInfiniteParams(queryKey, page);
+            const { data } = await opnamesListOpnames({
+                ...options,
+                ...params,
+                signal,
+                throwOnError: true
+            });
+            return data;
+        },
+        queryKey: opnamesListOpnamesInfiniteQueryKey(options)
+    });
+    return opts as Omit<typeof opts, 'initialData'>;
+};
+
+/**
+ * Open Opname
+ */
+export const opnamesOpenOpnameMutation = (options?: Partial<Options<OpnamesOpenOpnameData>>): UseMutationOptions<OpnamesOpenOpnameResponse, OpnamesOpenOpnameError, Options<OpnamesOpenOpnameData>> => {
+    const mutationOptions: UseMutationOptions<OpnamesOpenOpnameResponse, OpnamesOpenOpnameError, Options<OpnamesOpenOpnameData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await opnamesOpenOpname({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+export const opnamesListStaffQueryKey = (options?: Options<OpnamesListStaffData>) => createQueryKey('opnamesListStaff', options);
+
+/**
+ * List Staff
+ *
+ * Active users, to pick Checkers and the employee of a charge.
+ */
+export const opnamesListStaffOptions = (options?: Options<OpnamesListStaffData>) => queryOptions<OpnamesListStaffResponse, OpnamesListStaffError, OpnamesListStaffResponse, ReturnType<typeof opnamesListStaffQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await opnamesListStaff({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: opnamesListStaffQueryKey(options)
+});
+
+export const opnamesReadOpnameQueryKey = (options: Options<OpnamesReadOpnameData>) => createQueryKey('opnamesReadOpname', options);
+
+/**
+ * Read Opname
+ */
+export const opnamesReadOpnameOptions = (options: Options<OpnamesReadOpnameData>) => queryOptions<OpnamesReadOpnameResponse, OpnamesReadOpnameError, OpnamesReadOpnameResponse, ReturnType<typeof opnamesReadOpnameQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await opnamesReadOpname({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: opnamesReadOpnameQueryKey(options)
+});
+
+export const opnamesListLinesQueryKey = (options: Options<OpnamesListLinesData>) => createQueryKey('opnamesListLines', options);
+
+/**
+ * List Lines
+ */
+export const opnamesListLinesOptions = (options: Options<OpnamesListLinesData>) => queryOptions<OpnamesListLinesResponse, OpnamesListLinesError, OpnamesListLinesResponse, ReturnType<typeof opnamesListLinesQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await opnamesListLines({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: opnamesListLinesQueryKey(options)
+});
+
+export const opnamesListLinesInfiniteQueryKey = (options: Options<OpnamesListLinesData>): QueryKey<Options<OpnamesListLinesData>> => createQueryKey('opnamesListLines', options, true);
+
+/**
+ * List Lines
+ */
+export const opnamesListLinesInfiniteOptions = (options: Options<OpnamesListLinesData>) => {
+    const opts = infiniteQueryOptions<OpnamesListLinesResponse, OpnamesListLinesError, InfiniteData<OpnamesListLinesResponse>, QueryKey<Options<OpnamesListLinesData>>, number | Pick<QueryKey<Options<OpnamesListLinesData>>[0], 'body' | 'headers' | 'path' | 'query'>>(
+    // @ts-ignore
+    {
+        queryFn: async ({ pageParam, queryKey, signal }) => {
+            // @ts-ignore
+            const page: Pick<QueryKey<Options<OpnamesListLinesData>>[0], 'body' | 'headers' | 'path' | 'query'> = typeof pageParam === 'object' ? pageParam : {
+                query: {
+                    offset: pageParam
+                }
+            };
+            const params = createInfiniteParams(queryKey, page);
+            const { data } = await opnamesListLines({
+                ...options,
+                ...params,
+                signal,
+                throwOnError: true
+            });
+            return data;
+        },
+        queryKey: opnamesListLinesInfiniteQueryKey(options)
+    });
+    return opts as Omit<typeof opts, 'initialData'>;
+};
+
+/**
+ * Cancel Opname
+ */
+export const opnamesCancelOpnameMutation = (options?: Partial<Options<OpnamesCancelOpnameData>>): UseMutationOptions<OpnamesCancelOpnameResponse, OpnamesCancelOpnameError, Options<OpnamesCancelOpnameData>> => {
+    const mutationOptions: UseMutationOptions<OpnamesCancelOpnameResponse, OpnamesCancelOpnameError, Options<OpnamesCancelOpnameData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await opnamesCancelOpname({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+export const countingListSessionsQueryKey = (options?: Options<CountingListSessionsData>) => createQueryKey('countingListSessions', options);
+
+/**
+ * List Sessions
+ *
+ * Unfinished sessions the signed-in user counts in.
+ */
+export const countingListSessionsOptions = (options?: Options<CountingListSessionsData>) => queryOptions<CountingListSessionsResponse, CountingListSessionsError, CountingListSessionsResponse, ReturnType<typeof countingListSessionsQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await countingListSessions({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: countingListSessionsQueryKey(options)
+});
+
+export const countingReadSheetQueryKey = (options: Options<CountingReadSheetData>) => createQueryKey('countingReadSheet', options);
+
+/**
+ * Read Sheet
+ */
+export const countingReadSheetOptions = (options: Options<CountingReadSheetData>) => queryOptions<CountingReadSheetResponse, CountingReadSheetError, CountingReadSheetResponse, ReturnType<typeof countingReadSheetQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await countingReadSheet({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: countingReadSheetQueryKey(options)
+});
+
+export const countingFindSkusQueryKey = (options: Options<CountingFindSkusData>) => createQueryKey('countingFindSkus', options);
+
+/**
+ * Find Skus
+ */
+export const countingFindSkusOptions = (options: Options<CountingFindSkusData>) => queryOptions<CountingFindSkusResponse, CountingFindSkusError, CountingFindSkusResponse, ReturnType<typeof countingFindSkusQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await countingFindSkus({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: countingFindSkusQueryKey(options)
+});
+
+/**
+ * Add Count
+ */
+export const countingAddCountMutation = (options?: Partial<Options<CountingAddCountData>>): UseMutationOptions<CountingAddCountResponse, CountingAddCountError, Options<CountingAddCountData>> => {
+    const mutationOptions: UseMutationOptions<CountingAddCountResponse, CountingAddCountError, Options<CountingAddCountData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await countingAddCount({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Cancel Count
+ */
+export const countingCancelCountMutation = (options?: Partial<Options<CountingCancelCountData>>): UseMutationOptions<CountingCancelCountResponse, CountingCancelCountError, Options<CountingCancelCountData>> => {
+    const mutationOptions: UseMutationOptions<CountingCancelCountResponse, CountingCancelCountError, Options<CountingCancelCountData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await countingCancelCount({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
 };
 
 export const activityLogListEntriesQueryKey = (options?: Options<ActivityLogListEntriesData>) => createQueryKey('activityLogListEntries', options);

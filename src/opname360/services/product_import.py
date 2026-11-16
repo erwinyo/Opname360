@@ -16,7 +16,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlmodel import Session, col, func, select
 
 from opname360.core.errors import ConflictError
-from opname360.core.formatting import sku_label
+from opname360.core.formatting import ANGLE, sku_label
 from opname360.models import (
     Category,
     CostingMethod,
@@ -33,7 +33,6 @@ from opname360.services import activity_log, catalogue
 
 
 MAX_ROWS = 10_000
-ANGLE = '\N{SINGLE RIGHT-POINTING ANGLE QUOTATION MARK}'
 
 
 @dataclass(frozen=True)

@@ -242,6 +242,22 @@ def reverse(
         session.flush()
 
 
+def found_unit_cost(sku: Sku, balance: StockBalance | None) -> Decimal | None:
+    """Costing rule 5: what one unit found in an opname is worth.
+
+    The current average cost under Moving Average, the latest unit cost under
+    FIFO (or when there is nothing to average). None if the SKU has never had
+    a cost.
+    """
+    if (
+        _method(sku) == CostingMethod.moving_average
+        and balance is not None
+        and balance.quantity > 0
+    ):
+        return money(balance.value / balance.quantity)
+    return sku.latest_unit_cost
+
+
 def _method(sku: Sku) -> CostingMethod:
     return sku.product.sub_category.category.costing_method
 

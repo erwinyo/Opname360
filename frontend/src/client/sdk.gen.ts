@@ -2,7 +2,7 @@
 
 import { type Client, type ClientMeta, formDataBodySerializer, type Options as Options2, type RequestResult, type TDataShape } from './client';
 import { client } from './client.gen';
-import type { ActivityLogListEntriesData, ActivityLogListEntriesErrors, ActivityLogListEntriesResponses, AuthLoginData, AuthLoginErrors, AuthLoginResponses, AuthLogoutData, AuthLogoutErrors, AuthLogoutResponses, AuthReadMeData, AuthReadMeErrors, AuthReadMeResponses, CategoriesCreateCategoryData, CategoriesCreateCategoryErrors, CategoriesCreateCategoryResponses, CategoriesCreateSubCategoryData, CategoriesCreateSubCategoryErrors, CategoriesCreateSubCategoryResponses, CategoriesDeleteCategoryData, CategoriesDeleteCategoryErrors, CategoriesDeleteCategoryResponses, CategoriesDeleteSubCategoryData, CategoriesDeleteSubCategoryErrors, CategoriesDeleteSubCategoryResponses, CategoriesListCategoriesData, CategoriesListCategoriesErrors, CategoriesListCategoriesResponses, CategoriesRenameSubCategoryData, CategoriesRenameSubCategoryErrors, CategoriesRenameSubCategoryResponses, CategoriesUpdateCategoryData, CategoriesUpdateCategoryErrors, CategoriesUpdateCategoryResponses, GoodsReceiptsCompleteReceiptData, GoodsReceiptsCompleteReceiptErrors, GoodsReceiptsCompleteReceiptResponses, GoodsReceiptsCreateReceiptData, GoodsReceiptsCreateReceiptErrors, GoodsReceiptsCreateReceiptResponses, GoodsReceiptsDiscardReceiptData, GoodsReceiptsDiscardReceiptErrors, GoodsReceiptsDiscardReceiptResponses, GoodsReceiptsListReceiptsData, GoodsReceiptsListReceiptsErrors, GoodsReceiptsListReceiptsResponses, GoodsReceiptsReadReceiptData, GoodsReceiptsReadReceiptErrors, GoodsReceiptsReadReceiptResponses, GoodsReceiptsReverseReceiptData, GoodsReceiptsReverseReceiptErrors, GoodsReceiptsReverseReceiptResponses, GoodsReceiptsUpdateReceiptData, GoodsReceiptsUpdateReceiptErrors, GoodsReceiptsUpdateReceiptResponses, HealthHealthCheckData, HealthHealthCheckResponses, ProductionReceiptsCompleteReceiptData, ProductionReceiptsCompleteReceiptErrors, ProductionReceiptsCompleteReceiptResponses, ProductionReceiptsCreateReceiptData, ProductionReceiptsCreateReceiptErrors, ProductionReceiptsCreateReceiptResponses, ProductionReceiptsDiscardReceiptData, ProductionReceiptsDiscardReceiptErrors, ProductionReceiptsDiscardReceiptResponses, ProductionReceiptsListReceiptsData, ProductionReceiptsListReceiptsErrors, ProductionReceiptsListReceiptsResponses, ProductionReceiptsReadReceiptData, ProductionReceiptsReadReceiptErrors, ProductionReceiptsReadReceiptResponses, ProductionReceiptsReverseReceiptData, ProductionReceiptsReverseReceiptErrors, ProductionReceiptsReverseReceiptResponses, ProductionReceiptsUpdateReceiptData, ProductionReceiptsUpdateReceiptErrors, ProductionReceiptsUpdateReceiptResponses, ProductsCreateProductData, ProductsCreateProductErrors, ProductsCreateProductResponses, ProductsDeleteProductData, ProductsDeleteProductErrors, ProductsDeleteProductResponses, ProductsDownloadImportTemplateData, ProductsDownloadImportTemplateErrors, ProductsDownloadImportTemplateResponses, ProductsListPriceChangesData, ProductsListPriceChangesErrors, ProductsListPriceChangesResponses, ProductsListProductsData, ProductsListProductsErrors, ProductsListProductsResponses, ProductsListSkusData, ProductsListSkusErrors, ProductsListSkusResponses, ProductsPreviewImportData, ProductsPreviewImportErrors, ProductsPreviewImportResponses, ProductsReadProductData, ProductsReadProductErrors, ProductsReadProductResponses, ProductsRunImportData, ProductsRunImportErrors, ProductsRunImportResponses, ProductsSearchSkusData, ProductsSearchSkusErrors, ProductsSearchSkusResponses, ProductsUpdateProductData, ProductsUpdateProductErrors, ProductsUpdateProductResponses, StockListLocationsData, StockListLocationsErrors, StockListLocationsResponses, StockListStockData, StockListStockErrors, StockListStockResponses, StockReadStockCardData, StockReadStockCardErrors, StockReadStockCardResponses, SupplierReturnsCompleteReturnData, SupplierReturnsCompleteReturnErrors, SupplierReturnsCompleteReturnResponses, SupplierReturnsCreateReturnData, SupplierReturnsCreateReturnErrors, SupplierReturnsCreateReturnResponses, SupplierReturnsDiscardReturnData, SupplierReturnsDiscardReturnErrors, SupplierReturnsDiscardReturnResponses, SupplierReturnsListReturnsData, SupplierReturnsListReturnsErrors, SupplierReturnsListReturnsResponses, SupplierReturnsReadReturnData, SupplierReturnsReadReturnErrors, SupplierReturnsReadReturnResponses, SupplierReturnsReverseReturnData, SupplierReturnsReverseReturnErrors, SupplierReturnsReverseReturnResponses, SupplierReturnsUpdateReturnData, SupplierReturnsUpdateReturnErrors, SupplierReturnsUpdateReturnResponses, SuppliersCreateSupplierData, SuppliersCreateSupplierErrors, SuppliersCreateSupplierResponses, SuppliersListSuppliersData, SuppliersListSuppliersErrors, SuppliersListSuppliersResponses, SuppliersUpdateSupplierData, SuppliersUpdateSupplierErrors, SuppliersUpdateSupplierResponses, UsersCreateUserData, UsersCreateUserErrors, UsersCreateUserResponses, UsersListUsersData, UsersListUsersErrors, UsersListUsersResponses, UsersResetPasswordData, UsersResetPasswordErrors, UsersResetPasswordResponses, UsersUpdateUserData, UsersUpdateUserErrors, UsersUpdateUserResponses } from './types.gen';
+import type { ActivityLogListEntriesData, ActivityLogListEntriesErrors, ActivityLogListEntriesResponses, AuthLoginData, AuthLoginErrors, AuthLoginResponses, AuthLogoutData, AuthLogoutErrors, AuthLogoutResponses, AuthReadMeData, AuthReadMeErrors, AuthReadMeResponses, CategoriesCreateCategoryData, CategoriesCreateCategoryErrors, CategoriesCreateCategoryResponses, CategoriesCreateSubCategoryData, CategoriesCreateSubCategoryErrors, CategoriesCreateSubCategoryResponses, CategoriesDeleteCategoryData, CategoriesDeleteCategoryErrors, CategoriesDeleteCategoryResponses, CategoriesDeleteSubCategoryData, CategoriesDeleteSubCategoryErrors, CategoriesDeleteSubCategoryResponses, CategoriesListCategoriesData, CategoriesListCategoriesErrors, CategoriesListCategoriesResponses, CategoriesRenameSubCategoryData, CategoriesRenameSubCategoryErrors, CategoriesRenameSubCategoryResponses, CategoriesUpdateCategoryData, CategoriesUpdateCategoryErrors, CategoriesUpdateCategoryResponses, CountingAddCountData, CountingAddCountErrors, CountingAddCountResponses, CountingCancelCountData, CountingCancelCountErrors, CountingCancelCountResponses, CountingFindSkusData, CountingFindSkusErrors, CountingFindSkusResponses, CountingListSessionsData, CountingListSessionsErrors, CountingListSessionsResponses, CountingReadSheetData, CountingReadSheetErrors, CountingReadSheetResponses, GoodsReceiptsCompleteReceiptData, GoodsReceiptsCompleteReceiptErrors, GoodsReceiptsCompleteReceiptResponses, GoodsReceiptsCreateReceiptData, GoodsReceiptsCreateReceiptErrors, GoodsReceiptsCreateReceiptResponses, GoodsReceiptsDiscardReceiptData, GoodsReceiptsDiscardReceiptErrors, GoodsReceiptsDiscardReceiptResponses, GoodsReceiptsListReceiptsData, GoodsReceiptsListReceiptsErrors, GoodsReceiptsListReceiptsResponses, GoodsReceiptsReadReceiptData, GoodsReceiptsReadReceiptErrors, GoodsReceiptsReadReceiptResponses, GoodsReceiptsReverseReceiptData, GoodsReceiptsReverseReceiptErrors, GoodsReceiptsReverseReceiptResponses, GoodsReceiptsUpdateReceiptData, GoodsReceiptsUpdateReceiptErrors, GoodsReceiptsUpdateReceiptResponses, HealthHealthCheckData, HealthHealthCheckResponses, OpnamesCancelOpnameData, OpnamesCancelOpnameErrors, OpnamesCancelOpnameResponses, OpnamesListLinesData, OpnamesListLinesErrors, OpnamesListLinesResponses, OpnamesListOpnamesData, OpnamesListOpnamesErrors, OpnamesListOpnamesResponses, OpnamesListStaffData, OpnamesListStaffErrors, OpnamesListStaffResponses, OpnamesOpenOpnameData, OpnamesOpenOpnameErrors, OpnamesOpenOpnameResponses, OpnamesReadOpnameData, OpnamesReadOpnameErrors, OpnamesReadOpnameResponses, ProductionReceiptsCompleteReceiptData, ProductionReceiptsCompleteReceiptErrors, ProductionReceiptsCompleteReceiptResponses, ProductionReceiptsCreateReceiptData, ProductionReceiptsCreateReceiptErrors, ProductionReceiptsCreateReceiptResponses, ProductionReceiptsDiscardReceiptData, ProductionReceiptsDiscardReceiptErrors, ProductionReceiptsDiscardReceiptResponses, ProductionReceiptsListReceiptsData, ProductionReceiptsListReceiptsErrors, ProductionReceiptsListReceiptsResponses, ProductionReceiptsReadReceiptData, ProductionReceiptsReadReceiptErrors, ProductionReceiptsReadReceiptResponses, ProductionReceiptsReverseReceiptData, ProductionReceiptsReverseReceiptErrors, ProductionReceiptsReverseReceiptResponses, ProductionReceiptsUpdateReceiptData, ProductionReceiptsUpdateReceiptErrors, ProductionReceiptsUpdateReceiptResponses, ProductsCreateProductData, ProductsCreateProductErrors, ProductsCreateProductResponses, ProductsDeleteProductData, ProductsDeleteProductErrors, ProductsDeleteProductResponses, ProductsDownloadImportTemplateData, ProductsDownloadImportTemplateErrors, ProductsDownloadImportTemplateResponses, ProductsListPriceChangesData, ProductsListPriceChangesErrors, ProductsListPriceChangesResponses, ProductsListProductsData, ProductsListProductsErrors, ProductsListProductsResponses, ProductsListSkusData, ProductsListSkusErrors, ProductsListSkusResponses, ProductsPreviewImportData, ProductsPreviewImportErrors, ProductsPreviewImportResponses, ProductsReadProductData, ProductsReadProductErrors, ProductsReadProductResponses, ProductsRunImportData, ProductsRunImportErrors, ProductsRunImportResponses, ProductsSearchSkusData, ProductsSearchSkusErrors, ProductsSearchSkusResponses, ProductsUpdateProductData, ProductsUpdateProductErrors, ProductsUpdateProductResponses, StockListLocationsData, StockListLocationsErrors, StockListLocationsResponses, StockListStockData, StockListStockErrors, StockListStockResponses, StockReadStockCardData, StockReadStockCardErrors, StockReadStockCardResponses, SupplierReturnsCompleteReturnData, SupplierReturnsCompleteReturnErrors, SupplierReturnsCompleteReturnResponses, SupplierReturnsCreateReturnData, SupplierReturnsCreateReturnErrors, SupplierReturnsCreateReturnResponses, SupplierReturnsDiscardReturnData, SupplierReturnsDiscardReturnErrors, SupplierReturnsDiscardReturnResponses, SupplierReturnsListReturnsData, SupplierReturnsListReturnsErrors, SupplierReturnsListReturnsResponses, SupplierReturnsReadReturnData, SupplierReturnsReadReturnErrors, SupplierReturnsReadReturnResponses, SupplierReturnsReverseReturnData, SupplierReturnsReverseReturnErrors, SupplierReturnsReverseReturnResponses, SupplierReturnsUpdateReturnData, SupplierReturnsUpdateReturnErrors, SupplierReturnsUpdateReturnResponses, SuppliersCreateSupplierData, SuppliersCreateSupplierErrors, SuppliersCreateSupplierResponses, SuppliersListSuppliersData, SuppliersListSuppliersErrors, SuppliersListSuppliersResponses, SuppliersUpdateSupplierData, SuppliersUpdateSupplierErrors, SuppliersUpdateSupplierResponses, UsersCreateUserData, UsersCreateUserErrors, UsersCreateUserResponses, UsersListUsersData, UsersListUsersErrors, UsersListUsersResponses, UsersResetPasswordData, UsersResetPasswordErrors, UsersResetPasswordResponses, UsersUpdateUserData, UsersUpdateUserErrors, UsersUpdateUserResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -447,6 +447,79 @@ export const stockListLocations = <ThrowOnError extends boolean = false>(options
  * Read Stock Card
  */
 export const stockReadStockCard = <ThrowOnError extends boolean = false>(options: Options<StockReadStockCardData, ThrowOnError>): RequestResult<StockReadStockCardResponses, StockReadStockCardErrors, ThrowOnError> => (options.client ?? client).get<StockReadStockCardResponses, StockReadStockCardErrors, ThrowOnError>({ url: '/api/v1/stock/skus/{sku_id}/card', ...options });
+
+/**
+ * List Opnames
+ */
+export const opnamesListOpnames = <ThrowOnError extends boolean = false>(options?: Options<OpnamesListOpnamesData, ThrowOnError>): RequestResult<OpnamesListOpnamesResponses, OpnamesListOpnamesErrors, ThrowOnError> => (options?.client ?? client).get<OpnamesListOpnamesResponses, OpnamesListOpnamesErrors, ThrowOnError>({ url: '/api/v1/opnames/', ...options });
+
+/**
+ * Open Opname
+ */
+export const opnamesOpenOpname = <ThrowOnError extends boolean = false>(options: Options<OpnamesOpenOpnameData, ThrowOnError>): RequestResult<OpnamesOpenOpnameResponses, OpnamesOpenOpnameErrors, ThrowOnError> => (options.client ?? client).post<OpnamesOpenOpnameResponses, OpnamesOpenOpnameErrors, ThrowOnError>({
+    url: '/api/v1/opnames/',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * List Staff
+ *
+ * Active users, to pick Checkers and the employee of a charge.
+ */
+export const opnamesListStaff = <ThrowOnError extends boolean = false>(options?: Options<OpnamesListStaffData, ThrowOnError>): RequestResult<OpnamesListStaffResponses, OpnamesListStaffErrors, ThrowOnError> => (options?.client ?? client).get<OpnamesListStaffResponses, OpnamesListStaffErrors, ThrowOnError>({ url: '/api/v1/opnames/staff', ...options });
+
+/**
+ * Read Opname
+ */
+export const opnamesReadOpname = <ThrowOnError extends boolean = false>(options: Options<OpnamesReadOpnameData, ThrowOnError>): RequestResult<OpnamesReadOpnameResponses, OpnamesReadOpnameErrors, ThrowOnError> => (options.client ?? client).get<OpnamesReadOpnameResponses, OpnamesReadOpnameErrors, ThrowOnError>({ url: '/api/v1/opnames/{opname_id}', ...options });
+
+/**
+ * List Lines
+ */
+export const opnamesListLines = <ThrowOnError extends boolean = false>(options: Options<OpnamesListLinesData, ThrowOnError>): RequestResult<OpnamesListLinesResponses, OpnamesListLinesErrors, ThrowOnError> => (options.client ?? client).get<OpnamesListLinesResponses, OpnamesListLinesErrors, ThrowOnError>({ url: '/api/v1/opnames/{opname_id}/lines', ...options });
+
+/**
+ * Cancel Opname
+ */
+export const opnamesCancelOpname = <ThrowOnError extends boolean = false>(options: Options<OpnamesCancelOpnameData, ThrowOnError>): RequestResult<OpnamesCancelOpnameResponses, OpnamesCancelOpnameErrors, ThrowOnError> => (options.client ?? client).post<OpnamesCancelOpnameResponses, OpnamesCancelOpnameErrors, ThrowOnError>({ url: '/api/v1/opnames/{opname_id}/cancel', ...options });
+
+/**
+ * List Sessions
+ *
+ * Unfinished sessions the signed-in user counts in.
+ */
+export const countingListSessions = <ThrowOnError extends boolean = false>(options?: Options<CountingListSessionsData, ThrowOnError>): RequestResult<CountingListSessionsResponses, CountingListSessionsErrors, ThrowOnError> => (options?.client ?? client).get<CountingListSessionsResponses, CountingListSessionsErrors, ThrowOnError>({ url: '/api/v1/counting/', ...options });
+
+/**
+ * Read Sheet
+ */
+export const countingReadSheet = <ThrowOnError extends boolean = false>(options: Options<CountingReadSheetData, ThrowOnError>): RequestResult<CountingReadSheetResponses, CountingReadSheetErrors, ThrowOnError> => (options.client ?? client).get<CountingReadSheetResponses, CountingReadSheetErrors, ThrowOnError>({ url: '/api/v1/counting/{opname_id}', ...options });
+
+/**
+ * Find Skus
+ */
+export const countingFindSkus = <ThrowOnError extends boolean = false>(options: Options<CountingFindSkusData, ThrowOnError>): RequestResult<CountingFindSkusResponses, CountingFindSkusErrors, ThrowOnError> => (options.client ?? client).get<CountingFindSkusResponses, CountingFindSkusErrors, ThrowOnError>({ url: '/api/v1/counting/{opname_id}/skus', ...options });
+
+/**
+ * Add Count
+ */
+export const countingAddCount = <ThrowOnError extends boolean = false>(options: Options<CountingAddCountData, ThrowOnError>): RequestResult<CountingAddCountResponses, CountingAddCountErrors, ThrowOnError> => (options.client ?? client).post<CountingAddCountResponses, CountingAddCountErrors, ThrowOnError>({
+    url: '/api/v1/counting/{opname_id}/entries',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Cancel Count
+ */
+export const countingCancelCount = <ThrowOnError extends boolean = false>(options: Options<CountingCancelCountData, ThrowOnError>): RequestResult<CountingCancelCountResponses, CountingCancelCountErrors, ThrowOnError> => (options.client ?? client).delete<CountingCancelCountResponses, CountingCancelCountErrors, ThrowOnError>({ url: '/api/v1/counting/{opname_id}/entries/{entry_id}', ...options });
 
 /**
  * List Entries

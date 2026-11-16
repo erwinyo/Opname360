@@ -3399,6 +3399,748 @@
         }
       }
     },
+    "/api/v1/opnames/": {
+      "get": {
+        "tags": [
+          "opnames"
+        ],
+        "summary": "List Opnames",
+        "operationId": "opnames-list_opnames",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/OpnameStatus"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "title": "Offset"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "opname360_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Opname360 Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OpnamePage"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "opnames"
+        ],
+        "summary": "Open Opname",
+        "operationId": "opnames-open_opname",
+        "parameters": [
+          {
+            "name": "opname360_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Opname360 Session"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OpnameOpen"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OpnamePublic"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/opnames/staff": {
+      "get": {
+        "tags": [
+          "opnames"
+        ],
+        "summary": "List Staff",
+        "description": "Active users, to pick Checkers and the employee of a charge.",
+        "operationId": "opnames-list_staff",
+        "parameters": [
+          {
+            "name": "opname360_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Opname360 Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/StaffOption"
+                  },
+                  "title": "Response Opnames-List Staff"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/opnames/{opname_id}": {
+      "get": {
+        "tags": [
+          "opnames"
+        ],
+        "summary": "Read Opname",
+        "operationId": "opnames-read_opname",
+        "parameters": [
+          {
+            "name": "opname_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "title": "Opname Id"
+            }
+          },
+          {
+            "name": "opname360_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Opname360 Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OpnamePublic"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/opnames/{opname_id}/lines": {
+      "get": {
+        "tags": [
+          "opnames"
+        ],
+        "summary": "List Lines",
+        "operationId": "opnames-list_lines",
+        "parameters": [
+          {
+            "name": "opname_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "title": "Opname Id"
+            }
+          },
+          {
+            "name": "show",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/LineShow",
+              "default": "all"
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 100
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Search"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "title": "Offset"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 2000,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "opname360_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Opname360 Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OpnameLinePage"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/opnames/{opname_id}/cancel": {
+      "post": {
+        "tags": [
+          "opnames"
+        ],
+        "summary": "Cancel Opname",
+        "operationId": "opnames-cancel_opname",
+        "parameters": [
+          {
+            "name": "opname_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "title": "Opname Id"
+            }
+          },
+          {
+            "name": "opname360_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Opname360 Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OpnamePublic"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/counting/": {
+      "get": {
+        "tags": [
+          "counting"
+        ],
+        "summary": "List Sessions",
+        "description": "Unfinished sessions the signed-in user counts in.",
+        "operationId": "counting-list_sessions",
+        "parameters": [
+          {
+            "name": "opname360_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Opname360 Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CountingSummary"
+                  },
+                  "title": "Response Counting-List Sessions"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/counting/{opname_id}": {
+      "get": {
+        "tags": [
+          "counting"
+        ],
+        "summary": "Read Sheet",
+        "operationId": "counting-read_sheet",
+        "parameters": [
+          {
+            "name": "opname_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "title": "Opname Id"
+            }
+          },
+          {
+            "name": "opname360_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Opname360 Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CountSheet"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/counting/{opname_id}/skus": {
+      "get": {
+        "tags": [
+          "counting"
+        ],
+        "summary": "Find Skus",
+        "operationId": "counting-find_skus",
+        "parameters": [
+          {
+            "name": "opname_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "title": "Opname Id"
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 100,
+              "title": "Search"
+            }
+          },
+          {
+            "name": "opname360_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Opname360 Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CountSkuOption"
+                  },
+                  "title": "Response Counting-Find Skus"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/counting/{opname_id}/entries": {
+      "post": {
+        "tags": [
+          "counting"
+        ],
+        "summary": "Add Count",
+        "operationId": "counting-add_count",
+        "parameters": [
+          {
+            "name": "opname_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "title": "Opname Id"
+            }
+          },
+          {
+            "name": "opname360_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Opname360 Session"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CountCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MyCountEntry"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/counting/{opname_id}/entries/{entry_id}": {
+      "delete": {
+        "tags": [
+          "counting"
+        ],
+        "summary": "Cancel Count",
+        "operationId": "counting-cancel_count",
+        "parameters": [
+          {
+            "name": "entry_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "title": "Entry Id"
+            }
+          },
+          {
+            "name": "opname_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "title": "Opname Id"
+            }
+          },
+          {
+            "name": "opname360_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Opname360 Session"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/activity-log/": {
       "get": {
         "tags": [
@@ -3689,6 +4431,206 @@
           "fifo"
         ],
         "title": "CostingMethod"
+      },
+      "CountCreate": {
+        "properties": {
+          "code": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 64
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Code"
+          },
+          "sku_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sku Id"
+          },
+          "quantity": {
+            "anyOf": [
+              {
+                "type": "number",
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "title": "Quantity",
+            "default": "1"
+          }
+        },
+        "type": "object",
+        "title": "CountCreate",
+        "description": "A scan (code, quantity 1) or a typed quantity for a code or SKU."
+      },
+      "CountSheet": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "number": {
+            "type": "string",
+            "title": "Number"
+          },
+          "status": {
+            "$ref": "#/components/schemas/OpnameStatus"
+          },
+          "scope_label": {
+            "type": "string",
+            "title": "Scope Label"
+          },
+          "location_name": {
+            "type": "string",
+            "title": "Location Name"
+          },
+          "can_count": {
+            "type": "boolean",
+            "title": "Can Count"
+          },
+          "entries": {
+            "items": {
+              "$ref": "#/components/schemas/MyCountEntry"
+            },
+            "type": "array",
+            "title": "Entries"
+          },
+          "entry_count": {
+            "type": "integer",
+            "title": "Entry Count"
+          },
+          "sku_count": {
+            "type": "integer",
+            "title": "Sku Count"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "number",
+          "status",
+          "scope_label",
+          "location_name",
+          "can_count",
+          "entries",
+          "entry_count",
+          "sku_count"
+        ],
+        "title": "CountSheet",
+        "description": "What one Checker sees: their own entries, never a System Quantity."
+      },
+      "CountSkuOption": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "product_name": {
+            "type": "string",
+            "title": "Product Name"
+          },
+          "size": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Size"
+          },
+          "color": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Color"
+          },
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "barcode": {
+            "type": "string",
+            "title": "Barcode"
+          },
+          "stock_unit": {
+            "type": "string",
+            "title": "Stock Unit"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "product_name",
+          "size",
+          "color",
+          "code",
+          "barcode",
+          "stock_unit"
+        ],
+        "title": "CountSkuOption",
+        "description": "A SKU in Scope, found by name for typing a quantity."
+      },
+      "CountingSummary": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "number": {
+            "type": "string",
+            "title": "Number"
+          },
+          "status": {
+            "$ref": "#/components/schemas/OpnameStatus"
+          },
+          "scope_label": {
+            "type": "string",
+            "title": "Scope Label"
+          },
+          "location_name": {
+            "type": "string",
+            "title": "Location Name"
+          },
+          "opened_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Opened At"
+          },
+          "can_count": {
+            "type": "boolean",
+            "title": "Can Count"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "number",
+          "status",
+          "scope_label",
+          "location_name",
+          "opened_at",
+          "can_count"
+        ],
+        "title": "CountingSummary"
       },
       "DocumentStatus": {
         "type": "string",
@@ -4310,6 +5252,17 @@
         ],
         "title": "ImportResult"
       },
+      "LineShow": {
+        "type": "string",
+        "enum": [
+          "all",
+          "uncounted",
+          "counted",
+          "variance",
+          "needs_cost"
+        ],
+        "title": "LineShow"
+      },
       "LocationPublic": {
         "properties": {
           "id": {
@@ -4353,9 +5306,748 @@
           "production_receipt",
           "supplier_return",
           "reversal",
+          "opname",
+          "opening",
           "cost_adjustment"
         ],
         "title": "MovementReason"
+      },
+      "MyCountEntry": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "sku_id": {
+            "type": "integer",
+            "title": "Sku Id"
+          },
+          "product_name": {
+            "type": "string",
+            "title": "Product Name"
+          },
+          "size": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Size"
+          },
+          "color": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Color"
+          },
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "stock_unit": {
+            "type": "string",
+            "title": "Stock Unit"
+          },
+          "quantity": {
+            "type": "string",
+            "title": "Quantity"
+          },
+          "counted_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Counted At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "sku_id",
+          "product_name",
+          "size",
+          "color",
+          "code",
+          "stock_unit",
+          "quantity",
+          "counted_at"
+        ],
+        "title": "MyCountEntry"
+      },
+      "OpnameLinePage": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/OpnameLinePublic"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "total"
+        ],
+        "title": "OpnameLinePage"
+      },
+      "OpnameLinePublic": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "sku_id": {
+            "type": "integer",
+            "title": "Sku Id"
+          },
+          "product_name": {
+            "type": "string",
+            "title": "Product Name"
+          },
+          "size": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Size"
+          },
+          "color": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Color"
+          },
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "barcode": {
+            "type": "string",
+            "title": "Barcode"
+          },
+          "stock_unit": {
+            "type": "string",
+            "title": "Stock Unit"
+          },
+          "counted": {
+            "type": "boolean",
+            "title": "Counted"
+          },
+          "recount": {
+            "type": "boolean",
+            "title": "Recount"
+          },
+          "system_quantity": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "System Quantity"
+          },
+          "physical_quantity": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Physical Quantity"
+          },
+          "variance": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Variance"
+          },
+          "moved_while_counting": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Moved While Counting"
+          },
+          "unit_cost": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unit Cost"
+          },
+          "needs_cost": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Needs Cost"
+          },
+          "variance_value": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Variance Value"
+          },
+          "entered_unit_cost": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Entered Unit Cost"
+          },
+          "shortage_reason": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ShortageReason"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "resolution": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Resolution"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "charged_user_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Charged User Id"
+          },
+          "charged_user_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Charged User Name"
+          },
+          "charge_amount": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Charge Amount"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "sku_id",
+          "product_name",
+          "size",
+          "color",
+          "code",
+          "barcode",
+          "stock_unit",
+          "counted",
+          "recount"
+        ],
+        "title": "OpnameLinePublic"
+      },
+      "OpnameOpen": {
+        "properties": {
+          "location_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Location Id"
+          },
+          "scope": {
+            "$ref": "#/components/schemas/OpnameScope",
+            "default": "everything"
+          },
+          "category_ids": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array",
+            "title": "Category Ids",
+            "default": []
+          },
+          "sub_category_ids": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array",
+            "title": "Sub Category Ids",
+            "default": []
+          },
+          "sku_ids": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array",
+            "title": "Sku Ids",
+            "default": []
+          },
+          "checker_ids": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array",
+            "minItems": 1,
+            "title": "Checker Ids"
+          },
+          "is_opening": {
+            "type": "boolean",
+            "title": "Is Opening",
+            "default": false
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 500
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          }
+        },
+        "type": "object",
+        "required": [
+          "checker_ids"
+        ],
+        "title": "OpnameOpen"
+      },
+      "OpnamePage": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/OpnameSummary"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "total"
+        ],
+        "title": "OpnamePage"
+      },
+      "OpnamePublic": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "number": {
+            "type": "string",
+            "title": "Number"
+          },
+          "status": {
+            "$ref": "#/components/schemas/OpnameStatus"
+          },
+          "scope": {
+            "$ref": "#/components/schemas/OpnameScope"
+          },
+          "scope_label": {
+            "type": "string",
+            "title": "Scope Label"
+          },
+          "is_opening": {
+            "type": "boolean",
+            "title": "Is Opening"
+          },
+          "location_id": {
+            "type": "integer",
+            "title": "Location Id"
+          },
+          "location_name": {
+            "type": "string",
+            "title": "Location Name"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "opened_by_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Opened By Name"
+          },
+          "opened_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Opened At"
+          },
+          "counting_closed_by_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Counting Closed By Name"
+          },
+          "counting_closed_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Counting Closed At"
+          },
+          "approved_by_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Approved By Name"
+          },
+          "approved_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Approved At"
+          },
+          "cancelled_by_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cancelled By Name"
+          },
+          "cancelled_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cancelled At"
+          },
+          "checkers": {
+            "items": {
+              "$ref": "#/components/schemas/StaffOption"
+            },
+            "type": "array",
+            "title": "Checkers"
+          },
+          "line_count": {
+            "type": "integer",
+            "title": "Line Count"
+          },
+          "counted_count": {
+            "type": "integer",
+            "title": "Counted Count"
+          },
+          "recount_count": {
+            "type": "integer",
+            "title": "Recount Count"
+          },
+          "revealed": {
+            "type": "boolean",
+            "title": "Revealed"
+          },
+          "can_approve": {
+            "type": "boolean",
+            "title": "Can Approve"
+          },
+          "shortage_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Shortage Count"
+          },
+          "shortage_value": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Shortage Value"
+          },
+          "surplus_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Surplus Count"
+          },
+          "surplus_value": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Surplus Value"
+          },
+          "unknown_barcodes": {
+            "items": {
+              "$ref": "#/components/schemas/UnknownBarcodePublic"
+            },
+            "type": "array",
+            "title": "Unknown Barcodes"
+          },
+          "reversal": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ReversalPublic"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "number",
+          "status",
+          "scope",
+          "scope_label",
+          "is_opening",
+          "location_id",
+          "location_name",
+          "note",
+          "opened_by_name",
+          "opened_at",
+          "counting_closed_by_name",
+          "counting_closed_at",
+          "approved_by_name",
+          "approved_at",
+          "cancelled_by_name",
+          "cancelled_at",
+          "checkers",
+          "line_count",
+          "counted_count",
+          "recount_count",
+          "revealed",
+          "can_approve",
+          "shortage_count",
+          "shortage_value",
+          "surplus_count",
+          "surplus_value",
+          "unknown_barcodes",
+          "reversal"
+        ],
+        "title": "OpnamePublic"
+      },
+      "OpnameScope": {
+        "type": "string",
+        "enum": [
+          "everything",
+          "categories",
+          "sub_categories",
+          "skus"
+        ],
+        "title": "OpnameScope"
+      },
+      "OpnameStatus": {
+        "type": "string",
+        "enum": [
+          "counting",
+          "review",
+          "approved",
+          "cancelled",
+          "reversed"
+        ],
+        "title": "OpnameStatus"
+      },
+      "OpnameSummary": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "number": {
+            "type": "string",
+            "title": "Number"
+          },
+          "status": {
+            "$ref": "#/components/schemas/OpnameStatus"
+          },
+          "scope": {
+            "$ref": "#/components/schemas/OpnameScope"
+          },
+          "scope_label": {
+            "type": "string",
+            "title": "Scope Label"
+          },
+          "is_opening": {
+            "type": "boolean",
+            "title": "Is Opening"
+          },
+          "location_name": {
+            "type": "string",
+            "title": "Location Name"
+          },
+          "opened_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Opened At"
+          },
+          "opened_by_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Opened By Name"
+          },
+          "line_count": {
+            "type": "integer",
+            "title": "Line Count"
+          },
+          "counted_count": {
+            "type": "integer",
+            "title": "Counted Count"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "number",
+          "status",
+          "scope",
+          "scope_label",
+          "is_opening",
+          "location_name",
+          "opened_at",
+          "opened_by_name",
+          "line_count",
+          "counted_count"
+        ],
+        "title": "OpnameSummary"
       },
       "PasswordReset": {
         "properties": {
@@ -4828,6 +6520,14 @@
         ],
         "title": "ProductionReceiptSummary"
       },
+      "Resolution": {
+        "type": "string",
+        "enum": [
+          "company_loss",
+          "employee_charge"
+        ],
+        "title": "Resolution"
+      },
       "ReversalCreate": {
         "properties": {
           "reason": {
@@ -4887,6 +6587,16 @@
           "cashier"
         ],
         "title": "Role"
+      },
+      "ShortageReason": {
+        "type": "string",
+        "enum": [
+          "damaged",
+          "lost",
+          "miscounted",
+          "unknown"
+        ],
+        "title": "ShortageReason"
       },
       "SkuOption": {
         "properties": {
@@ -5250,6 +6960,28 @@
         ],
         "title": "SkuSave",
         "description": "One SKU row of a Product form. Without an `id` it is a new SKU."
+      },
+      "StaffOption": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "full_name": {
+            "type": "string",
+            "title": "Full Name"
+          },
+          "role": {
+            "$ref": "#/components/schemas/Role"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "full_name",
+          "role"
+        ],
+        "title": "StaffOption"
       },
       "StockCard": {
         "properties": {
@@ -6040,6 +7772,42 @@
         },
         "type": "object",
         "title": "SupplierUpdate"
+      },
+      "UnknownBarcodePublic": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "times": {
+            "type": "integer",
+            "title": "Times"
+          },
+          "last_scanned_by_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Scanned By Name"
+          },
+          "last_scanned_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Last Scanned At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code",
+          "times",
+          "last_scanned_by_name",
+          "last_scanned_at"
+        ],
+        "title": "UnknownBarcodePublic"
       },
       "UserCreate": {
         "properties": {

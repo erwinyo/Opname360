@@ -1,5 +1,8 @@
 """How values are written in messages shown to staff (Indonesian)."""
 
+# Between a Category and its Sub-category, as in "Seragam > Topi".
+ANGLE = '\N{SINGLE RIGHT-POINTING ANGLE QUOTATION MARK}'
+
 
 def rupiah(amount: int) -> str:
     """1250000 -> 'Rp 1.250.000'."""

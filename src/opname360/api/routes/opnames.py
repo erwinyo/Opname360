@@ -1,0 +1,78 @@
+from typing import Annotated
+
+from fastapi import APIRouter, Depends, Path, Query, status
+
+from opname360.api.deps import AdminDep, SessionDep, require_admin
+from opname360.models import (
+    OpnameFilter,
+    OpnameLineFilter,
+    OpnameLinePage,
+    OpnameOpen,
+    OpnamePage,
+    OpnamePublic,
+    StaffOption,
+    StockOpname,
+)
+from opname360.services import opnames
+
+
+router = APIRouter(
+    prefix='/opnames',
+    tags=['opnames'],
+    dependencies=[Depends(require_admin)],
+)
+
+
+def get_opname_or_404(
+    session: SessionDep, opname_id: Annotated[int, Path(ge=1)]
+) -> StockOpname:
+    return opnames.get_opname(session, opname_id)
+
+
+OpnameDep = Annotated[StockOpname, Depends(get_opname_or_404)]
+
+
+@router.get('/')
+def list_opnames(
+    session: SessionDep, filters: Annotated[OpnameFilter, Query()]
+) -> OpnamePage:
+    return opnames.list_opnames(session, filters)
+
+
+@router.post('/', status_code=status.HTTP_201_CREATED)
+def open_opname(
+    session: SessionDep, admin: AdminDep, opname_in: OpnameOpen
+) -> OpnamePublic:
+    opname = opnames.open_opname(session, opname_in, actor=admin)
+    return opnames.opname_public(session, opname, user=admin)
+
+
+@router.get('/staff')
+def list_staff(session: SessionDep) -> list[StaffOption]:
+    """Active users, to pick Checkers and the employee of a charge."""
+    return opnames.list_staff(session)
+
+
+@router.get('/{opname_id}')
+def read_opname(
+    session: SessionDep, admin: AdminDep, opname: OpnameDep
+) -> OpnamePublic:
+    return opnames.opname_public(session, opname, user=admin)
+
+
+@router.get('/{opname_id}/lines')
+def list_lines(
+    session: SessionDep,
+    admin: AdminDep,
+    opname: OpnameDep,
+    filters: Annotated[OpnameLineFilter, Query()],
+) -> OpnameLinePage:
+    return opnames.list_lines(session, opname, filters, user=admin)
+
+
+@router.post('/{opname_id}/cancel')
+def cancel_opname(
+    session: SessionDep, admin: AdminDep, opname: OpnameDep
+) -> OpnamePublic:
+    opnames.cancel(session, opname, actor=admin)
+    return opnames.opname_public(session, opname, user=admin)

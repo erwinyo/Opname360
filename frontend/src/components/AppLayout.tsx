@@ -1,6 +1,7 @@
 import { useMutation } from '@tanstack/react-query'
 import {
   BoxesIcon,
+  ClipboardCheckIcon,
   HistoryIcon,
   HouseIcon,
   LogOutIcon,
@@ -8,6 +9,7 @@ import {
   PackageIcon,
   PackagePlusIcon,
   PrinterIcon,
+  ScanBarcodeIcon,
   ScissorsIcon,
   TagsIcon,
   TruckIcon,
@@ -47,12 +49,24 @@ const NAV: NavGroup[] = [
         icon: HouseIcon,
         roles: ['owner', 'admin', 'cashier'],
       },
+      {
+        to: '/hitung',
+        label: 'Hitung Stok',
+        icon: ScanBarcodeIcon,
+        roles: ['owner', 'admin', 'cashier'],
+      },
     ],
   },
   {
     label: 'Stok',
     items: [
       { to: '/stok', label: 'Stok', icon: BoxesIcon, roles: BACK_OFFICE },
+      {
+        to: '/stok-opname',
+        label: 'Stok Opname',
+        icon: ClipboardCheckIcon,
+        roles: BACK_OFFICE,
+      },
       {
         to: '/barang-masuk',
         label: 'Barang Masuk',

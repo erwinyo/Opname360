@@ -12,6 +12,10 @@ class MovementReason(StrEnum):
     production_receipt = 'production_receipt'
     supplier_return = 'supplier_return'
     reversal = 'reversal'
+    # A Variance corrected by an approved Stock Opname.
+    opname = 'opname'
+    # Opening stock from the Opening Opname.
+    opening = 'opening'
     # Quantity 0: stock value corrected without goods moving (costing rule 6).
     cost_adjustment = 'cost_adjustment'
 

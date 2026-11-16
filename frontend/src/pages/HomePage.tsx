@@ -1,7 +1,10 @@
+import { useQuery } from '@tanstack/react-query'
 import {
   BoxesIcon,
+  ClipboardCheckIcon,
   PackageIcon,
   PackagePlusIcon,
+  ScanBarcodeIcon,
   TagsIcon,
   UsersIcon,
 } from 'lucide-react'
@@ -9,6 +12,7 @@ import type { LucideIcon } from 'lucide-react'
 import { Link } from 'react-router'
 
 import type { Role, UserPublic } from '@/client'
+import { countingListSessionsOptions } from '@/client/@tanstack/react-query.gen'
 import { ROLE_LABELS } from '@/lib/auth'
 
 type Shortcut = {
@@ -20,6 +24,13 @@ type Shortcut = {
 }
 
 const SHORTCUTS: Shortcut[] = [
+  {
+    to: '/stok-opname',
+    title: 'Stok Opname',
+    description: 'Buka opname, pantau penghitungan, tinjau selisih.',
+    icon: ClipboardCheckIcon,
+    roles: ['owner', 'admin'],
+  },
   {
     to: '/stok',
     title: 'Stok',
@@ -59,6 +70,8 @@ const SHORTCUTS: Shortcut[] = [
 
 export function HomePage({ user }: { user: UserPublic }) {
   const shortcuts = SHORTCUTS.filter((item) => item.roles.includes(user.role))
+  const counting = useQuery(countingListSessionsOptions())
+  const toCount = counting.data?.filter((opname) => opname.can_count) ?? []
   return (
     <>
       <h1 className="text-2xl font-semibold tracking-tight">
@@ -67,6 +80,30 @@ export function HomePage({ user }: { user: UserPublic }) {
       <p className="mt-1 text-muted-foreground">
         Anda masuk sebagai {ROLE_LABELS[user.role]}.
       </p>
+
+      {toCount.length > 0 && (
+        <div className="mt-6 grid gap-3">
+          {toCount.map((opname) => (
+            <Link
+              key={opname.id}
+              to={`/hitung/${opname.id}`}
+              className="flex items-center gap-4 rounded-xl border border-primary/40 bg-primary/5 p-4 hover:border-primary"
+            >
+              <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-primary text-primary-foreground">
+                <ScanBarcodeIcon className="size-5" />
+              </span>
+              <span>
+                <span className="block font-medium">
+                  Anda ditugaskan menghitung {opname.number}
+                </span>
+                <span className="block text-sm text-muted-foreground">
+                  {opname.scope_label}. Ketuk untuk mulai menghitung.
+                </span>
+              </span>
+            </Link>
+          ))}
+        </div>
+      )}
 
       {shortcuts.length > 0 ? (
         <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -90,8 +127,8 @@ export function HomePage({ user }: { user: UserPublic }) {
         </div>
       ) : (
         <p className="mt-8 max-w-md rounded-xl border border-dashed p-4 text-sm text-muted-foreground">
-          Belum ada menu untuk peran {ROLE_LABELS[user.role]}. Menu akan muncul
-          di sini begitu tersedia.
+          Belum ada menu lain untuk peran {ROLE_LABELS[user.role]}. Saat Anda
+          ditugaskan menghitung stok, tugasnya muncul di sini.
         </p>
       )}
     </>

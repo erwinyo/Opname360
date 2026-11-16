@@ -63,3 +63,12 @@ export function today(): string {
   const day = String(now.getDate()).padStart(2, '0')
   return `${now.getFullYear()}-${month}-${day}`
 }
+
+/** "Kemeja Putih SD · 10, Putih" */
+export function skuName(sku: {
+  product_name: string
+  size?: string | null
+  color?: string | null
+}): string {
+  return [sku.product_name, variantLabel(sku)].filter(Boolean).join(' · ')
+}

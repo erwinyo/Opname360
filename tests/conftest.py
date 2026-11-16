@@ -191,3 +191,47 @@ def stock_of(
     """The SKU's System Quantity and Stock Value, read from its Stock Card."""
     card = client.get(f'/api/v1/stock/skus/{sku_id}/card').json()
     return Decimal(card['sku']['quantity']), Decimal(card['sku']['value'])
+
+
+OPNAMES = '/api/v1/opnames/'
+COUNTING = '/api/v1/counting/'
+
+
+def switch_to(client: TestClient, user: User) -> TestClient:
+    """Sign the test client in as someone else."""
+    assert sign_in(client, user.username).status_code == 200
+    return client
+
+
+def receive(
+    client: TestClient, sku: Sku, quantity: float, unit_cost: float
+) -> None:
+    """Stock in through a completed Goods Receipt from a fresh Supplier."""
+    supplier = new_supplier(client, f'Pemasok {next(_names)}')
+    new_receipt(
+        client, supplier['id'], [receipt_line(sku.id, quantity, unit_cost)]
+    )
+
+
+def open_opname(
+    client: TestClient, checkers: list[User], **body: object
+) -> dict:
+    response = client.post(
+        OPNAMES,
+        json={'checker_ids': [user.id for user in checkers], **body},
+    )
+    assert response.status_code == 201, response.text
+    return response.json()
+
+
+def count(client: TestClient, opname_id: int, **body: object):
+    """One Count Entry: `code=` a scan or `sku_id=`, with `quantity=`."""
+    return client.post(f'{COUNTING}{opname_id}/entries', json=body)
+
+
+def lines_of(client: TestClient, opname_id: int, **query: object) -> list:
+    response = client.get(
+        f'{OPNAMES}{opname_id}/lines', params={'limit': 2000, **query}
+    )
+    assert response.status_code == 200, response.text
+    return response.json()['items']

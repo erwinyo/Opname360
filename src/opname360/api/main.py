@@ -5,8 +5,10 @@ from opname360.api.routes import (
     activity_log,
     auth,
     categories,
+    counting,
     goods_receipts,
     health,
+    opnames,
     production_receipts,
     products,
     stock,
@@ -29,6 +31,8 @@ api_router.include_router(goods_receipts.router)
 api_router.include_router(production_receipts.router)
 api_router.include_router(supplier_returns.router)
 api_router.include_router(stock.router)
+api_router.include_router(opnames.router)
+api_router.include_router(counting.router)
 api_router.include_router(activity_log.router)
 
 

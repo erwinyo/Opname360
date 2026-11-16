@@ -7,8 +7,8 @@ from sqlmodel import Session, select
 
 from .conftest import make_user, new_category, new_product, sign_in, sku_row
 
+from opname360.core.formatting import ANGLE
 from opname360.models import ActivityLog, Role, Sku
-from opname360.services.product_import import ANGLE
 
 
 PRODUCTS = '/api/v1/products/'

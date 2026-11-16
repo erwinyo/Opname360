@@ -173,7 +173,9 @@ export function CountPage() {
               </Button>
               {camera && (
                 <div className="mt-3">
-                  <CameraScanner onScan={(scanned) => send({ code: scanned })} />
+                  <CameraScanner
+                    onScan={(scanned) => send({ code: scanned })}
+                  />
                 </div>
               )}
             </div>

@@ -3866,6 +3866,38 @@ export type OpnamesListStaffResponses = {
 
 export type OpnamesListStaffResponse = OpnamesListStaffResponses[keyof OpnamesListStaffResponses];
 
+export type OpnamesOpeningAllowedData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Location Id
+         */
+        location_id?: number | null;
+    };
+    url: '/api/v1/opnames/opening-allowed';
+};
+
+export type OpnamesOpeningAllowedErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type OpnamesOpeningAllowedError = OpnamesOpeningAllowedErrors[keyof OpnamesOpeningAllowedErrors];
+
+export type OpnamesOpeningAllowedResponses = {
+    /**
+     * Response Opnames-Opening Allowed
+     *
+     * Successful Response
+     */
+    200: boolean;
+};
+
+export type OpnamesOpeningAllowedResponse = OpnamesOpeningAllowedResponses[keyof OpnamesOpeningAllowedResponses];
+
 export type OpnamesReadOpnameData = {
     body?: never;
     path: {

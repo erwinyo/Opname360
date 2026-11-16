@@ -3598,6 +3598,73 @@
         }
       }
     },
+    "/api/v1/opnames/opening-allowed": {
+      "get": {
+        "tags": [
+          "opnames"
+        ],
+        "summary": "Opening Allowed",
+        "description": "Whether an Opening Opname can still be opened: only before any Stock\nMovement at the Location.",
+        "operationId": "opnames-opening_allowed",
+        "parameters": [
+          {
+            "name": "location_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Location Id"
+            }
+          },
+          {
+            "name": "opname360_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Opname360 Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "boolean",
+                  "title": "Response Opnames-Opening Allowed"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/opnames/{opname_id}": {
       "get": {
         "tags": [

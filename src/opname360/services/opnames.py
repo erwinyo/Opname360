@@ -176,6 +176,12 @@ def open_opname(
     return opname
 
 
+def opening_allowed(session: Session, location_id: int | None) -> bool:
+    """Whether an Opening Opname can still be opened here (rule 18)."""
+    location_id = stock.resolve_location(session, location_id)
+    return not _location_has_movements(session, location_id)
+
+
 def _checkers(session: Session, user_ids: list[int]) -> list[User]:
     users = session.exec(
         select(User).where(col(User.id).in_(set(user_ids)))

@@ -10,6 +10,7 @@ import {
   categoriesListCategoriesOptions,
   opnamesListStaffOptions,
   opnamesOpenOpnameMutation,
+  opnamesOpeningAllowedOptions,
 } from '@/client/@tanstack/react-query.gen'
 import { BackLink } from '@/components/documents'
 import { Field } from '@/components/FormDialog'
@@ -60,6 +61,8 @@ export function OpenOpnamePage() {
   const navigate = useNavigate()
   const categories = useQuery(categoriesListCategoriesOptions())
   const staff = useQuery(opnamesListStaffOptions())
+  // Only before any stock has moved; after go-live the switch is noise.
+  const openingAllowed = useQuery(opnamesOpeningAllowedOptions()).data === true
   const [opening, setOpening] = useState(false)
   const [scope, setScope] = useState<OpnameScope>('skus')
   const [categoryIds, setCategoryIds] = useState<number[]>([])
@@ -115,21 +118,24 @@ export function OpenOpnamePage() {
       </p>
 
       <section className="mt-6 grid gap-5 rounded-xl border bg-card p-4">
-        <div className="flex items-start gap-3">
-          <Switch
-            id="opening"
-            checked={opening}
-            onCheckedChange={setOpening}
-            className="mt-0.5"
-          />
-          <div>
-            <Label htmlFor="opening">Opname awal</Label>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Sekali saja, sebelum ada mutasi stok: semua SKU dihitung, dan
-              hasilnya menjadi stok awal dengan harga beli terakhir dari impor.
-            </p>
+        {openingAllowed && (
+          <div className="flex items-start gap-3">
+            <Switch
+              id="opening"
+              checked={opening}
+              onCheckedChange={setOpening}
+              className="mt-0.5"
+            />
+            <div>
+              <Label htmlFor="opening">Opname awal</Label>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Sekali saja, sebelum ada mutasi stok: semua SKU dihitung, dan
+                hasilnya menjadi stok awal dengan harga beli terakhir dari
+                impor.
+              </p>
+            </div>
           </div>
-        </div>
+        )}
 
         {!opening && (
           <Field

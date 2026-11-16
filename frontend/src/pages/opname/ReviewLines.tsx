@@ -77,34 +77,52 @@ export function ReviewLines({ opname }: { opname: OpnamePublic }) {
   return (
     <section className="mt-8">
       <h2 className="text-lg font-semibold">
-        {estimated ? 'Tinjau selisih' : 'Selisih'}
+        {opname.is_opening
+          ? 'Stok awal'
+          : estimated
+            ? 'Tinjau selisih'
+            : 'Selisih'}
       </h2>
       <div className="mt-3 grid grid-cols-2 gap-3 sm:max-w-md">
-        <Total
-          label="Kurang"
-          count={opname.shortage_count ?? 0}
-          value={opname.shortage_value ?? '0'}
-          estimated={estimated}
-          className="text-destructive"
-        />
-        <Total
-          label="Lebih"
-          count={opname.surplus_count ?? 0}
-          value={opname.surplus_value ?? '0'}
-          estimated={estimated}
-        />
+        {opname.is_opening ? (
+          <Total
+            label="Stok awal"
+            count={opname.surplus_count ?? 0}
+            value={opname.surplus_value ?? '0'}
+            estimated={estimated}
+          />
+        ) : (
+          <>
+            <Total
+              label="Kurang"
+              count={opname.shortage_count ?? 0}
+              value={opname.shortage_value ?? '0'}
+              estimated={estimated}
+              className="text-destructive"
+            />
+            <Total
+              label="Lebih"
+              count={opname.surplus_count ?? 0}
+              value={opname.surplus_value ?? '0'}
+              estimated={estimated}
+            />
+          </>
+        )}
       </div>
 
       <div className="mt-4 flex flex-wrap items-center gap-2">
         <div className="flex rounded-lg border bg-card p-0.5">
-          {SHOW_LABELS.map(([value, label]) => (
+          {SHOW_LABELS.map(([value, label]) => [
+            value,
+            opname.is_opening && value === 'variance' ? 'Ada stok' : label,
+          ]).map(([value, label]) => (
             <Button
               key={value}
               size="sm"
               variant={show === value ? 'secondary' : 'ghost'}
               aria-pressed={show === value}
               onClick={() => {
-                setShow(value)
+                setShow(value as LineShow)
                 setOffset(0)
               }}
             >
@@ -175,9 +193,7 @@ function Total({
       <p className={cn('text-xl font-semibold tabular-nums', className)}>
         {money(value)}
       </p>
-      {estimated && (
-        <p className="text-xs text-muted-foreground">perkiraan</p>
-      )}
+      {estimated && <p className="text-xs text-muted-foreground">perkiraan</p>}
     </div>
   )
 }
@@ -385,13 +401,13 @@ function Decision({
                 <SelectValue placeholder="Pilih alasan" />
               </SelectTrigger>
               <SelectContent>
-                {(
-                  Object.keys(SHORTAGE_REASON_LABELS) as ShortageReason[]
-                ).map((value) => (
-                  <SelectItem key={value} value={value}>
-                    {SHORTAGE_REASON_LABELS[value]}
-                  </SelectItem>
-                ))}
+                {(Object.keys(SHORTAGE_REASON_LABELS) as ShortageReason[]).map(
+                  (value) => (
+                    <SelectItem key={value} value={value}>
+                      {SHORTAGE_REASON_LABELS[value]}
+                    </SelectItem>
+                  ),
+                )}
               </SelectContent>
             </Select>
           </div>
@@ -474,7 +490,9 @@ function Decision({
                     setAmount(onlyDigits(event.target.value))
                   }
                   onBlur={() =>
-                    send({ charge_amount: amount === '' ? null : Number(amount) })
+                    send({
+                      charge_amount: amount === '' ? null : Number(amount),
+                    })
                   }
                   className="tabular-nums"
                 />
@@ -488,9 +506,7 @@ function Decision({
       )}
       {needsCostInput && Number(line.variance) > 0 && (
         <div className="grid gap-2">
-          <Label htmlFor={`cost-${line.id}`}>
-            Harga per {line.stock_unit}
-          </Label>
+          <Label htmlFor={`cost-${line.id}`}>Harga per {line.stock_unit}</Label>
           <Input
             id={`cost-${line.id}`}
             inputMode="numeric"

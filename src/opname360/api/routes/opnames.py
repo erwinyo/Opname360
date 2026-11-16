@@ -57,6 +57,15 @@ def list_staff(session: SessionDep) -> list[StaffOption]:
     return opnames.list_staff(session)
 
 
+@router.get('/opening-allowed')
+def opening_allowed(
+    session: SessionDep, location_id: int | None = None
+) -> bool:
+    """Whether an Opening Opname can still be opened: only before any Stock
+    Movement at the Location."""
+    return opnames.opening_allowed(session, location_id)
+
+
 @router.get('/{opname_id}')
 def read_opname(
     session: SessionDep, admin: AdminDep, opname: OpnameDep

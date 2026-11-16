@@ -223,10 +223,7 @@ function facts(data: OpnamePublic): [string, string][] {
       'Dibuka',
       `${data.opened_by_name ?? 'Sistem'} · ${formatDateTime(data.opened_at)}`,
     ],
-    [
-      'Checker',
-      data.checkers.map((checker) => checker.full_name).join(', '),
-    ],
+    ['Checker', data.checkers.map((checker) => checker.full_name).join(', ')],
   ]
   if (data.counting_closed_at) {
     rows.push([

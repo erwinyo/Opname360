@@ -1000,3 +1000,156 @@ STATUS_WORDS = {
     OpnameStatus.cancelled: 'dibatalkan',
     OpnameStatus.reversed: 'dibatalkan setelah disetujui',
 }
+
+
+def confirm_zero(
+    session: Session, opname: StockOpname, line_ids: list[int], *, actor: User
+) -> int:
+    """The Admin confirms uncounted lines as none found (rule 9).
+
+    Lines counted in the meantime are left alone. Returns how many were
+    confirmed.
+    """
+    opname = _share_lock(session, opname)
+    _require_countable(opname)
+    assert opname.id is not None
+    lines = session.exec(
+        select(OpnameLine)
+        .where(
+            OpnameLine.opname_id == opname.id,
+            col(OpnameLine.id).in_(line_ids),
+        )
+        .order_by(col(OpnameLine.sku_id))
+        .with_for_update()
+        .execution_options(populate_existing=True)
+    ).all()
+    if len(lines) != len(set(line_ids)):
+        raise NotFoundError('SKU tidak ditemukan dalam opname ini.')
+    confirmed = 0
+    for line in lines:
+        if line.first_counted_at is not None:
+            continue
+        if opname.status == OpnameStatus.review and not line.recount:
+            continue
+        _count(session, opname, line, ZERO, user=actor)
+        confirmed += 1
+    if confirmed:
+        activity_log.record(
+            session,
+            actor=actor,
+            action='stock_opname.confirm_zero',
+            summary=(
+                f'Mengonfirmasi {confirmed} SKU tidak ditemukan (nol) di '
+                f'stok opname {opname.number}.'
+            ),
+            entity_type=DOCUMENT_TYPE,
+            entity_id=opname.id,
+        )
+    session.commit()
+    return confirmed
+
+
+def close_counting(
+    session: Session, opname: StockOpname, *, actor: User
+) -> StockOpname:
+    """Counting -> Review, once every line is counted or confirmed zero."""
+    assert opname.id is not None
+    opname = documents.lock(session, StockOpname, opname.id)
+    if opname.status != OpnameStatus.counting:
+        raise ConflictError(
+            f'Stok opname {opname.number} sudah {STATUS_WORDS[opname.status]}.'
+        )
+    uncounted = session.exec(
+        select(func.count())
+        .select_from(OpnameLine)
+        .where(
+            OpnameLine.opname_id == opname.id,
+            col(OpnameLine.first_counted_at).is_(None),
+        )
+    ).one()
+    if uncounted:
+        raise ConflictError(
+            f'Masih ada {uncounted} SKU yang belum dihitung. Hitung, atau '
+            'konfirmasi nol jika memang tidak ada barangnya.'
+        )
+    opname.status = OpnameStatus.review
+    opname.counting_closed_by = actor.id
+    opname.counting_closed_at = utc_now()
+    session.add(opname)
+    activity_log.record(
+        session,
+        actor=actor,
+        action='stock_opname.close_counting',
+        summary=f'Menutup penghitungan stok opname {opname.number}.',
+        entity_type=DOCUMENT_TYPE,
+        entity_id=opname.id,
+    )
+    session.commit()
+    return opname
+
+
+def get_line(
+    session: Session, opname: StockOpname, line_id: int
+) -> OpnameLine:
+    line = session.get(OpnameLine, line_id)
+    if line is None or line.opname_id != opname.id:
+        raise NotFoundError('SKU tidak ditemukan dalam opname ini.')
+    return line
+
+
+def recount(
+    session: Session, opname: StockOpname, line: OpnameLine, *, actor: User
+) -> None:
+    """Send one line back to the Checkers; the rest waits in Review (rule
+    11). Its entries are cancelled, not deleted."""
+    opname = _lock_for_review(session, opname, actor)
+    assert opname.id is not None
+    locked = _lock_line(session, opname.id, line.sku_id)
+    assert locked is not None
+    line = locked
+    now = utc_now()
+    for entry in _active_entries(session, line):
+        entry.cancelled_at = now
+        entry.cancelled_by = actor.id
+        session.add(entry)
+    _clear_count(line)
+    line.recount = True
+    line.shortage_reason = None
+    line.resolution = None
+    line.charged_user_id = None
+    line.charge_amount = None
+    session.add(line)
+    sku = session.get(Sku, line.sku_id)
+    assert sku is not None
+    activity_log.record(
+        session,
+        actor=actor,
+        action='stock_opname.recount',
+        summary=(
+            f'Meminta hitung ulang '
+            f'{sku_label(sku.product.name, sku.size, sku.color)} di stok '
+            f'opname {opname.number}.'
+        ),
+        entity_type=DOCUMENT_TYPE,
+        entity_id=opname.id,
+    )
+    session.commit()
+
+
+def _lock_for_review(
+    session: Session, opname: StockOpname, actor: User
+) -> StockOpname:
+    """Lock a session in Review for its approver."""
+    assert opname.id is not None
+    opname = documents.lock(session, StockOpname, opname.id)
+    if opname.status != OpnameStatus.review:
+        raise ConflictError(
+            f'Stok opname {opname.number} {STATUS_WORDS[opname.status]}, '
+            'bukan dalam peninjauan.'
+        )
+    if not can_approve(session, opname, actor):
+        raise ForbiddenError(
+            'Peninjauan dilakukan oleh Pemilik atau Admin yang tidak ikut '
+            'menghitung di opname ini.'
+        )
+    return opname

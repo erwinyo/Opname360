@@ -4,9 +4,12 @@ import { useEffect, useState } from 'react'
 import { useParams } from 'react-router'
 import { toast } from 'sonner'
 
+import { opnamesListLines } from '@/client'
 import type { LineShow, OpnamePublic } from '@/client'
 import {
   opnamesCancelOpnameMutation,
+  opnamesCloseCountingMutation,
+  opnamesConfirmZeroMutation,
   opnamesListLinesOptions,
   opnamesReadOpnameOptions,
 } from '@/client/@tanstack/react-query.gen'
@@ -28,6 +31,7 @@ import { errorMessage } from '@/lib/api'
 import { formatDateTime, skuName } from '@/lib/format'
 import { cn } from '@/lib/utils'
 import { refreshOpname } from '@/pages/opname/refresh'
+import { ReviewLines } from '@/pages/opname/ReviewLines'
 import { OpnameStatusBadge, Progress } from '@/pages/opname/shared'
 
 const PAGE_SIZE = 50
@@ -38,6 +42,27 @@ export function OpnamePage() {
     opnamesReadOpnameOptions({ path: { opname_id: opnameId } }),
   )
   const [cancelling, setCancelling] = useState(false)
+  const [zeroing, setZeroing] = useState<number[] | null>(null)
+  const close = useMutation({
+    ...opnamesCloseCountingMutation(),
+    onSuccess: (closed) => {
+      void refreshOpname(closed.id)
+      toast.success(`Penghitungan ${closed.number} ditutup.`)
+    },
+    onError: (error) => toast.error(errorMessage(error)),
+  })
+  const findUncounted = useMutation({
+    mutationFn: async () => {
+      const { data } = await opnamesListLines({
+        path: { opname_id: opnameId },
+        query: { show: 'uncounted', limit: 2000 },
+        throwOnError: true,
+      })
+      return data.items.map((line) => line.id)
+    },
+    onSuccess: setZeroing,
+    onError: (error) => toast.error(errorMessage(error)),
+  })
 
   if (opname.isPending) return <p className="text-muted-foreground">Memuat…</p>
   if (opname.isError) {
@@ -50,6 +75,7 @@ export function OpnamePage() {
   }
   const data = opname.data
   const unfinished = data.status === 'counting' || data.status === 'review'
+  const uncounted = data.line_count - data.counted_count
 
   return (
     <>
@@ -84,14 +110,57 @@ export function OpnamePage() {
         <div className="mt-3">
           <Progress done={data.counted_count} total={data.line_count} />
         </div>
+        {data.status === 'counting' && (
+          <div className="mt-4 flex flex-wrap gap-2">
+            <Button
+              disabled={close.isPending || uncounted > 0}
+              onClick={() => close.mutate({ path: { opname_id: data.id } })}
+            >
+              Tutup penghitungan
+            </Button>
+            {uncounted > 0 && (
+              <Button
+                variant="outline"
+                disabled={findUncounted.isPending}
+                onClick={() => findUncounted.mutate()}
+              >
+                Konfirmasi nol semua yang belum dihitung
+              </Button>
+            )}
+          </div>
+        )}
+        {data.status === 'counting' && uncounted > 0 && (
+          <p className="mt-2 text-sm text-muted-foreground">
+            Penghitungan bisa ditutup setelah semua SKU dihitung atau
+            dikonfirmasi nol.
+          </p>
+        )}
       </section>
 
       {data.unknown_barcodes.length > 0 && <UnknownBarcodes data={data} />}
 
-      <Lines opname={data} />
+      {data.status === 'review' && !data.can_approve && (
+        <p className="mt-4 rounded-xl border border-dashed p-4 text-muted-foreground">
+          Anda checker di opname ini, jadi selisihnya tidak ditampilkan dan
+          peninjauan dilakukan Pemilik atau Admin lain.
+        </p>
+      )}
+
+      {data.revealed ? (
+        <ReviewLines opname={data} />
+      ) : (
+        <ProgressLines opname={data} onConfirmZero={setZeroing} />
+      )}
 
       {cancelling && (
         <CancelDialog opname={data} onClose={() => setCancelling(false)} />
+      )}
+      {zeroing && (
+        <ZeroDialog
+          opname={data}
+          lineIds={zeroing}
+          onClose={() => setZeroing(null)}
+        />
       )}
     </>
   )
@@ -162,8 +231,16 @@ const SHOW_LABELS: [LineShow, string][] = [
   ['counted', 'Sudah dihitung'],
 ]
 
-function Lines({ opname }: { opname: OpnamePublic }) {
+function ProgressLines({
+  opname,
+  onConfirmZero,
+}: {
+  opname: OpnamePublic
+  onConfirmZero: (lineIds: number[]) => void
+}) {
   const [show, setShow] = useState<LineShow>('all')
+  const [selected, setSelected] = useState<number[]>([])
+  const canZero = opname.status === 'counting'
   const [typed, setTyped] = useState('')
   const [search, setSearch] = useState('')
   const [offset, setOffset] = useState(0)
@@ -181,6 +258,11 @@ function Lines({ opname }: { opname: OpnamePublic }) {
     }),
     placeholderData: keepPreviousData,
   })
+  // Only lines still uncounted on this page can be confirmed zero.
+  const uncountedHere = new Set(
+    lines.data?.items.filter((line) => !line.counted).map((line) => line.id),
+  )
+  const chosen = selected.filter((id) => uncountedHere.has(id))
 
   return (
     <section className="mt-8">
@@ -221,12 +303,27 @@ function Lines({ opname }: { opname: OpnamePublic }) {
           Tidak ada SKU di sini.
         </p>
       )}
+      {canZero && chosen.length > 0 && (
+        <div className="mt-3 flex items-center gap-3">
+          <Button variant="outline" onClick={() => onConfirmZero(chosen)}>
+            Konfirmasi nol ({chosen.length})
+          </Button>
+          <Button variant="ghost" onClick={() => setSelected([])}>
+            Batal pilih
+          </Button>
+        </div>
+      )}
       {lines.data && lines.data.total > 0 && (
         <>
           <div className="mt-3 overflow-x-auto rounded-xl border bg-card">
             <Table>
               <TableHeader>
                 <TableRow>
+                  {canZero && (
+                    <TableHead className="w-10">
+                      <span className="sr-only">Pilih</span>
+                    </TableHead>
+                  )}
                   <TableHead>Barang</TableHead>
                   <TableHead>Status</TableHead>
                 </TableRow>
@@ -234,6 +331,25 @@ function Lines({ opname }: { opname: OpnamePublic }) {
               <TableBody>
                 {lines.data.items.map((line) => (
                   <TableRow key={line.id}>
+                    {canZero && (
+                      <TableCell>
+                        {!line.counted && (
+                          <input
+                            type="checkbox"
+                            className="size-4 accent-primary"
+                            aria-label={`Pilih ${skuName(line)}`}
+                            checked={selected.includes(line.id)}
+                            onChange={() =>
+                              setSelected((ids) =>
+                                ids.includes(line.id)
+                                  ? ids.filter((id) => id !== line.id)
+                                  : [...ids, line.id],
+                              )
+                            }
+                          />
+                        )}
+                      </TableCell>
+                    )}
                     <TableCell>
                       <span className="font-medium">{skuName(line)}</span>
                       <span className="block text-sm text-muted-foreground tabular-nums">
@@ -290,6 +406,41 @@ function CancelDialog({
       pending={cancel.isPending}
       error={cancel.error}
       onSubmit={() => cancel.mutate({ path: { opname_id: opname.id } })}
+      onClose={onClose}
+    />
+  )
+}
+
+function ZeroDialog({
+  opname,
+  lineIds,
+  onClose,
+}: {
+  opname: OpnamePublic
+  lineIds: number[]
+  onClose: () => void
+}) {
+  const confirm = useMutation({
+    ...opnamesConfirmZeroMutation(),
+    onSuccess: () => {
+      void refreshOpname(opname.id)
+      toast.success(`${lineIds.length} SKU dikonfirmasi nol.`)
+      onClose()
+    },
+  })
+  return (
+    <FormDialog
+      title={`Konfirmasi nol untuk ${lineIds.length} SKU?`}
+      description="Artinya barangnya dicari dan memang tidak ada. Stok sistemnya dicatat sekarang; kalau ternyata ada barangnya, selisihnya kelihatan saat peninjauan."
+      submitLabel="Konfirmasi nol"
+      pending={confirm.isPending}
+      error={confirm.error}
+      onSubmit={() =>
+        confirm.mutate({
+          path: { opname_id: opname.id },
+          body: { line_ids: lineIds },
+        })
+      }
       onClose={onClose}
     />
   )

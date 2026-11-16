@@ -2058,6 +2058,16 @@ export type ValidationError = {
     };
 };
 
+/**
+ * ZeroConfirm
+ */
+export type ZeroConfirm = {
+    /**
+     * Line Ids
+     */
+    line_ids: Array<number>;
+};
+
 export type HealthHealthCheckData = {
     body?: never;
     path?: never;
@@ -3847,6 +3857,100 @@ export type OpnamesCancelOpnameResponses = {
 };
 
 export type OpnamesCancelOpnameResponse = OpnamesCancelOpnameResponses[keyof OpnamesCancelOpnameResponses];
+
+export type OpnamesConfirmZeroData = {
+    body: ZeroConfirm;
+    path: {
+        /**
+         * Opname Id
+         */
+        opname_id: number;
+    };
+    query?: never;
+    url: '/api/v1/opnames/{opname_id}/confirm-zero';
+};
+
+export type OpnamesConfirmZeroErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type OpnamesConfirmZeroError = OpnamesConfirmZeroErrors[keyof OpnamesConfirmZeroErrors];
+
+export type OpnamesConfirmZeroResponses = {
+    /**
+     * Successful Response
+     */
+    200: OpnamePublic;
+};
+
+export type OpnamesConfirmZeroResponse = OpnamesConfirmZeroResponses[keyof OpnamesConfirmZeroResponses];
+
+export type OpnamesCloseCountingData = {
+    body?: never;
+    path: {
+        /**
+         * Opname Id
+         */
+        opname_id: number;
+    };
+    query?: never;
+    url: '/api/v1/opnames/{opname_id}/close-counting';
+};
+
+export type OpnamesCloseCountingErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type OpnamesCloseCountingError = OpnamesCloseCountingErrors[keyof OpnamesCloseCountingErrors];
+
+export type OpnamesCloseCountingResponses = {
+    /**
+     * Successful Response
+     */
+    200: OpnamePublic;
+};
+
+export type OpnamesCloseCountingResponse = OpnamesCloseCountingResponses[keyof OpnamesCloseCountingResponses];
+
+export type OpnamesRecountLineData = {
+    body?: never;
+    path: {
+        /**
+         * Line Id
+         */
+        line_id: number;
+        /**
+         * Opname Id
+         */
+        opname_id: number;
+    };
+    query?: never;
+    url: '/api/v1/opnames/{opname_id}/lines/{line_id}/recount';
+};
+
+export type OpnamesRecountLineErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type OpnamesRecountLineError = OpnamesRecountLineErrors[keyof OpnamesRecountLineErrors];
+
+export type OpnamesRecountLineResponses = {
+    /**
+     * Successful Response
+     */
+    200: OpnamePublic;
+};
+
+export type OpnamesRecountLineResponse = OpnamesRecountLineResponses[keyof OpnamesRecountLineResponses];
 
 export type CountingListSessionsData = {
     body?: never;

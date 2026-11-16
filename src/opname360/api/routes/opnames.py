@@ -12,6 +12,7 @@ from opname360.models import (
     OpnamePublic,
     StaffOption,
     StockOpname,
+    ZeroConfirm,
 )
 from opname360.services import opnames
 
@@ -75,4 +76,36 @@ def cancel_opname(
     session: SessionDep, admin: AdminDep, opname: OpnameDep
 ) -> OpnamePublic:
     opnames.cancel(session, opname, actor=admin)
+    return opnames.opname_public(session, opname, user=admin)
+
+
+@router.post('/{opname_id}/confirm-zero')
+def confirm_zero(
+    session: SessionDep,
+    admin: AdminDep,
+    opname: OpnameDep,
+    body: ZeroConfirm,
+) -> OpnamePublic:
+    """Uncounted lines confirmed as none found."""
+    opnames.confirm_zero(session, opname, body.line_ids, actor=admin)
+    return opnames.opname_public(session, opname, user=admin)
+
+
+@router.post('/{opname_id}/close-counting')
+def close_counting(
+    session: SessionDep, admin: AdminDep, opname: OpnameDep
+) -> OpnamePublic:
+    opname = opnames.close_counting(session, opname, actor=admin)
+    return opnames.opname_public(session, opname, user=admin)
+
+
+@router.post('/{opname_id}/lines/{line_id}/recount')
+def recount_line(
+    session: SessionDep,
+    admin: AdminDep,
+    opname: OpnameDep,
+    line_id: Annotated[int, Path(ge=1)],
+) -> OpnamePublic:
+    line = opnames.get_line(session, opname, line_id)
+    opnames.recount(session, opname, line, actor=admin)
     return opnames.opname_public(session, opname, user=admin)

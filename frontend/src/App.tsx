@@ -11,8 +11,10 @@ import { HomePage } from '@/pages/HomePage'
 import { ActivityLogPage } from '@/pages/ActivityLogPage'
 import { LabelsPage } from '@/pages/labels/LabelsPage'
 import { LoginPage } from '@/pages/LoginPage'
+import { BeritaAcaraPage } from '@/pages/opname/BeritaAcaraPage'
 import { CountingPage } from '@/pages/opname/CountingPage'
 import { CountPage } from '@/pages/opname/CountPage'
+import { EmployeeChargesPage } from '@/pages/opname/EmployeeChargesPage'
 import { OpenOpnamePage } from '@/pages/opname/OpenOpnamePage'
 import { OpnamePage } from '@/pages/opname/OpnamePage'
 import { OpnamesPage } from '@/pages/opname/OpnamesPage'
@@ -68,6 +70,10 @@ export function App() {
             <Route path="stok-opname" element={<OpnamesPage />} />
             <Route path="stok-opname/baru" element={<OpenOpnamePage />} />
             <Route path="stok-opname/:opnameId" element={<OpnamePage />} />
+            <Route
+              path="stok-opname/:opnameId/berita-acara"
+              element={<BeritaAcaraPage />}
+            />
             <Route path="barang-masuk" element={<GoodsReceiptsPage />} />
             <Route path="barang-masuk/baru" element={<GoodsReceiptPage />} />
             <Route
@@ -99,6 +105,7 @@ export function App() {
           <>
             <Route path="pengguna" element={<UsersPage me={user} />} />
             <Route path="log-aktivitas" element={<ActivityLogPage />} />
+            <Route path="ganti-rugi" element={<EmployeeChargesPage />} />
           </>
         )}
         <Route path="*" element={<Navigate to="/" replace />} />

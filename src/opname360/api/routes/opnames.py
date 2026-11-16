@@ -4,12 +4,15 @@ from fastapi import APIRouter, Depends, Path, Query, status
 
 from opname360.api.deps import AdminDep, SessionDep, require_admin
 from opname360.models import (
+    LineResolutionSave,
     OpnameFilter,
     OpnameLineFilter,
     OpnameLinePage,
+    OpnameLinePublic,
     OpnameOpen,
     OpnamePage,
     OpnamePublic,
+    ReversalCreate,
     StaffOption,
     StockOpname,
     ZeroConfirm,
@@ -108,4 +111,37 @@ def recount_line(
 ) -> OpnamePublic:
     line = opnames.get_line(session, opname, line_id)
     opnames.recount(session, opname, line, actor=admin)
+    return opnames.opname_public(session, opname, user=admin)
+
+
+@router.put('/{opname_id}/lines/{line_id}')
+def save_resolution(
+    session: SessionDep,
+    admin: AdminDep,
+    opname: OpnameDep,
+    line_id: Annotated[int, Path(ge=1)],
+    body: LineResolutionSave,
+) -> OpnameLinePublic:
+    """The approver's decision on one line."""
+    line = opnames.get_line(session, opname, line_id)
+    opnames.save_resolution(session, opname, line, body, actor=admin)
+    return opnames.line_public(session, opname, line, user=admin)
+
+
+@router.post('/{opname_id}/approve')
+def approve_opname(
+    session: SessionDep, admin: AdminDep, opname: OpnameDep
+) -> OpnamePublic:
+    opname = opnames.approve(session, opname, actor=admin)
+    return opnames.opname_public(session, opname, user=admin)
+
+
+@router.post('/{opname_id}/reverse')
+def reverse_opname(
+    session: SessionDep,
+    admin: AdminDep,
+    opname: OpnameDep,
+    body: ReversalCreate,
+) -> OpnamePublic:
+    opname = opnames.reverse(session, opname, body.reason, actor=admin)
     return opnames.opname_public(session, opname, user=admin)

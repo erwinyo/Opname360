@@ -110,10 +110,34 @@ def reverse(
         raise ConflictError(
             f'{label.capitalize()} belum selesai, jadi tidak perlu dibatalkan.'
         )
+    reversal = write_reversal(
+        session,
+        document_type=document_type,
+        document_id=document_id,
+        label=label,
+        reason=reason,
+        actor=actor,
+    )
+    document.status = DocumentStatus.reversed
+    session.add(document)
+    return reversal
+
+
+def write_reversal(
+    session: Session,
+    *,
+    document_type: str,
+    document_id: int,
+    label: str,
+    reason: str,
+    actor: User,
+) -> Reversal:
+    """The Reversal itself: its number, the opposite Stock Movements and the
+    log line. The caller has checked the document may be reversed and marks
+    it reversed."""
     reason = reason.strip()
     if not reason:
         raise ConflictError('Alasan pembatalan wajib diisi.')
-
     reversal = Reversal(
         number=next_number(session, REVERSAL_PREFIX),
         document_type=document_type,
@@ -129,8 +153,6 @@ def reverse(
         number=reversal.number,
         actor=actor,
     )
-    document.status = DocumentStatus.reversed
-    session.add(document)
     activity_log.record(
         session,
         actor=actor,

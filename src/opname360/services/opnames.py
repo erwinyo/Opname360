@@ -24,8 +24,11 @@ from opname360.models import (
     CountSheet,
     CountSkuOption,
     CountingSummary,
+    EmployeeCharge,
+    LineResolutionSave,
     LineShow,
     Location,
+    MovementReason,
     MyCountEntry,
     OpnameChecker,
     OpnameFilter,
@@ -40,6 +43,7 @@ from opname360.models import (
     OpnameStatus,
     OpnameSummary,
     Product,
+    Resolution,
     Role,
     Sku,
     StaffOption,
@@ -52,7 +56,13 @@ from opname360.models import (
     User,
 )
 from opname360.models._types import utc_now
-from opname360.services import activity_log, costing, documents, stock
+from opname360.services import (
+    activity_log,
+    costing,
+    documents,
+    employee_charges,
+    stock,
+)
 
 
 PREFIX = 'SO'  # Stok Opname
@@ -588,6 +598,24 @@ def list_lines(
             for line, sku, name, balance in page
         ],
         total=len(rows),
+    )
+
+
+def line_public(
+    session: Session, opname: StockOpname, line: OpnameLine, *, user: User
+) -> OpnameLinePublic:
+    session.refresh(line)
+    sku = session.get(Sku, line.sku_id)
+    assert sku is not None
+    balance = session.get(StockBalance, (sku.id, opname.location_id))
+    return _line_public(
+        opname,
+        line,
+        sku,
+        sku.product.name,
+        balance,
+        revealed(session, opname, user),
+        _charged_names(session, [line]),
     )
 
 
@@ -1152,4 +1180,234 @@ def _lock_for_review(
             'Peninjauan dilakukan oleh Pemilik atau Admin yang tidak ikut '
             'menghitung di opname ini.'
         )
+    return opname
+
+
+# Approval
+
+
+def save_resolution(
+    session: Session,
+    opname: StockOpname,
+    line: OpnameLine,
+    data: LineResolutionSave,
+    *,
+    actor: User,
+) -> None:
+    """The approver's decision on one line: why a Shortage happened, who
+    bears it, and a unit cost where none is known (rules 12-14, 19)."""
+    opname = _lock_for_review(session, opname, actor)
+    charged = data.resolution == Resolution.employee_charge
+    decision = (data.resolution, data.charged_user_id, data.charge_amount)
+    unchanged = decision == (
+        line.resolution,
+        line.charged_user_id,
+        line.charge_amount,
+    )
+    if charged and not unchanged and actor.role != Role.owner:
+        raise ForbiddenError(
+            'Hanya Pemilik yang boleh membebankan selisih ke karyawan.'
+        )
+    if charged and data.charged_user_id is not None:
+        employee = session.get(User, data.charged_user_id)
+        if employee is None:
+            raise NotFoundError('Karyawan tidak ditemukan.')
+        if not employee.is_active and not unchanged:
+            raise ConflictError(f'{employee.full_name} sudah nonaktif.')
+    line.shortage_reason = data.shortage_reason
+    line.resolution = data.resolution
+    line.charged_user_id = data.charged_user_id if charged else None
+    line.charge_amount = data.charge_amount if charged else None
+    line.unit_cost = data.unit_cost
+    session.add(line)
+    session.commit()
+
+
+def approve(
+    session: Session, opname: StockOpname, *, actor: User
+) -> StockOpname:
+    """Write one Stock Movement per Variance on top of today's System
+    Quantity, create the Employee Charges, and close the session for good
+    (rules 15-16, 20)."""
+    opname = _lock_for_review(session, opname, actor)
+    assert opname.id is not None
+    rows = session.exec(
+        select(OpnameLine, Sku)
+        .join(Sku, col(OpnameLine.sku_id) == Sku.id)
+        .where(OpnameLine.opname_id == opname.id)
+        # SKU order, like every other stock document, avoids deadlocks.
+        .order_by(col(OpnameLine.sku_id))
+    ).all()
+    waiting = sum(1 for line, _ in rows if line.first_counted_at is None)
+    if waiting:
+        raise ConflictError(f'{waiting} SKU masih menunggu hitung ulang.')
+    problems = [
+        problem
+        for line, sku in rows
+        if (problem := _approval_problem(session, opname, line, sku))
+    ]
+    if problems:
+        more = len(problems) - 5
+        listed = '; '.join(problems[:5]) + (
+            f'; dan {more} lagi' if more > 0 else ''
+        )
+        raise ConflictError(f'Belum bisa disetujui. {listed}.')
+
+    source = costing.Source(DOCUMENT_TYPE, opname.id, opname.number)
+    reason = (
+        MovementReason.opening if opname.is_opening else MovementReason.opname
+    )
+    shortages = surpluses = charges = 0
+    for line, sku in rows:
+        variance = _variance(line)
+        if variance == 0:
+            continue
+        assert sku.id is not None
+        if variance > 0:
+            surpluses += 1
+            if opname.is_opening:
+                assert line.unit_cost is not None
+                movement = costing.receive(
+                    session,
+                    sku=sku,
+                    location_id=opname.location_id,
+                    quantity=variance,
+                    value=costing.money(variance * line.unit_cost),
+                    reason=reason,
+                    source=source,
+                    actor=actor,
+                )
+            else:
+                movement = costing.found(
+                    session,
+                    sku=sku,
+                    location_id=opname.location_id,
+                    quantity=variance,
+                    reason=reason,
+                    source=source,
+                    actor=actor,
+                    unit_cost=line.unit_cost,
+                )
+        else:
+            shortages += 1
+            movement = costing.issue(
+                session,
+                sku=sku,
+                location_id=opname.location_id,
+                quantity=-variance,
+                reason=reason,
+                source=source,
+                actor=actor,
+            )
+        line.adjusted_value = movement.value
+        if variance < 0 and not opname.is_opening:
+            line.resolution = line.resolution or Resolution.company_loss
+            if line.resolution == Resolution.employee_charge:
+                charges += 1
+                _charge(session, opname, line, sku, movement.value, actor)
+        session.add(line)
+
+    opname.status = OpnameStatus.approved
+    opname.approved_by = actor.id
+    opname.approved_at = utc_now()
+    session.add(opname)
+    activity_log.record(
+        session,
+        actor=actor,
+        action='stock_opname.approve',
+        summary=(
+            f'Menyetujui {"opname awal" if opname.is_opening else "stok opname"} '
+            f'{opname.number}: {shortages} SKU kurang, {surpluses} SKU lebih, '
+            f'{charges} ganti rugi karyawan.'
+        ),
+        entity_type=DOCUMENT_TYPE,
+        entity_id=opname.id,
+    )
+    session.commit()
+    return opname
+
+
+def _approval_problem(
+    session: Session, opname: StockOpname, line: OpnameLine, sku: Sku
+) -> str | None:
+    """What still stops this line from being approved, if anything."""
+    variance = _variance(line)
+    label = sku_label(sku.product.name, sku.size, sku.color)
+    if variance > 0:
+        balance = session.get(StockBalance, (sku.id, opname.location_id))
+        if _unit_cost(opname, line, sku, balance) is None:
+            return f'{label}: isi harga per {sku.stock_unit}'
+    if variance < 0 and not opname.is_opening:
+        if line.shortage_reason is None:
+            return f'{label}: pilih alasan selisih kurang'
+        if (
+            line.resolution == Resolution.employee_charge
+            and line.charged_user_id is None
+        ):
+            return f'{label}: pilih karyawan yang menanggung'
+    return None
+
+
+def _charge(
+    session: Session,
+    opname: StockOpname,
+    line: OpnameLine,
+    sku: Sku,
+    value: Decimal,
+    actor: User,
+) -> None:
+    """The Employee Charge for a Shortage: the amount the Owner set, or the
+    Shortage at the cost it left stock at (rule 13)."""
+    assert line.charged_user_id is not None
+    assert opname.id is not None
+    amount = (
+        line.charge_amount
+        if line.charge_amount is not None
+        else int(costing.money(-value).to_integral_value())
+    )
+    label = sku_label(sku.product.name, sku.size, sku.color)
+    shortage = -_variance(line)
+    session.add(
+        EmployeeCharge(
+            user_id=line.charged_user_id,
+            amount=amount,
+            description=(
+                f'Selisih kurang {label}: {shortage.normalize():f} '
+                f'{sku.stock_unit}'
+            )[:300],
+            source_type=DOCUMENT_TYPE,
+            source_id=opname.id,
+            source_number=opname.number,
+            created_by=actor.id,
+        )
+    )
+
+
+def reverse(
+    session: Session, opname: StockOpname, reason: str, *, actor: User
+) -> StockOpname:
+    """Undo an approved session's adjustments and cancel its Employee
+    Charges that are still outstanding (rule 17)."""
+    assert opname.id is not None
+    opname = documents.lock(session, StockOpname, opname.id)
+    assert opname.id is not None
+    if opname.status != OpnameStatus.approved:
+        raise ConflictError(
+            f'Stok opname {opname.number} {STATUS_WORDS[opname.status]}; '
+            'hanya opname yang sudah disetujui yang bisa dibatalkan.'
+        )
+    documents.write_reversal(
+        session,
+        document_type=DOCUMENT_TYPE,
+        document_id=opname.id,
+        label=f'stok opname {opname.number}',
+        reason=reason,
+        actor=actor,
+    )
+    employee_charges.cancel_outstanding(
+        session, source_type=DOCUMENT_TYPE, source_id=opname.id
+    )
+    opname.status = OpnameStatus.reversed
+    session.add(opname)
+    session.commit()
     return opname

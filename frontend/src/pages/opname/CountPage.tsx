@@ -146,7 +146,7 @@ export function CountPage() {
                   ref={scanInput}
                   value={code}
                   onChange={(event) => setCode(event.target.value)}
-                  placeholder="Scan atau ketik, lalu Enter"
+                  placeholder="Scan atau ketik"
                   autoFocus
                   autoComplete="off"
                   className="pl-8"

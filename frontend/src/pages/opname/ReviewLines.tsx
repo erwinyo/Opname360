@@ -3,17 +3,44 @@ import { SearchIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
-import type { LineShow, OpnameLinePublic, OpnamePublic } from '@/client'
+import type {
+  LineResolutionSave,
+  LineShow,
+  OpnameLinePublic,
+  OpnamePublic,
+  Resolution,
+  ShortageReason,
+} from '@/client'
 import {
   opnamesListLinesOptions,
+  opnamesListStaffOptions,
   opnamesRecountLineMutation,
+  opnamesSaveResolutionMutation,
 } from '@/client/@tanstack/react-query.gen'
 import { Pager } from '@/components/Pager'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { errorMessage } from '@/lib/api'
-import { money, quantity, skuName } from '@/lib/format'
+import { useMe } from '@/lib/auth'
+import {
+  groupDigits,
+  money,
+  onlyDigits,
+  parseQuantity,
+  quantity,
+  rupiah,
+  skuName,
+} from '@/lib/format'
+import { RESOLUTION_LABELS, SHORTAGE_REASON_LABELS } from '@/lib/labels'
 import { cn } from '@/lib/utils'
 import { refreshOpname } from '@/pages/opname/refresh'
 
@@ -240,6 +267,10 @@ function ReviewLine({
         </dl>
       )}
 
+      {line.counted && variance !== 0 && (
+        <Decision opname={opname} line={line} editable={reviewing} />
+      )}
+
       {reviewing && line.counted && (
         <div className="mt-3 flex flex-wrap gap-2 border-t pt-3">
           <Button
@@ -257,5 +288,230 @@ function ReviewLine({
         </div>
       )}
     </li>
+  )
+}
+
+const NO_EMPLOYEE = 'none'
+
+/**
+ * Why a Shortage happened and who bears it, or the unit cost a Surplus or
+ * opening stock needs. Saved as soon as something is chosen.
+ */
+function Decision({
+  opname,
+  line,
+  editable,
+}: {
+  opname: OpnamePublic
+  line: OpnameLinePublic
+  editable: boolean
+}) {
+  const me = useMe()
+  const isOwner = me.data?.role === 'owner'
+  const shortage = Number(line.variance) < 0 && !opname.is_opening
+  const needsCostInput =
+    opname.is_opening || line.needs_cost || line.entered_unit_cost != null
+  const staff = useQuery({
+    ...opnamesListStaffOptions(),
+    enabled: editable && shortage && isOwner,
+  })
+  const [amount, setAmount] = useState(
+    line.charge_amount == null ? '' : String(line.charge_amount),
+  )
+  const [cost, setCost] = useState(
+    line.entered_unit_cost == null
+      ? ''
+      : String(Math.round(Number(line.entered_unit_cost))),
+  )
+  const save = useMutation({
+    ...opnamesSaveResolutionMutation(),
+    onSuccess: () => void refreshOpname(opname.id),
+    onError: (error) => toast.error(errorMessage(error)),
+  })
+  const current: LineResolutionSave = {
+    shortage_reason: line.shortage_reason,
+    resolution: line.resolution,
+    charged_user_id: line.charged_user_id,
+    charge_amount: line.charge_amount,
+    unit_cost: line.entered_unit_cost,
+  }
+  const send = (change: Partial<LineResolutionSave>) =>
+    save.mutate({
+      path: { opname_id: opname.id, line_id: line.id },
+      body: { ...current, ...change },
+    })
+  const resolution: Resolution = line.resolution ?? 'company_loss'
+  const charged = resolution === 'employee_charge'
+  const estimate = Math.round(-Number(line.variance_value ?? 0))
+
+  if (!editable) {
+    if (!shortage) return null
+    return (
+      <p className="mt-3 border-t pt-3 text-sm">
+        {line.shortage_reason
+          ? SHORTAGE_REASON_LABELS[line.shortage_reason]
+          : 'Alasan belum dipilih'}{' '}
+        · {RESOLUTION_LABELS[resolution]}
+        {charged && line.charged_user_name && (
+          <>
+            {' '}
+            oleh {line.charged_user_name} (
+            {rupiah(line.charge_amount ?? estimate)})
+          </>
+        )}
+      </p>
+    )
+  }
+
+  return (
+    <div className="mt-3 grid gap-3 border-t pt-3 sm:grid-cols-2">
+      {shortage && (
+        <>
+          <div className="grid gap-2">
+            <Label htmlFor={`reason-${line.id}`}>Alasan kurang</Label>
+            <Select
+              value={line.shortage_reason ?? undefined}
+              onValueChange={(value) =>
+                send({ shortage_reason: value as ShortageReason })
+              }
+            >
+              <SelectTrigger
+                id={`reason-${line.id}`}
+                className={cn(
+                  'w-full',
+                  !line.shortage_reason && 'border-amber-500/60',
+                )}
+              >
+                <SelectValue placeholder="Pilih alasan" />
+              </SelectTrigger>
+              <SelectContent>
+                {(
+                  Object.keys(SHORTAGE_REASON_LABELS) as ShortageReason[]
+                ).map((value) => (
+                  <SelectItem key={value} value={value}>
+                    {SHORTAGE_REASON_LABELS[value]}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor={`resolution-${line.id}`}>Ditanggung</Label>
+            <Select
+              value={resolution}
+              disabled={!isOwner}
+              onValueChange={(value) =>
+                send({
+                  resolution: value as Resolution,
+                  charged_user_id: null,
+                  charge_amount: null,
+                })
+              }
+            >
+              <SelectTrigger id={`resolution-${line.id}`} className="w-full">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {(Object.keys(RESOLUTION_LABELS) as Resolution[]).map(
+                  (value) => (
+                    <SelectItem key={value} value={value}>
+                      {RESOLUTION_LABELS[value]}
+                    </SelectItem>
+                  ),
+                )}
+              </SelectContent>
+            </Select>
+            {!isOwner && (
+              <p className="text-sm text-muted-foreground">
+                Hanya Pemilik yang bisa membebankan ke karyawan.
+              </p>
+            )}
+          </div>
+          {charged && isOwner && (
+            <>
+              <div className="grid gap-2">
+                <Label htmlFor={`employee-${line.id}`}>Karyawan</Label>
+                <Select
+                  value={
+                    line.charged_user_id == null
+                      ? NO_EMPLOYEE
+                      : String(line.charged_user_id)
+                  }
+                  onValueChange={(value) =>
+                    send({
+                      charged_user_id:
+                        value === NO_EMPLOYEE ? null : Number(value),
+                    })
+                  }
+                >
+                  <SelectTrigger
+                    id={`employee-${line.id}`}
+                    className={cn(
+                      'w-full',
+                      line.charged_user_id == null && 'border-amber-500/60',
+                    )}
+                  >
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={NO_EMPLOYEE}>Pilih karyawan</SelectItem>
+                    {staff.data?.map((user) => (
+                      <SelectItem key={user.id} value={String(user.id)}>
+                        {user.full_name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor={`amount-${line.id}`}>Jumlah ganti rugi</Label>
+                <Input
+                  id={`amount-${line.id}`}
+                  inputMode="numeric"
+                  value={groupDigits(amount)}
+                  placeholder={groupDigits(String(estimate))}
+                  onChange={(event) =>
+                    setAmount(onlyDigits(event.target.value))
+                  }
+                  onBlur={() =>
+                    send({ charge_amount: amount === '' ? null : Number(amount) })
+                  }
+                  className="tabular-nums"
+                />
+                <p className="text-sm text-muted-foreground">
+                  Kosongkan untuk memakai nilai selisih.
+                </p>
+              </div>
+            </>
+          )}
+        </>
+      )}
+      {needsCostInput && Number(line.variance) > 0 && (
+        <div className="grid gap-2">
+          <Label htmlFor={`cost-${line.id}`}>
+            Harga per {line.stock_unit}
+          </Label>
+          <Input
+            id={`cost-${line.id}`}
+            inputMode="numeric"
+            value={groupDigits(cost)}
+            onChange={(event) => setCost(onlyDigits(event.target.value))}
+            onBlur={() => {
+              const typed = parseQuantity(cost)
+              send({ unit_cost: Number.isFinite(typed) ? cost : null })
+            }}
+            className={cn(
+              'tabular-nums',
+              line.needs_cost && 'border-amber-500/60',
+            )}
+          />
+          <p className="text-sm text-muted-foreground">
+            {opname.is_opening
+              ? 'Harga pokok stok awal, dari harga beli terakhir di impor.'
+              : 'SKU ini belum pernah punya harga beli.'}
+          </p>
+        </div>
+      )}
+    </div>
   )
 }

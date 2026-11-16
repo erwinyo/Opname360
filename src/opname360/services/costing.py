@@ -242,6 +242,41 @@ def reverse(
         session.flush()
 
 
+def found(
+    session: Session,
+    *,
+    sku: Sku,
+    location_id: int,
+    quantity: Decimal,
+    reason: MovementReason,
+    source: Source,
+    actor: User | None,
+    unit_cost: Decimal | None = None,
+) -> StockMovement:
+    """A Surplus found in an opname, valued by costing rule 5.
+
+    `unit_cost` was entered by hand and is used only when the SKU has never
+    had a cost; it then becomes the SKU's latest unit cost.
+    """
+    assert sku.id is not None
+    balance = _lock_balance(session, sku.id, location_id)
+    cost = found_unit_cost(sku, balance)
+    if cost is None:
+        assert unit_cost is not None, 'the caller checks a cost is known'
+        cost = unit_cost
+    return receive(
+        session,
+        sku=sku,
+        location_id=location_id,
+        quantity=quantity,
+        value=money(quantity * cost),
+        reason=reason,
+        source=source,
+        actor=actor,
+        sets_latest_cost=sku.latest_unit_cost is None,
+    )
+
+
 def found_unit_cost(sku: Sku, balance: StockBalance | None) -> Decimal | None:
     """Costing rule 5: what one unit found in an opname is worth.
 

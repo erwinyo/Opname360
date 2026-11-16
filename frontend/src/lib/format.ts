@@ -4,9 +4,10 @@ const dateTime = new Intl.DateTimeFormat('id-ID', {
   timeStyle: 'short',
 })
 
-/** 85000 -> "Rp 85.000" */
+/** 85000 -> "Rp 85.000", -10000 -> "-Rp 10.000" */
 export function rupiah(amount: number): string {
-  return `Rp ${thousands.format(amount)}`
+  const sign = amount < 0 ? '-' : ''
+  return `${sign}Rp ${thousands.format(Math.abs(amount))}`
 }
 
 /** "85000" -> "85.000", for money inputs that group digits as you type. */

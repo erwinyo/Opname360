@@ -1,19 +1,26 @@
 import { keepPreviousData, useMutation, useQuery } from '@tanstack/react-query'
-import { SearchIcon } from 'lucide-react'
+import { PrinterIcon, SearchIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { useParams } from 'react-router'
+import { Link, useParams } from 'react-router'
 import { toast } from 'sonner'
 
 import { opnamesListLines } from '@/client'
 import type { LineShow, OpnamePublic } from '@/client'
 import {
+  opnamesApproveOpnameMutation,
   opnamesCancelOpnameMutation,
   opnamesCloseCountingMutation,
   opnamesConfirmZeroMutation,
   opnamesListLinesOptions,
   opnamesReadOpnameOptions,
+  opnamesReverseOpnameMutation,
 } from '@/client/@tanstack/react-query.gen'
-import { BackLink, Facts } from '@/components/documents'
+import {
+  BackLink,
+  Facts,
+  ReversalNotice,
+  ReverseDialog,
+} from '@/components/documents'
 import { FormDialog } from '@/components/FormDialog'
 import { Pager } from '@/components/Pager'
 import { Badge } from '@/components/ui/badge'
@@ -28,7 +35,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { errorMessage } from '@/lib/api'
-import { formatDateTime, skuName } from '@/lib/format'
+import { formatDateTime, money, skuName } from '@/lib/format'
 import { cn } from '@/lib/utils'
 import { refreshOpname } from '@/pages/opname/refresh'
 import { ReviewLines } from '@/pages/opname/ReviewLines'
@@ -43,6 +50,16 @@ export function OpnamePage() {
   )
   const [cancelling, setCancelling] = useState(false)
   const [zeroing, setZeroing] = useState<number[] | null>(null)
+  const [approving, setApproving] = useState(false)
+  const [reversing, setReversing] = useState(false)
+  const reverse = useMutation({
+    ...opnamesReverseOpnameMutation(),
+    onSuccess: (reversed) => {
+      void refreshOpname(reversed.id)
+      toast.success(`Stok opname ${reversed.number} dibatalkan.`)
+      setReversing(false)
+    },
+  })
   const close = useMutation({
     ...opnamesCloseCountingMutation(),
     onSuccess: (closed) => {
@@ -86,18 +103,33 @@ export function OpnamePage() {
         </h1>
         <OpnameStatusBadge status={data.status} />
         {data.is_opening && <Badge variant="outline">Opname awal</Badge>}
-        {unfinished && (
-          <Button
-            variant="outline"
-            className="ml-auto"
-            onClick={() => setCancelling(true)}
-          >
-            Batalkan opname
-          </Button>
-        )}
+        <div className="flex flex-wrap gap-2 sm:ml-auto">
+          {data.status === 'review' && data.can_approve && (
+            <Button onClick={() => setApproving(true)}>Setujui opname</Button>
+          )}
+          {(data.status === 'approved' || data.status === 'reversed') && (
+            <Button variant="outline" asChild>
+              <Link to={`/stok-opname/${data.id}/berita-acara`}>
+                <PrinterIcon />
+                Berita acara
+              </Link>
+            </Button>
+          )}
+          {data.status === 'approved' && (
+            <Button variant="outline" onClick={() => setReversing(true)}>
+              Batalkan opname
+            </Button>
+          )}
+          {unfinished && (
+            <Button variant="outline" onClick={() => setCancelling(true)}>
+              Batalkan opname
+            </Button>
+          )}
+        </div>
       </div>
       <p className="mt-1 text-muted-foreground">{data.scope_label}</p>
 
+      {data.reversal && <ReversalNotice reversal={data.reversal} />}
       <Facts facts={facts(data)} note={data.note} />
 
       <section className="mt-4 rounded-xl border bg-card p-4">
@@ -154,6 +186,24 @@ export function OpnamePage() {
 
       {cancelling && (
         <CancelDialog opname={data} onClose={() => setCancelling(false)} />
+      )}
+      {approving && (
+        <ApproveDialog opname={data} onClose={() => setApproving(false)} />
+      )}
+      {reversing && (
+        <ReverseDialog
+          title={`Batalkan ${data.number}?`}
+          description="Semua penyesuaian stok dari opname ini dibalik, dan ganti rugi karyawan yang belum dilunasi dibatalkan."
+          pending={reverse.isPending}
+          error={reverse.error}
+          onReverse={(reason) =>
+            reverse.mutate({
+              path: { opname_id: data.id },
+              body: { reason },
+            })
+          }
+          onClose={() => setReversing(false)}
+        />
       )}
       {zeroing && (
         <ZeroDialog
@@ -441,6 +491,37 @@ function ZeroDialog({
           body: { line_ids: lineIds },
         })
       }
+      onClose={onClose}
+    />
+  )
+}
+
+function ApproveDialog({
+  opname,
+  onClose,
+}: {
+  opname: OpnamePublic
+  onClose: () => void
+}) {
+  const approve = useMutation({
+    ...opnamesApproveOpnameMutation(),
+    onSuccess: () => {
+      void refreshOpname(opname.id)
+      toast.success(`Stok opname ${opname.number} disetujui.`)
+      onClose()
+    },
+  })
+  const description = opname.is_opening
+    ? `Stok awal dicatat untuk ${opname.surplus_count ?? 0} SKU senilai ${money(opname.surplus_value ?? 0)}.`
+    : `Stok sistem disesuaikan: ${opname.shortage_count ?? 0} SKU kurang (${money(opname.shortage_value ?? 0)}) dan ${opname.surplus_count ?? 0} SKU lebih (${money(opname.surplus_value ?? 0)}), dihitung dari stok saat ini.`
+  return (
+    <FormDialog
+      title={`Setujui ${opname.number}?`}
+      description={`${description} Setelah disetujui, opname tidak bisa diubah; kesalahan dibetulkan dengan membatalkannya.`}
+      submitLabel="Setujui"
+      pending={approve.isPending}
+      error={approve.error}
+      onSubmit={() => approve.mutate({ path: { opname_id: opname.id } })}
       onClose={onClose}
     />
   )

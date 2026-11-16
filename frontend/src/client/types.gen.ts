@@ -114,6 +114,11 @@ export type CategoryUpdate = {
 };
 
 /**
+ * ChargeStatus
+ */
+export type ChargeStatus = 'outstanding' | 'settled' | 'cancelled';
+
+/**
  * CostingMethod
  */
 export type CostingMethod = 'moving_average' | 'fifo';
@@ -250,6 +255,91 @@ export type CountingSummary = {
  * DocumentStatus
  */
 export type DocumentStatus = 'draft' | 'completed' | 'reversed';
+
+/**
+ * EmployeeChargePage
+ */
+export type EmployeeChargePage = {
+    /**
+     * Items
+     */
+    items: Array<EmployeeChargePublic>;
+    /**
+     * Total
+     */
+    total: number;
+};
+
+/**
+ * EmployeeChargePublic
+ */
+export type EmployeeChargePublic = {
+    /**
+     * Id
+     */
+    id: number;
+    /**
+     * User Id
+     */
+    user_id: number;
+    /**
+     * User Name
+     */
+    user_name: string;
+    /**
+     * Amount
+     */
+    amount: number;
+    status: ChargeStatus;
+    /**
+     * Description
+     */
+    description: string;
+    /**
+     * Source Type
+     */
+    source_type: string;
+    /**
+     * Source Id
+     */
+    source_id: number;
+    /**
+     * Source Number
+     */
+    source_number: string;
+    /**
+     * Created By Name
+     */
+    created_by_name: string | null;
+    /**
+     * Created At
+     */
+    created_at: string;
+};
+
+/**
+ * EmployeeChargeTotal
+ *
+ * What one employee still owes.
+ */
+export type EmployeeChargeTotal = {
+    /**
+     * User Id
+     */
+    user_id: number;
+    /**
+     * Full Name
+     */
+    full_name: string;
+    /**
+     * Outstanding Amount
+     */
+    outstanding_amount: number;
+    /**
+     * Outstanding Count
+     */
+    outstanding_count: number;
+};
 
 /**
  * GoodsReceiptLinePublic
@@ -575,6 +665,28 @@ export type ImportResult = {
      * Sub Category Count
      */
     sub_category_count: number;
+};
+
+/**
+ * LineResolutionSave
+ *
+ * The approver's decision on one line. Unset fields are cleared.
+ */
+export type LineResolutionSave = {
+    shortage_reason?: ShortageReason | null;
+    resolution?: Resolution | null;
+    /**
+     * Charged User Id
+     */
+    charged_user_id?: number | null;
+    /**
+     * Charge Amount
+     */
+    charge_amount?: number | null;
+    /**
+     * Unit Cost
+     */
+    unit_cost?: number | string | null;
 };
 
 /**
@@ -3952,6 +4064,100 @@ export type OpnamesRecountLineResponses = {
 
 export type OpnamesRecountLineResponse = OpnamesRecountLineResponses[keyof OpnamesRecountLineResponses];
 
+export type OpnamesSaveResolutionData = {
+    body: LineResolutionSave;
+    path: {
+        /**
+         * Line Id
+         */
+        line_id: number;
+        /**
+         * Opname Id
+         */
+        opname_id: number;
+    };
+    query?: never;
+    url: '/api/v1/opnames/{opname_id}/lines/{line_id}';
+};
+
+export type OpnamesSaveResolutionErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type OpnamesSaveResolutionError = OpnamesSaveResolutionErrors[keyof OpnamesSaveResolutionErrors];
+
+export type OpnamesSaveResolutionResponses = {
+    /**
+     * Successful Response
+     */
+    200: OpnameLinePublic;
+};
+
+export type OpnamesSaveResolutionResponse = OpnamesSaveResolutionResponses[keyof OpnamesSaveResolutionResponses];
+
+export type OpnamesApproveOpnameData = {
+    body?: never;
+    path: {
+        /**
+         * Opname Id
+         */
+        opname_id: number;
+    };
+    query?: never;
+    url: '/api/v1/opnames/{opname_id}/approve';
+};
+
+export type OpnamesApproveOpnameErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type OpnamesApproveOpnameError = OpnamesApproveOpnameErrors[keyof OpnamesApproveOpnameErrors];
+
+export type OpnamesApproveOpnameResponses = {
+    /**
+     * Successful Response
+     */
+    200: OpnamePublic;
+};
+
+export type OpnamesApproveOpnameResponse = OpnamesApproveOpnameResponses[keyof OpnamesApproveOpnameResponses];
+
+export type OpnamesReverseOpnameData = {
+    body: ReversalCreate;
+    path: {
+        /**
+         * Opname Id
+         */
+        opname_id: number;
+    };
+    query?: never;
+    url: '/api/v1/opnames/{opname_id}/reverse';
+};
+
+export type OpnamesReverseOpnameErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type OpnamesReverseOpnameError = OpnamesReverseOpnameErrors[keyof OpnamesReverseOpnameErrors];
+
+export type OpnamesReverseOpnameResponses = {
+    /**
+     * Successful Response
+     */
+    200: OpnamePublic;
+};
+
+export type OpnamesReverseOpnameResponse = OpnamesReverseOpnameResponses[keyof OpnamesReverseOpnameResponses];
+
 export type CountingListSessionsData = {
     body?: never;
     path?: never;
@@ -4109,6 +4315,75 @@ export type CountingCancelCountResponses = {
 };
 
 export type CountingCancelCountResponse = CountingCancelCountResponses[keyof CountingCancelCountResponses];
+
+export type EmployeeChargesListChargesData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * User Id
+         */
+        user_id?: number | null;
+        /**
+         * Status
+         */
+        status?: ChargeStatus | null;
+        /**
+         * Offset
+         */
+        offset?: number;
+        /**
+         * Limit
+         */
+        limit?: number;
+    };
+    url: '/api/v1/employee-charges/';
+};
+
+export type EmployeeChargesListChargesErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type EmployeeChargesListChargesError = EmployeeChargesListChargesErrors[keyof EmployeeChargesListChargesErrors];
+
+export type EmployeeChargesListChargesResponses = {
+    /**
+     * Successful Response
+     */
+    200: EmployeeChargePage;
+};
+
+export type EmployeeChargesListChargesResponse = EmployeeChargesListChargesResponses[keyof EmployeeChargesListChargesResponses];
+
+export type EmployeeChargesOutstandingTotalsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/employee-charges/totals';
+};
+
+export type EmployeeChargesOutstandingTotalsErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type EmployeeChargesOutstandingTotalsError = EmployeeChargesOutstandingTotalsErrors[keyof EmployeeChargesOutstandingTotalsErrors];
+
+export type EmployeeChargesOutstandingTotalsResponses = {
+    /**
+     * Response Employee Charges-Outstanding Totals
+     *
+     * Successful Response
+     */
+    200: Array<EmployeeChargeTotal>;
+};
+
+export type EmployeeChargesOutstandingTotalsResponse = EmployeeChargesOutstandingTotalsResponses[keyof EmployeeChargesOutstandingTotalsResponses];
 
 export type ActivityLogListEntriesData = {
     body?: never;

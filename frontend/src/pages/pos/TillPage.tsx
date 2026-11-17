@@ -14,10 +14,13 @@ import { Button } from '@/components/ui/button'
 import { errorMessage, queryClient } from '@/lib/api'
 import { formatDateTime } from '@/lib/format'
 
+import { ReturnScreen } from './ReturnScreen'
 import { SaleScreen } from './SaleScreen'
 
+const SCREENS = { sale: SaleScreen, return: ReturnScreen }
+
 /** The till: open a Shift first, then sell in it. */
-export function TillPage() {
+export function TillPage({ screen }: { screen: keyof typeof SCREENS }) {
   const current = useQuery(shiftsReadCurrentOptions())
   if (current.isPending) return <p className="text-muted-foreground">Memuat…</p>
   if (current.isError) {
@@ -26,7 +29,8 @@ export function TillPage() {
   const shift = current.data
   if (!shift) return <OpenShift />
   if (!shift.is_mine) return <SomeoneElsesShift shift={shift} />
-  return <SaleScreen shift={shift} />
+  const Screen = SCREENS[screen]
+  return <Screen shift={shift} />
 }
 
 function SomeoneElsesShift({ shift }: { shift: ShiftCurrent }) {

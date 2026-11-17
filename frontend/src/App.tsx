@@ -69,7 +69,8 @@ export function App() {
         <Route path="struk/:receiptId" element={<ReceiptPage user={user} />} />
         {user.role !== 'admin' && (
           <>
-            <Route path="kasir" element={<TillPage />} />
+            <Route path="kasir" element={<TillPage screen="sale" />} />
+            <Route path="kasir/retur" element={<TillPage screen="return" />} />
             <Route path="kasir/tutup" element={<CloseShiftPage />} />
           </>
         )}

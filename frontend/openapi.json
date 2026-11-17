@@ -5456,6 +5456,67 @@
         }
       }
     },
+    "/api/v1/receipts/for-return": {
+      "get": {
+        "tags": [
+          "receipts"
+        ],
+        "summary": "Receipt For Return",
+        "description": "A Receipt scanned for a return or exchange, if it can still be\nreturned.",
+        "operationId": "receipts-receipt_for_return",
+        "parameters": [
+          {
+            "name": "number",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 30,
+              "title": "Number"
+            }
+          },
+          {
+            "name": "opname360_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Opname360 Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReceiptPublic"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/receipts/quote": {
       "post": {
         "tags": [
@@ -6239,6 +6300,26 @@
             "type": "array",
             "maxItems": 500,
             "title": "Lines",
+            "default": []
+          },
+          "original_receipt_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Original Receipt Id"
+          },
+          "returns": {
+            "items": {
+              "$ref": "#/components/schemas/ReturnLineIn"
+            },
+            "type": "array",
+            "maxItems": 500,
+            "title": "Returns",
             "default": []
           }
         },
@@ -8997,6 +9078,13 @@
             "type": "array",
             "title": "Lines"
           },
+          "returns": {
+            "items": {
+              "$ref": "#/components/schemas/QuotedReturn"
+            },
+            "type": "array",
+            "title": "Returns"
+          },
           "subtotal": {
             "type": "integer",
             "title": "Subtotal"
@@ -9017,6 +9105,7 @@
         "type": "object",
         "required": [
           "lines",
+          "returns",
           "subtotal",
           "discount_total",
           "refund_total",
@@ -9108,6 +9197,38 @@
         ],
         "title": "QuotedLine"
       },
+      "QuotedReturn": {
+        "properties": {
+          "original_line_id": {
+            "type": "integer",
+            "title": "Original Line Id"
+          },
+          "sku_id": {
+            "type": "integer",
+            "title": "Sku Id"
+          },
+          "quantity": {
+            "type": "string",
+            "title": "Quantity"
+          },
+          "condition": {
+            "$ref": "#/components/schemas/ReturnCondition"
+          },
+          "refund": {
+            "type": "integer",
+            "title": "Refund"
+          }
+        },
+        "type": "object",
+        "required": [
+          "original_line_id",
+          "sku_id",
+          "quantity",
+          "condition",
+          "refund"
+        ],
+        "title": "QuotedReturn"
+      },
       "ReceiptCreate": {
         "properties": {
           "lines": {
@@ -9119,6 +9240,26 @@
             "title": "Lines",
             "default": []
           },
+          "original_receipt_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Original Receipt Id"
+          },
+          "returns": {
+            "items": {
+              "$ref": "#/components/schemas/ReturnLineIn"
+            },
+            "type": "array",
+            "maxItems": 500,
+            "title": "Returns",
+            "default": []
+          },
           "payments": {
             "items": {
               "$ref": "#/components/schemas/PaymentIn"
@@ -9127,6 +9268,17 @@
             "maxItems": 10,
             "title": "Payments",
             "default": []
+          },
+          "refund_method_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Refund Method Id"
           },
           "expected_total": {
             "type": "integer",
@@ -9239,6 +9391,10 @@
                 "type": "null"
               }
             ]
+          },
+          "returned_quantity": {
+            "type": "string",
+            "title": "Returned Quantity"
           }
         },
         "type": "object",
@@ -9256,7 +9412,8 @@
           "discount",
           "line_total",
           "original_line_id",
-          "condition"
+          "condition",
+          "returned_quantity"
         ],
         "title": "ReceiptLinePublic"
       },
@@ -9437,6 +9594,36 @@
           "damaged"
         ],
         "title": "ReturnCondition"
+      },
+      "ReturnLineIn": {
+        "properties": {
+          "original_line_id": {
+            "type": "integer",
+            "title": "Original Line Id"
+          },
+          "quantity": {
+            "anyOf": [
+              {
+                "type": "number",
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "title": "Quantity"
+          },
+          "condition": {
+            "$ref": "#/components/schemas/ReturnCondition"
+          }
+        },
+        "type": "object",
+        "required": [
+          "original_line_id",
+          "quantity",
+          "condition"
+        ],
+        "title": "ReturnLineIn"
       },
       "ReversalCreate": {
         "properties": {

@@ -39,6 +39,18 @@ def find_skus(
     return receipts.find_skus(session, search)
 
 
+@router.get('/for-return')
+def receipt_for_return(
+    session: SessionDep,
+    seller: SellerDep,
+    number: Annotated[str, Query(min_length=1, max_length=30)],
+) -> ReceiptPublic:
+    """A Receipt scanned for a return or exchange, if it can still be
+    returned."""
+    receipt = receipts.receipt_for_return(session, number)
+    return receipts.receipt_public(session, receipt)
+
+
 @router.post('/quote')
 def quote(session: SessionDep, seller: SellerDep, cart: Cart) -> Quote:
     """Today's prices and Promotions for a cart, before payment."""

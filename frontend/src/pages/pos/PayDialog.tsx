@@ -1,7 +1,7 @@
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
 
-import type { CartLine, PaymentMethodPublic, ReceiptPublic } from '@/client'
+import type { Cart, PaymentMethodPublic, ReceiptPublic } from '@/client'
 import {
   paymentMethodsListMethodsOptions,
   receiptsCompleteReceiptMutation,
@@ -22,12 +22,12 @@ function cashSuggestions(due: number): number[] {
 /** Payment, split over methods if needed; change only from cash (rule 8). */
 export function PayDialog({
   total,
-  lines,
+  cart,
   onClose,
   onPaid,
 }: {
   total: number
-  lines: CartLine[]
+  cart: Cart
   onClose: () => void
   onPaid: (receipt: ReceiptPublic) => void
 }) {
@@ -71,7 +71,7 @@ export function PayDialog({
     if (problem) return
     complete.mutate({
       body: {
-        lines,
+        ...cart,
         expected_total: total,
         payments: list
           .filter((method) => amount(method) > 0)

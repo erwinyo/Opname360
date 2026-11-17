@@ -1,6 +1,4 @@
-import { CheckCircle2Icon, PrinterIcon } from 'lucide-react'
 import { useRef, useState } from 'react'
-import { Link } from 'react-router'
 
 import type { ReceiptPublic, ShiftCurrent } from '@/client'
 import { Button } from '@/components/ui/button'
@@ -10,6 +8,7 @@ import { rupiah, skuName } from '@/lib/format'
 import { addOne, cartLines, linesAreValid, useQuote } from './cart'
 import type { CartItem } from './cart'
 import { CartLines } from './CartLines'
+import { DoneBanner } from './DoneBanner'
 import { PayDialog } from './PayDialog'
 import { ScanBox } from './ScanBox'
 import { ShiftBar } from './ShiftBar'
@@ -26,7 +25,7 @@ export function SaleScreen({ shift }: { shift: ShiftCurrent }) {
 
   const lastAdded = items.find((item) => item.sku.id === lastSkuId)
   const lines = cartLines(items)
-  const quote = useQuote(lines)
+  const quote = useQuote({ lines })
   const ready =
     items.length > 0 &&
     linesAreValid(lines) &&
@@ -62,38 +61,11 @@ export function SaleScreen({ shift }: { shift: ShiftCurrent }) {
     <>
       <ShiftBar shift={shift} />
       {done && (
-        <div
-          role="status"
-          className="mt-4 flex flex-wrap items-center gap-x-6 gap-y-2 rounded-xl border border-primary/40 bg-primary/5 p-4"
-        >
-          <CheckCircle2Icon className="size-6 text-primary" />
-          <div>
-            <p className="font-medium">
-              Struk{' '}
-              <Link to={`/struk/${done.id}`} className="text-primary underline">
-                {done.number}
-              </Link>{' '}
-              selesai.
-            </p>
-            <p className="text-sm text-muted-foreground">
-              Total {rupiah(done.total)}
-            </p>
-          </div>
-          {done.change_given > 0 && (
-            <p className="text-2xl font-semibold tabular-nums">
-              Kembali {rupiah(done.change_given)}
-            </p>
-          )}
-          <Button
-            variant="outline"
-            className="ml-auto"
-            disabled={printer.printing}
-            onClick={() => printer.print(done.id)}
-          >
-            <PrinterIcon />
-            Cetak ulang
-          </Button>
-        </div>
+        <DoneBanner
+          receipt={done}
+          printing={printer.printing}
+          onReprint={() => printer.print(done.id)}
+        />
       )}
 
       <div className="mt-4 grid items-start gap-4 lg:grid-cols-[1fr_18rem]">
@@ -160,7 +132,7 @@ export function SaleScreen({ shift }: { shift: ShiftCurrent }) {
       {paying && quote.data && (
         <PayDialog
           total={quote.data.total}
-          lines={lines}
+          cart={{ lines }}
           onClose={() => {
             setPaying(false)
             focusScan()

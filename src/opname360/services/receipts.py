@@ -1,28 +1,33 @@
-"""The till: pricing a cart and completing Receipts."""
+"""The till: pricing a cart and completing Receipts, returns and exchanges."""
 
 from dataclasses import dataclass
+from datetime import date, datetime
 from decimal import ROUND_HALF_UP, Decimal
+from zoneinfo import ZoneInfo
 
-from sqlmodel import Session, col, select
+from sqlmodel import Session, col, func, select
 
+from opname360.core.config import settings
 from opname360.core.errors import ConflictError, NotFoundError
 from opname360.core.formatting import rupiah, sku_label
 from opname360.models import (
     Cart,
     MovementReason,
     Payment,
-    PaymentIn,
     PaymentMethod,
     PaymentPublic,
     Promotion,
     Quote,
     QuotedLine,
+    QuotedReturn,
     Receipt,
     ReceiptCreate,
     ReceiptKind,
     ReceiptLine,
     ReceiptLinePublic,
     ReceiptPublic,
+    ReceiptStatus,
+    ReturnCondition,
     Shift,
     Sku,
     TillSku,
@@ -34,7 +39,9 @@ from opname360.services import (
     catalogue,
     costing,
     documents,
+    payment_methods,
     promotions,
+    shop_settings,
 )
 from opname360.services import shifts as shifts_service
 
@@ -122,14 +129,168 @@ def _price(session: Session, cart: Cart) -> list[_Priced]:
     return priced
 
 
-def quote(session: Session, cart: Cart) -> Quote:
-    priced = _price(session, cart)
-    return Quote(
-        lines=[_quoted(line) for line in priced],
+@dataclass
+class _Returned:
+    original: ReceiptLine
+    sku: Sku
+    # Units coming back.
+    quantity: Decimal
+    condition: ReturnCondition
+    refund: int
+
+    @property
+    def gross(self) -> int:
+        return whole_rupiah(self.original.unit_price * self.quantity)
+
+
+def _shop_day(moment: datetime) -> date:
+    return moment.astimezone(ZoneInfo(settings.timezone)).date()
+
+
+def receipt_for_return(session: Session, number: str) -> Receipt:
+    """The Receipt a customer brings back, if it can still be returned."""
+    number = number.strip().upper()
+    receipt = session.exec(
+        select(Receipt).where(Receipt.number == number)
+    ).first()
+    if receipt is None:
+        raise NotFoundError(f'Struk {number} tidak ditemukan.')
+    _check_returnable(session, receipt)
+    return receipt
+
+
+def _check_returnable(session: Session, receipt: Receipt) -> None:
+    """Rules 12, 13 and 19: not voided, and inside today's Return Window."""
+    if receipt.status == ReceiptStatus.voided:
+        raise ConflictError(
+            f'Struk {receipt.number} sudah dibatalkan, jadi tidak bisa '
+            'diretur.'
+        )
+    if not any(line.quantity > 0 for line in receipt.lines):
+        raise ConflictError(
+            f'Struk {receipt.number} tidak berisi barang yang dibeli.'
+        )
+    window = shop_settings.get_settings(session).return_window_days
+    sold_on = _shop_day(receipt.created_at)
+    if (documents.shop_now().date() - sold_on).days > window:
+        raise ConflictError(
+            f'Struk {receipt.number} dari {sold_on:%d-%m-%Y} sudah lewat '
+            f'batas retur {window} hari.'
+        )
+
+
+def _returned_so_far(
+    session: Session, original_receipt_id: int
+) -> dict[int, tuple[Decimal, int]]:
+    """Per line of a Receipt: units back so far and what they refunded.
+    A voided return gave nothing back."""
+    rows = session.exec(
+        select(
+            ReceiptLine.original_line_id,
+            func.sum(-col(ReceiptLine.quantity)),
+            func.sum(-col(ReceiptLine.line_total)),
+        )
+        .join(Receipt, col(ReceiptLine.receipt_id) == Receipt.id)
+        .where(
+            Receipt.original_receipt_id == original_receipt_id,
+            Receipt.status == ReceiptStatus.completed,
+            col(ReceiptLine.original_line_id).is_not(None),
+        )
+        .group_by(col(ReceiptLine.original_line_id))
+    ).all()
+    return {
+        line_id: (quantity, int(refunded))
+        for line_id, quantity, refunded in rows
+        if line_id is not None
+    }
+
+
+def _price_returns(session: Session, cart: Cart) -> list[_Returned]:
+    """What comes back, each refunded at what was paid for it after
+    discount (rules 12 and 14)."""
+    if not cart.returns:
+        return []
+    if cart.original_receipt_id is None:
+        raise ConflictError('Retur harus dari struk asalnya.')
+    original = get_receipt(session, cart.original_receipt_id)
+    _check_returnable(session, original)
+    sold = {line.id: line for line in original.lines if line.quantity > 0}
+    so_far = _returned_so_far(session, cart.original_receipt_id)
+    returned: list[_Returned] = []
+    for row in cart.returns:
+        line = sold.get(row.original_line_id)
+        if line is None:
+            raise NotFoundError(
+                f'Barang itu tidak ada di struk {original.number}.'
+            )
+        sku = session.get(Sku, line.sku_id)
+        assert sku is not None
+        back, refunded = so_far.get(row.original_line_id, (Decimal(0), 0))
+        left = line.quantity - back
+        if row.quantity > left:
+            label = sku_label(sku.product.name, sku.size, sku.color)
+            raise ConflictError(
+                f'{label}: paling banyak {left.normalize():f} '
+                f'{sku.stock_unit} yang masih bisa diretur dari '
+                f'{original.number}.'
+            )
+        # Refunds add up to exactly the line total once all units are back.
+        back += row.quantity
+        refund = (
+            whole_rupiah(line.line_total * back / line.quantity) - refunded
+        )
+        so_far[row.original_line_id] = (back, refunded + refund)
+        returned.append(
+            _Returned(
+                original=line,
+                sku=sku,
+                quantity=row.quantity,
+                condition=row.condition,
+                refund=refund,
+            )
+        )
+    return returned
+
+
+@dataclass
+class _Totals:
+    subtotal: int
+    discount_total: int
+    refund_total: int
+
+    @property
+    def total(self) -> int:
+        return self.subtotal - self.discount_total - self.refund_total
+
+
+def _totals(priced: list[_Priced], returned: list[_Returned]) -> _Totals:
+    return _Totals(
         subtotal=sum(line.gross for line in priced),
         discount_total=sum(line.discount for line in priced),
-        refund_total=0,
-        total=sum(line.line_total for line in priced),
+        refund_total=sum(item.refund for item in returned),
+    )
+
+
+def quote(session: Session, cart: Cart) -> Quote:
+    priced = _price(session, cart)
+    returned = _price_returns(session, cart)
+    totals = _totals(priced, returned)
+    return Quote(
+        lines=[_quoted(line) for line in priced],
+        returns=[
+            QuotedReturn(
+                original_line_id=item.original.id or 0,
+                sku_id=item.sku.id or 0,
+                quantity=item.quantity,
+                condition=item.condition,
+                refund=item.refund,
+            )
+            for item in returned
+        ],
+        subtotal=totals.subtotal,
+        discount_total=totals.discount_total,
+        refund_total=totals.refund_total,
+        total=totals.total,
     )
 
 
@@ -153,22 +314,30 @@ def _quoted(line: _Priced) -> QuotedLine:
 def complete(
     session: Session, receipt_in: ReceiptCreate, *, actor: User
 ) -> Receipt:
-    """Price the cart again, take the payment, write the stock out
-    (rules 6, 8 and 9)."""
+    """A sale, return or exchange: price it again, settle the money, move
+    the stock (rules 6, 8, 9 and 12-16)."""
     shift = shifts_service.selling_shift(session, actor)
     assert shift.id is not None
+    if receipt_in.original_receipt_id is not None:
+        # Two returns at once can't both take back the last unit.
+        get_receipt(session, receipt_in.original_receipt_id)
+        documents.lock(session, Receipt, receipt_in.original_receipt_id)
     priced = _price(session, receipt_in)
-    if not priced:
+    returned = _price_returns(session, receipt_in)
+    if not priced and not returned:
         raise ConflictError('Keranjang masih kosong.')
-    total = sum(line.line_total for line in priced)
-    if total != receipt_in.expected_total:
+    totals = _totals(priced, returned)
+    if totals.total != receipt_in.expected_total:
         raise ConflictError(
-            f'Harga berubah: totalnya sekarang {rupiah(total)}. '
+            f'Harga berubah: totalnya sekarang {rupiah(totals.total)}. '
             'Periksa lagi sebelum menerima pembayaran.'
         )
-    payments, change = _settle(session, total, receipt_in.payments)
+    if not returned:
+        kind = ReceiptKind.sale
+    else:
+        kind = ReceiptKind.exchange if priced else ReceiptKind.return_
+    payments, change = _settle(session, totals.total, receipt_in, kind)
 
-    kind = ReceiptKind.sale
     assert actor.id is not None
     receipt = Receipt(
         number=documents.next_number(session, PREFIXES[kind]),
@@ -176,9 +345,13 @@ def complete(
         shift_id=shift.id,
         location_id=shift.location_id,
         cashier_id=actor.id,
-        subtotal=sum(line.gross for line in priced),
-        discount_total=sum(line.discount for line in priced),
-        total=total,
+        original_receipt_id=(
+            receipt_in.original_receipt_id if returned else None
+        ),
+        subtotal=totals.subtotal,
+        discount_total=totals.discount_total,
+        refund_total=totals.refund_total,
+        total=totals.total,
         change_given=change,
     )
     session.add(receipt)
@@ -186,30 +359,19 @@ def complete(
     assert receipt.id is not None
 
     source = costing.Source(DOCUMENT_TYPE, receipt.id, receipt.number)
-    # SKU order, like every stock document, avoids deadlocks.
-    for line in sorted(priced, key=lambda line: line.sku.id or 0):
-        assert line.sku.id is not None
-        movement = costing.issue(
-            session,
-            sku=line.sku,
-            location_id=shift.location_id,
-            quantity=line.quantity,
-            reason=MovementReason.sale,
-            source=source,
-            actor=actor,
-        )
-        session.add(
-            ReceiptLine(
-                receipt_id=receipt.id,
-                sku_id=line.sku.id,
-                quantity=line.quantity,
-                unit_price=line.unit_price,
-                promotion_id=line.promotion.id if line.promotion else None,
-                discount=line.discount,
-                line_total=line.line_total,
-                unit_cogs=costing.money(-movement.value / line.quantity),
+    # SKU order, like every stock document, avoids deadlocks; what comes
+    # back goes in before the same SKU goes out.
+    items: list[_Priced | _Returned] = [*returned, *priced]
+    for item in sorted(
+        items,
+        key=lambda item: (item.sku.id or 0, isinstance(item, _Priced)),
+    ):
+        if isinstance(item, _Returned):
+            _take_back(
+                session, receipt, item, shift.location_id, source, actor
             )
-        )
+        else:
+            _sell(session, receipt, item, shift.location_id, source, actor)
     for method_id, amount, reference in payments:
         session.add(
             Payment(
@@ -223,10 +385,7 @@ def complete(
         session,
         actor=actor,
         action='receipt.complete',
-        summary=(
-            f'{KIND_WORDS[kind].capitalize()} {receipt.number}: '
-            f'{rupiah(total)}.'
-        ),
+        summary=_summary(session, receipt),
         entity_type=DOCUMENT_TYPE,
         entity_id=receipt.id,
     )
@@ -235,15 +394,138 @@ def complete(
     return receipt
 
 
+def _sell(
+    session: Session,
+    receipt: Receipt,
+    line: _Priced,
+    location_id: int,
+    source: costing.Source,
+    actor: User,
+) -> None:
+    """Stock out at its cost; Negative Stock never stops a sale (rule 9)."""
+    assert receipt.id is not None
+    assert line.sku.id is not None
+    movement = costing.issue(
+        session,
+        sku=line.sku,
+        location_id=location_id,
+        quantity=line.quantity,
+        reason=MovementReason.sale,
+        source=source,
+        actor=actor,
+    )
+    session.add(
+        ReceiptLine(
+            receipt_id=receipt.id,
+            sku_id=line.sku.id,
+            quantity=line.quantity,
+            unit_price=line.unit_price,
+            promotion_id=line.promotion.id if line.promotion else None,
+            discount=line.discount,
+            line_total=line.line_total,
+            unit_cogs=costing.money(-movement.value / line.quantity),
+        )
+    )
+
+
+def _take_back(
+    session: Session,
+    receipt: Receipt,
+    item: _Returned,
+    location_id: int,
+    source: costing.Source,
+    actor: User,
+) -> None:
+    """Back into stock at the cost it was sold at; a Damaged Return leaves
+    again at once, so the Stock Card shows both (rule 15)."""
+    assert receipt.id is not None
+    assert item.sku.id is not None
+    original = item.original
+    movement = costing.receive(
+        session,
+        sku=item.sku,
+        location_id=location_id,
+        quantity=item.quantity,
+        value=costing.money(item.quantity * original.unit_cogs),
+        reason=MovementReason.customer_return,
+        source=source,
+        actor=actor,
+        sets_latest_cost=False,
+    )
+    if item.condition == ReturnCondition.damaged:
+        session.flush()
+        costing.issue(
+            session,
+            sku=item.sku,
+            location_id=location_id,
+            quantity=item.quantity,
+            reason=MovementReason.write_off,
+            source=source,
+            actor=actor,
+            unit_cost=original.unit_cogs,
+            layer_of=movement.id,
+        )
+    gross = -item.gross
+    session.add(
+        ReceiptLine(
+            receipt_id=receipt.id,
+            sku_id=item.sku.id,
+            quantity=-item.quantity,
+            unit_price=original.unit_price,
+            promotion_id=original.promotion_id,
+            discount=gross + item.refund,
+            line_total=-item.refund,
+            unit_cogs=original.unit_cogs,
+            original_line_id=original.id,
+            condition=item.condition,
+        )
+    )
+
+
+def _summary(session: Session, receipt: Receipt) -> str:
+    words = f'{KIND_WORDS[receipt.kind].capitalize()} {receipt.number}'
+    if receipt.original_receipt_id:
+        original = session.get(Receipt, receipt.original_receipt_id)
+        assert original is not None
+        words += f' dari {original.number}'
+    if receipt.total > 0:
+        return f'{words}: {rupiah(receipt.total)}.'
+    if receipt.total < 0:
+        return f'{words}: dikembalikan {rupiah(-receipt.total)}.'
+    return f'{words}: tanpa selisih.'
+
+
+def _refund(
+    session: Session, total: int, receipt_in: ReceiptCreate, kind: ReceiptKind
+) -> tuple[int, int, str | None]:
+    """Money back: cash unless the Cashier picks another method for a
+    return; an exchange always pays back in cash (rules 14 and 16)."""
+    if receipt_in.refund_method_id is None:
+        method = payment_methods.cash_method(session)
+    else:
+        method = payment_methods.get_method(
+            session, receipt_in.refund_method_id
+        )
+        if not method.is_active:
+            raise ConflictError(f'Metode {method.name} sedang nonaktif.')
+        if kind == ReceiptKind.exchange and not method.is_cash:
+            raise ConflictError('Selisih tukar tambah dikembalikan tunai.')
+    assert method.id is not None
+    return method.id, total, None
+
+
 def _settle(
-    session: Session, total: int, payments_in: list[PaymentIn]
+    session: Session, total: int, receipt_in: ReceiptCreate, kind: ReceiptKind
 ) -> tuple[list[tuple[int, int, str | None]], int]:
     """The payments to keep as (method, amount, reference), and the
-    change (rule 8)."""
+    change (rules 8, 14 and 16)."""
+    payments_in = receipt_in.payments
+    if total <= 0 and payments_in:
+        raise ConflictError('Tidak ada yang perlu dibayar pelanggan.')
     if total == 0:
-        if payments_in:
-            raise ConflictError('Tidak ada yang perlu dibayar.')
         return [], 0
+    if total < 0:
+        return [_refund(session, total, receipt_in, kind)], 0
     methods = {
         method.id: method
         for method in session.exec(
@@ -328,6 +610,8 @@ def receipt_public(session: Session, receipt: Receipt) -> ReceiptPublic:
         if receipt.original_receipt_id
         else None
     )
+    assert receipt.id is not None
+    returned = _returned_so_far(session, receipt.id)
     lines = []
     for line in receipt.lines:
         sku = session.get(Sku, line.sku_id)
@@ -344,6 +628,9 @@ def receipt_public(session: Session, receipt: Receipt) -> ReceiptPublic:
                     'promotion_name': _promotion_name(
                         session, line.promotion_id
                     ),
+                    'returned_quantity': returned.get(
+                        line.id or 0, (Decimal(0), 0)
+                    )[0],
                 },
             )
         )

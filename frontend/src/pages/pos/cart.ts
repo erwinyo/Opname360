@@ -1,7 +1,7 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
 
 import { receiptsQuote } from '@/client'
-import type { CartLine, TillSku } from '@/client'
+import type { Cart, CartLine, TillSku } from '@/client'
 import { parseQuantity } from '@/lib/format'
 
 /** A SKU in the cart; `quantity` is what is typed, "1" or "1,5". */
@@ -28,18 +28,23 @@ export function linesAreValid(lines: CartLine[]): boolean {
   return lines.every((line) => Number(line.quantity) > 0)
 }
 
-/** Today's prices and Promotions for the cart, worked out by the server. */
-export function useQuote(lines: CartLine[]) {
+/**
+ * Today's prices and Promotions, and refunds for what comes back, worked out
+ * by the server.
+ */
+export function useQuote(cart: Cart) {
+  const lines = cart.lines ?? []
+  const returns = cart.returns ?? []
   return useQuery({
-    queryKey: ['quote', lines],
+    queryKey: ['quote', cart],
     queryFn: async () => {
-      const { data } = await receiptsQuote({
-        body: { lines },
-        throwOnError: true,
-      })
+      const { data } = await receiptsQuote({ body: cart, throwOnError: true })
       return data
     },
-    enabled: lines.length > 0 && linesAreValid(lines),
+    enabled:
+      lines.length + returns.length > 0 &&
+      linesAreValid(lines) &&
+      returns.every((line) => Number(line.quantity) > 0),
     placeholderData: keepPreviousData,
   })
 }

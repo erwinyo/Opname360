@@ -1,10 +1,17 @@
 import { LockIcon } from 'lucide-react'
-import { Link } from 'react-router'
+import { Link, NavLink } from 'react-router'
 
 import type { ShiftCurrent } from '@/client'
 import { Button } from '@/components/ui/button'
 import { formatDateTime } from '@/lib/format'
+import { cn } from '@/lib/utils'
 
+const SCREENS = [
+  { to: '/kasir', label: 'Jual' },
+  { to: '/kasir/retur', label: 'Retur / Tukar' },
+]
+
+/** The open Shift, and the till's screens. */
 export function ShiftBar({ shift }: { shift: ShiftCurrent }) {
   return (
     <div className="flex flex-wrap items-center justify-between gap-3">
@@ -15,12 +22,32 @@ export function ShiftBar({ shift }: { shift: ShiftCurrent }) {
           {formatDateTime(shift.opened_at)}
         </p>
       </div>
-      <Button asChild variant="outline">
-        <Link to="/kasir/tutup">
-          <LockIcon />
-          Tutup shift
-        </Link>
-      </Button>
+      <div className="flex flex-wrap items-center gap-2">
+        <nav className="flex rounded-lg border bg-card p-0.5">
+          {SCREENS.map((screen) => (
+            <NavLink
+              key={screen.to}
+              to={screen.to}
+              end
+              className={({ isActive }) =>
+                cn(
+                  'rounded-md px-3 py-1.5 text-sm font-medium text-muted-foreground hover:text-foreground',
+                  isActive &&
+                    'bg-primary text-primary-foreground hover:text-primary-foreground',
+                )
+              }
+            >
+              {screen.label}
+            </NavLink>
+          ))}
+        </nav>
+        <Button asChild variant="outline">
+          <Link to="/kasir/tutup">
+            <LockIcon />
+            Tutup shift
+          </Link>
+        </Button>
+      </div>
     </div>
   )
 }

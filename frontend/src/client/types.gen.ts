@@ -80,6 +80,14 @@ export type Cart = {
      * Lines
      */
     lines?: Array<CartLine>;
+    /**
+     * Original Receipt Id
+     */
+    original_receipt_id?: number | null;
+    /**
+     * Returns
+     */
+    returns?: Array<ReturnLineIn>;
 };
 
 /**
@@ -1607,6 +1615,10 @@ export type Quote = {
      */
     lines: Array<QuotedLine>;
     /**
+     * Returns
+     */
+    returns: Array<QuotedReturn>;
+    /**
      * Subtotal
      */
     subtotal: number;
@@ -1675,6 +1687,29 @@ export type QuotedLine = {
 };
 
 /**
+ * QuotedReturn
+ */
+export type QuotedReturn = {
+    /**
+     * Original Line Id
+     */
+    original_line_id: number;
+    /**
+     * Sku Id
+     */
+    sku_id: number;
+    /**
+     * Quantity
+     */
+    quantity: string;
+    condition: ReturnCondition;
+    /**
+     * Refund
+     */
+    refund: number;
+};
+
+/**
  * ReceiptCreate
  */
 export type ReceiptCreate = {
@@ -1683,9 +1718,21 @@ export type ReceiptCreate = {
      */
     lines?: Array<CartLine>;
     /**
+     * Original Receipt Id
+     */
+    original_receipt_id?: number | null;
+    /**
+     * Returns
+     */
+    returns?: Array<ReturnLineIn>;
+    /**
      * Payments
      */
     payments?: Array<PaymentIn>;
+    /**
+     * Refund Method Id
+     */
+    refund_method_id?: number | null;
     /**
      * Expected Total
      */
@@ -1754,6 +1801,10 @@ export type ReceiptLinePublic = {
      */
     original_line_id: number | null;
     condition: ReturnCondition | null;
+    /**
+     * Returned Quantity
+     */
+    returned_quantity: string;
 };
 
 /**
@@ -1854,6 +1905,21 @@ export type Resolution = 'company_loss' | 'employee_charge';
  * ReturnCondition
  */
 export type ReturnCondition = 'resellable' | 'damaged';
+
+/**
+ * ReturnLineIn
+ */
+export type ReturnLineIn = {
+    /**
+     * Original Line Id
+     */
+    original_line_id: number;
+    /**
+     * Quantity
+     */
+    quantity: number | string;
+    condition: ReturnCondition;
+};
 
 /**
  * ReversalCreate
@@ -5474,6 +5540,36 @@ export type ReceiptsFindSkusResponses = {
 };
 
 export type ReceiptsFindSkusResponse = ReceiptsFindSkusResponses[keyof ReceiptsFindSkusResponses];
+
+export type ReceiptsReceiptForReturnData = {
+    body?: never;
+    path?: never;
+    query: {
+        /**
+         * Number
+         */
+        number: string;
+    };
+    url: '/api/v1/receipts/for-return';
+};
+
+export type ReceiptsReceiptForReturnErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type ReceiptsReceiptForReturnError = ReceiptsReceiptForReturnErrors[keyof ReceiptsReceiptForReturnErrors];
+
+export type ReceiptsReceiptForReturnResponses = {
+    /**
+     * Successful Response
+     */
+    200: ReceiptPublic;
+};
+
+export type ReceiptsReceiptForReturnResponse = ReceiptsReceiptForReturnResponses[keyof ReceiptsReceiptForReturnResponses];
 
 export type ReceiptsQuoteData = {
     body: Cart;

@@ -131,8 +131,18 @@ class CartLine(SQLModel):
     quantity: Decimal = Field(gt=0, max_digits=14, decimal_places=3)
 
 
+class ReturnLineIn(SQLModel):
+    original_line_id: int
+    quantity: Decimal = Field(gt=0, max_digits=14, decimal_places=3)
+    condition: ReturnCondition
+
+
 class Cart(SQLModel):
     lines: list[CartLine] = Field(default=[], max_length=500)
+    # A return or exchange: the Receipt the goods were bought on, and what
+    # comes back from it.
+    original_receipt_id: int | None = None
+    returns: list[ReturnLineIn] = Field(default=[], max_length=500)
 
 
 class QuotedLine(SQLModel):
@@ -149,8 +159,18 @@ class QuotedLine(SQLModel):
     line_total: int
 
 
+class QuotedReturn(SQLModel):
+    original_line_id: int
+    sku_id: int
+    quantity: Decimal
+    condition: ReturnCondition
+    # What was paid for these units, after discount.
+    refund: int
+
+
 class Quote(SQLModel):
     lines: list[QuotedLine]
+    returns: list[QuotedReturn]
     subtotal: int
     discount_total: int
     refund_total: int
@@ -168,6 +188,9 @@ class PaymentIn(SQLModel):
 
 class ReceiptCreate(Cart):
     payments: list[PaymentIn] = Field(default=[], max_length=10)
+    # Money back from a return goes out in cash unless the Cashier picks
+    # another method.
+    refund_method_id: int | None = None
     # The total the customer was shown; a price change in between stops
     # the sale.
     expected_total: int
@@ -188,6 +211,8 @@ class ReceiptLinePublic(SQLModel):
     line_total: int
     original_line_id: int | None
     condition: ReturnCondition | None
+    # For a line sold: how much of it has come back since.
+    returned_quantity: Decimal
 
 
 class PaymentPublic(SQLModel):

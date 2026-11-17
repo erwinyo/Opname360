@@ -122,6 +122,7 @@ from opname360.models.receipt import (
     PaymentPublic,
     Quote,
     QuotedLine,
+    QuotedReturn,
     Receipt,
     ReceiptCreate,
     ReceiptKind,
@@ -130,6 +131,7 @@ from opname360.models.receipt import (
     ReceiptPublic,
     ReceiptStatus,
     ReturnCondition,
+    ReturnLineIn,
     TillSku,
 )
 from opname360.models.shift import (
@@ -281,6 +283,7 @@ __all__ = [
     'PromotionTargetPublic',
     'Quote',
     'QuotedLine',
+    'QuotedReturn',
     'Receipt',
     'ReceiptCreate',
     'ReceiptKind',
@@ -290,6 +293,7 @@ __all__ = [
     'ReceiptStatus',
     'Resolution',
     'ReturnCondition',
+    'ReturnLineIn',
     'Reversal',
     'ReversalCreate',
     'ReversalPublic',

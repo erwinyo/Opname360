@@ -63,6 +63,7 @@ test('pos: open a shift, sell, close', async ({ browser }) => {
   await signIn(owner, OWNER.username, OWNER.password)
   await expect(owner.getByRole('heading', { name: /^Halo/ })).toBeVisible()
   const [small, medium] = await setUp(owner)
+  let sale = ''
 
   const till = await (
     await browser.newContext({ viewport: { width: 1280, height: 800 } })
@@ -112,21 +113,38 @@ test('pos: open a shift, sell, close', async ({ browser }) => {
     await till.getByRole('button', { name: 'Selesai' }).click()
     await expect(till.getByText('Kembali Rp 27.000')).toBeVisible()
     await shot(till, 'pos-04-done')
+    sale = (await till.getByRole('link', { name: /^PJ-/ }).textContent()) ?? ''
     await till.getByRole('link', { name: /^PJ-/ }).click()
     await expect(till.getByText('Kaos S hemat')).toBeVisible()
     await shot(till, 'pos-04-receipt')
     await till.getByRole('button', { name: 'Kembali' }).click()
   })
 
+  await test.step('exchanges one size S for a size M', async () => {
+    await till.getByRole('link', { name: 'Retur / Tukar' }).click()
+    await till.getByLabel('Nomor struk').fill(sale)
+    await till.getByLabel('Nomor struk').press('Enter')
+    await till.getByLabel('Jumlah retur Kaos Olahraga · S').fill('1')
+    await expect(till.getByText('Dikembalikan Rp 54.000')).toBeVisible()
+    await scan(till, medium.barcode)
+    await expect(till.getByText('Pelanggan bayar')).toBeVisible()
+    await expect(till.getByText('Rp 11.000').last()).toBeVisible()
+    await shot(till, 'pos-05-exchange')
+    await till.getByRole('button', { name: 'Bayar' }).click()
+    await till.getByRole('button', { name: 'Uang pas' }).click()
+    await till.getByRole('button', { name: 'Selesai' }).click()
+    await expect(till.getByRole('link', { name: /^TT-/ })).toBeVisible()
+  })
+
   await test.step('closes the shift with a blind count', async () => {
     await till.getByRole('link', { name: 'Tutup shift' }).click()
-    await till.getByLabel('Uang tunai di laci').fill('368000')
+    await till.getByLabel('Uang tunai di laci').fill('379000')
     await till.getByRole('button', { name: 'Tutup shift' }).click()
     await till
       .getByRole('dialog')
       .getByRole('button', { name: 'Tutup shift' })
       .click()
     await expect(till.getByText('Kurang Rp 5.000')).toBeVisible()
-    await shot(till, 'pos-05-closed')
+    await shot(till, 'pos-06-closed')
   })
 })

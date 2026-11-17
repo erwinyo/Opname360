@@ -20,6 +20,7 @@ import {
   TruckIcon,
   Undo2Icon,
   UsersIcon,
+  WalletIcon,
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { NavLink, Outlet } from 'react-router'
@@ -62,6 +63,13 @@ const NAV: NavGroup[] = [
         icon: ScanBarcodeIcon,
         roles: ['owner', 'admin', 'cashier'],
       },
+    ],
+  },
+  {
+    label: 'Penjualan',
+    items: [
+      { to: '/shift', label: 'Shift', icon: WalletIcon, roles: BACK_OFFICE },
+      { to: '/promo', label: 'Promo', icon: PercentIcon, roles: BACK_OFFICE },
     ],
   },
   {
@@ -117,7 +125,6 @@ const NAV: NavGroup[] = [
         roles: BACK_OFFICE,
       },
       { to: '/pemasok', label: 'Pemasok', icon: TruckIcon, roles: BACK_OFFICE },
-      { to: '/promo', label: 'Promo', icon: PercentIcon, roles: BACK_OFFICE },
     ],
   },
   {

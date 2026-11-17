@@ -5,6 +5,7 @@ from fastapi import APIRouter, Depends, Path, Query, status
 from opname360.api.deps import (
     AdminDep,
     CurrentUserDep,
+    OwnerDep,
     SellerDep,
     SessionDep,
     get_current_user,
@@ -18,6 +19,7 @@ from opname360.models import (
     ShiftOpen,
     ShiftPage,
     ShiftPublic,
+    ShiftResolve,
 )
 from opname360.services import shifts
 
@@ -82,4 +84,16 @@ def read_shift(
 ) -> ShiftPublic:
     if not shifts.may_read(shift, user):
         raise ForbiddenError('Ringkasan shift terlihat setelah shift ditutup.')
+    return shifts.shift_public(session, shift)
+
+
+@router.post('/{shift_id}/resolution')
+def resolve_shift(
+    session: SessionDep,
+    owner: OwnerDep,
+    shift: ShiftDep,
+    resolve_in: ShiftResolve,
+) -> ShiftPublic:
+    """Who bears a short drawer: the company, or a named employee."""
+    shift = shifts.resolve(session, shift, resolve_in, actor=owner)
     return shifts.shift_public(session, shift)

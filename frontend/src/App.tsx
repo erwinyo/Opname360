@@ -21,6 +21,7 @@ import { OpnamesPage } from '@/pages/opname/OpnamesPage'
 import { CloseShiftPage } from '@/pages/pos/CloseShiftPage'
 import { ReceiptPage } from '@/pages/pos/ReceiptPage'
 import { ShiftPage } from '@/pages/pos/ShiftPage'
+import { ShiftsPage } from '@/pages/pos/ShiftsPage'
 import { TillPage } from '@/pages/pos/TillPage'
 import { PromotionFormPage } from '@/pages/promotions/PromotionFormPage'
 import { PromotionsPage } from '@/pages/promotions/PromotionsPage'
@@ -71,6 +72,10 @@ export function App() {
           <>
             <Route path="kasir" element={<TillPage screen="sale" />} />
             <Route path="kasir/retur" element={<TillPage screen="return" />} />
+            <Route
+              path="kasir/transaksi"
+              element={<TillPage screen="transactions" />}
+            />
             <Route path="kasir/tutup" element={<CloseShiftPage />} />
           </>
         )}
@@ -116,6 +121,7 @@ export function App() {
               element={<SupplierReturnPage />}
             />
             <Route path="pemasok" element={<SuppliersPage />} />
+            <Route path="shift" element={<ShiftsPage />} />
             <Route path="promo" element={<PromotionsPage />} />
             <Route path="promo/baru" element={<PromotionFormPage />} />
             <Route path="promo/:promotionId" element={<PromotionFormPage />} />

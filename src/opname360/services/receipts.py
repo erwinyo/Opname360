@@ -8,7 +8,7 @@ from zoneinfo import ZoneInfo
 from sqlmodel import Session, col, func, select
 
 from opname360.core.config import settings
-from opname360.core.errors import ConflictError, NotFoundError
+from opname360.core.errors import ConflictError, ForbiddenError, NotFoundError
 from opname360.core.formatting import rupiah, sku_label
 from opname360.models import (
     Cart,
@@ -22,12 +22,16 @@ from opname360.models import (
     QuotedReturn,
     Receipt,
     ReceiptCreate,
+    ReceiptFilter,
     ReceiptKind,
     ReceiptLine,
     ReceiptLinePublic,
+    ReceiptPage,
     ReceiptPublic,
     ReceiptStatus,
+    ReceiptSummary,
     ReturnCondition,
+    Role,
     Shift,
     Sku,
     TillSku,
@@ -578,6 +582,112 @@ def get_receipt(session: Session, receipt_id: int) -> Receipt:
     receipt = session.get(Receipt, receipt_id)
     if receipt is None:
         raise NotFoundError('Struk tidak ditemukan.')
+    return receipt
+
+
+def list_receipts(session: Session, filters: ReceiptFilter) -> ReceiptPage:
+    """A Shift's Receipts, the latest first."""
+    query = select(Receipt).where(Receipt.shift_id == filters.shift_id)
+    total = session.exec(
+        select(func.count()).select_from(query.subquery())
+    ).one()
+    receipts = session.exec(
+        query.order_by(col(Receipt.id).desc())
+        .offset(filters.offset)
+        .limit(filters.limit)
+    ).all()
+    ids = [receipt.id for receipt in receipts]
+    methods: dict[int, list[str]] = {}
+    for receipt_id, name in session.exec(
+        select(Payment.receipt_id, PaymentMethod.name)
+        .join(
+            PaymentMethod, col(Payment.payment_method_id) == PaymentMethod.id
+        )
+        .where(col(Payment.receipt_id).in_(ids))
+        .order_by(col(Payment.id))
+    ).all():
+        methods.setdefault(receipt_id, []).append(name)
+    line_counts = dict(
+        session.exec(
+            select(ReceiptLine.receipt_id, func.count())
+            .where(col(ReceiptLine.receipt_id).in_(ids))
+            .group_by(col(ReceiptLine.receipt_id))
+        ).all()
+    )
+    return ReceiptPage(
+        items=[
+            ReceiptSummary.model_validate(
+                receipt,
+                update={
+                    'cashier_name': documents.user_name(
+                        session, receipt.cashier_id
+                    )
+                    or '',
+                    'methods': ', '.join(
+                        dict.fromkeys(methods.get(receipt.id or 0, []))
+                    ),
+                    'line_count': line_counts.get(receipt.id, 0),
+                },
+            )
+            for receipt in receipts
+        ],
+        total=total,
+    )
+
+
+def void(
+    session: Session, receipt: Receipt, reason: str, *, actor: User
+) -> Receipt:
+    """Cancel a Receipt inside its own open Shift: the stock moves back and
+    its money no longer counts (rule 11)."""
+    assert receipt.id is not None
+    # The Shift first, like a sale: it can't close halfway through.
+    shift = session.get(
+        Shift,
+        receipt.shift_id,
+        with_for_update={'read': True},
+        populate_existing=True,
+    )
+    assert shift is not None
+    receipt = documents.lock(session, Receipt, receipt.id)
+    assert receipt.id is not None
+    if receipt.status == ReceiptStatus.voided:
+        raise ConflictError(f'Struk {receipt.number} sudah dibatalkan.')
+    if shift.closed_at is not None:
+        raise ConflictError(
+            f'Shift {shift.number} sudah ditutup. Sekarang penjualan ini '
+            'hanya bisa dibatalkan lewat retur.'
+        )
+    if receipt.cashier_id != actor.id and actor.role != Role.owner:
+        raise ForbiddenError(
+            'Struk hanya bisa dibatalkan oleh kasir yang membuatnya atau '
+            'Pemilik.'
+        )
+    returned = session.exec(
+        select(Receipt.number).where(
+            Receipt.original_receipt_id == receipt.id,
+            Receipt.status == ReceiptStatus.completed,
+        )
+    ).first()
+    if returned is not None:
+        raise ConflictError(
+            f'Sudah ada {returned} dari struk {receipt.number}; batalkan '
+            'struk itu dulu.'
+        )
+    documents.write_reversal(
+        session,
+        document_type=DOCUMENT_TYPE,
+        document_id=receipt.id,
+        label=f'struk {receipt.number}',
+        reason=reason,
+        actor=actor,
+    )
+    receipt.status = ReceiptStatus.voided
+    receipt.void_reason = reason.strip()
+    receipt.voided_by = actor.id
+    receipt.voided_at = utc_now()
+    session.add(receipt)
+    session.commit()
     return receipt
 
 

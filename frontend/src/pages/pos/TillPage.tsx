@@ -16,8 +16,13 @@ import { formatDateTime } from '@/lib/format'
 
 import { ReturnScreen } from './ReturnScreen'
 import { SaleScreen } from './SaleScreen'
+import { TransactionsScreen } from './TransactionsScreen'
 
-const SCREENS = { sale: SaleScreen, return: ReturnScreen }
+const SCREENS = {
+  sale: SaleScreen,
+  return: ReturnScreen,
+  transactions: TransactionsScreen,
+}
 
 /** The till: open a Shift first, then sell in it. */
 export function TillPage({ screen }: { screen: keyof typeof SCREENS }) {

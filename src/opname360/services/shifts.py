@@ -5,11 +5,15 @@ from sqlmodel import Session, col, func, select
 from opname360.core.errors import ConflictError, ForbiddenError, NotFoundError
 from opname360.core.formatting import rupiah
 from opname360.models import (
+    EmployeeCharge,
     Location,
     Payment,
     PaymentMethod,
+    PaymentTotal,
     Receipt,
+    ReceiptKind,
     ReceiptStatus,
+    Resolution,
     Role,
     Shift,
     ShiftClose,
@@ -18,6 +22,7 @@ from opname360.models import (
     ShiftOpen,
     ShiftPage,
     ShiftPublic,
+    ShiftResolve,
     User,
 )
 from opname360.models._types import utc_now
@@ -208,9 +213,43 @@ def list_shifts(session: Session, filters: ShiftFilter) -> ShiftPage:
 def shift_public(session: Session, shift: Shift) -> ShiftPublic:
     location = session.get(Location, shift.location_id)
     assert location is not None
+    counts = {
+        (kind, status): (count, total)
+        for kind, status, count, total in session.exec(
+            select(
+                Receipt.kind,
+                Receipt.status,
+                func.count(),
+                func.sum(Receipt.total),
+            )
+            .where(Receipt.shift_id == shift.id)
+            .group_by(col(Receipt.kind), col(Receipt.status))
+        ).all()
+    }
+    completed = {
+        kind: count
+        for (kind, status), (count, _) in counts.items()
+        if status == ReceiptStatus.completed
+    }
     return ShiftPublic.model_validate(
         shift,
         update={
+            'payment_totals': _payment_totals(session, shift),
+            'sale_count': completed.get(ReceiptKind.sale, 0),
+            'return_count': completed.get(ReceiptKind.return_, 0)
+            + completed.get(ReceiptKind.exchange, 0),
+            'void_count': sum(
+                count
+                for (_, status), (count, _) in counts.items()
+                if status == ReceiptStatus.voided
+            ),
+            'net_sales': int(
+                sum(
+                    total
+                    for (_, status), (_, total) in counts.items()
+                    if status == ReceiptStatus.completed
+                )
+            ),
             'location_name': location.name,
             'cashier_name': documents.user_name(session, shift.cashier_id)
             or '',
@@ -225,6 +264,89 @@ def shift_public(session: Session, shift: Shift) -> ShiftPublic:
             ),
         },
     )
+
+
+def _payment_totals(session: Session, shift: Shift) -> list[PaymentTotal]:
+    rows = session.exec(
+        select(
+            PaymentMethod.name, PaymentMethod.is_cash, func.sum(Payment.amount)
+        )
+        .join(Payment, col(Payment.payment_method_id) == PaymentMethod.id)
+        .join(Receipt, col(Payment.receipt_id) == Receipt.id)
+        .where(
+            Receipt.shift_id == shift.id,
+            Receipt.status == ReceiptStatus.completed,
+        )
+        .group_by(
+            col(PaymentMethod.id),
+            col(PaymentMethod.name),
+            col(PaymentMethod.is_cash),
+        )
+        .order_by(col(PaymentMethod.is_cash).desc(), col(PaymentMethod.id))
+    ).all()
+    return [
+        PaymentTotal(method_name=name, is_cash=is_cash, amount=int(amount))
+        for name, is_cash, amount in rows
+    ]
+
+
+def resolve(
+    session: Session, shift: Shift, resolve_in: ShiftResolve, *, actor: User
+) -> Shift:
+    """The Owner decides who bears a short drawer (rule 3)."""
+    assert shift.id is not None
+    shift = documents.lock(session, Shift, shift.id)
+    assert shift.id is not None
+    if shift.resolution is not None:
+        raise ConflictError(
+            f'Selisih kas shift {shift.number} sudah diputuskan.'
+        )
+    if not needs_resolution(shift):
+        raise ConflictError(f'Kas shift {shift.number} tidak kurang.')
+    assert shift.cash_variance is not None
+    shortage = -shift.cash_variance
+    charged = None
+    if resolve_in.resolution == Resolution.employee_charge:
+        if resolve_in.charged_user_id is None:
+            raise ConflictError('Pilih karyawan yang menanggung.')
+        charged = session.get(User, resolve_in.charged_user_id)
+        if charged is None:
+            raise NotFoundError('Karyawan tidak ditemukan.')
+        assert charged.id is not None
+        session.add(
+            EmployeeCharge(
+                user_id=charged.id,
+                amount=shortage,
+                description=f'Selisih kurang kas shift {shift.number}',
+                source_type=DOCUMENT_TYPE,
+                source_id=shift.id,
+                source_number=shift.number,
+                created_by=actor.id,
+            )
+        )
+    shift.resolution = resolve_in.resolution
+    shift.charged_user_id = charged.id if charged else None
+    shift.resolved_by = actor.id
+    shift.resolved_at = utc_now()
+    session.add(shift)
+    activity_log.record(
+        session,
+        actor=actor,
+        action='shift.resolve',
+        summary=(
+            f'Selisih kurang kas shift {shift.number} '
+            f'({rupiah(shortage)}): '
+            + (
+                f'ganti rugi {charged.full_name}.'
+                if charged
+                else 'kerugian perusahaan.'
+            )
+        ),
+        entity_type=DOCUMENT_TYPE,
+        entity_id=shift.id,
+    )
+    session.commit()
+    return shift
 
 
 def may_read(shift: Shift, user: User) -> bool:

@@ -62,6 +62,20 @@ class ShiftCurrent(SQLModel):
     is_mine: bool
 
 
+class ShiftResolve(SQLModel):
+    resolution: Resolution
+    # Who pays the shortage back, for an Employee Charge.
+    charged_user_id: int | None = None
+
+
+class PaymentTotal(SQLModel):
+    """What one Payment Method took in a Shift, net of money paid back."""
+
+    method_name: str
+    is_cash: bool
+    amount: int
+
+
 class ShiftPublic(SQLModel):
     id: int
     number: str
@@ -81,6 +95,12 @@ class ShiftPublic(SQLModel):
     charged_user_name: str | None
     resolved_by_name: str | None
     resolved_at: datetime | None
+    payment_totals: list[PaymentTotal]
+    sale_count: int
+    return_count: int
+    void_count: int
+    # Sales minus refunds, after discounts, of the Receipts not voided.
+    net_sales: int
 
 
 class ShiftPage(SQLModel):

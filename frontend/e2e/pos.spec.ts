@@ -134,6 +134,9 @@ test('pos: open a shift, sell, close', async ({ browser }) => {
     await till.getByRole('button', { name: 'Uang pas' }).click()
     await till.getByRole('button', { name: 'Selesai' }).click()
     await expect(till.getByRole('link', { name: /^TT-/ })).toBeVisible()
+    await till.getByRole('link', { name: 'Transaksi' }).click()
+    await expect(till.getByRole('cell', { name: 'Tukar tambah' })).toBeVisible()
+    await shot(till, 'pos-06-transactions')
   })
 
   await test.step('closes the shift with a blind count', async () => {
@@ -145,6 +148,23 @@ test('pos: open a shift, sell, close', async ({ browser }) => {
       .getByRole('button', { name: 'Tutup shift' })
       .click()
     await expect(till.getByText('Kurang Rp 5.000')).toBeVisible()
-    await shot(till, 'pos-06-closed')
+    await shot(till, 'pos-07-closed')
+  })
+
+  await test.step('the owner charges the shortage to the cashier', async () => {
+    await openMenu(owner, 'Shift')
+    await expect(owner.getByText('Menunggu keputusan Pemilik')).toBeVisible()
+    await owner.getByRole('link', { name: /^SH-/ }).first().click()
+    await owner.getByLabel('Ganti rugi karyawan').check()
+    await expect(owner.getByLabel('Karyawan', { exact: true })).toHaveText(
+      'Rina Kasir',
+    )
+    await shot(owner, 'pos-08-resolve')
+    await owner.getByRole('button', { name: 'Simpan keputusan' }).click()
+    await expect(owner.getByText('Ganti rugi Rina Kasir')).toBeVisible()
+    await openMenu(owner, 'Ganti Rugi Karyawan')
+    await expect(
+      owner.getByRole('button', { name: /Rina Kasir/ }),
+    ).toContainText('Rp 5.000')
   })
 })

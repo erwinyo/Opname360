@@ -5393,6 +5393,215 @@
         }
       }
     },
+    "/api/v1/shifts/{shift_id}/resolution": {
+      "post": {
+        "tags": [
+          "shifts"
+        ],
+        "summary": "Resolve Shift",
+        "description": "Who bears a short drawer: the company, or a named employee.",
+        "operationId": "shifts-resolve_shift",
+        "parameters": [
+          {
+            "name": "shift_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "title": "Shift Id"
+            }
+          },
+          {
+            "name": "opname360_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Opname360 Session"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ShiftResolve"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShiftPublic"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/receipts/": {
+      "get": {
+        "tags": [
+          "receipts"
+        ],
+        "summary": "List Receipts",
+        "description": "One Shift's Receipts. A Cashier sees only their own Shifts.",
+        "operationId": "receipts-list_receipts",
+        "parameters": [
+          {
+            "name": "shift_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Shift Id"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "title": "Offset"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 500,
+              "minimum": 1,
+              "default": 100,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "opname360_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Opname360 Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReceiptPage"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "receipts"
+        ],
+        "summary": "Complete Receipt",
+        "operationId": "receipts-complete_receipt",
+        "parameters": [
+          {
+            "name": "opname360_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Opname360 Session"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReceiptCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReceiptPublic"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/receipts/skus": {
       "get": {
         "tags": [
@@ -5577,65 +5786,6 @@
         }
       }
     },
-    "/api/v1/receipts/": {
-      "post": {
-        "tags": [
-          "receipts"
-        ],
-        "summary": "Complete Receipt",
-        "operationId": "receipts-complete_receipt",
-        "parameters": [
-          {
-            "name": "opname360_session",
-            "in": "cookie",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Opname360 Session"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ReceiptCreate"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ReceiptPublic"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/api/v1/receipts/{receipt_id}": {
       "get": {
         "tags": [
@@ -5731,6 +5881,76 @@
             }
           }
         ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReceiptPublic"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/receipts/{receipt_id}/void": {
+      "post": {
+        "tags": [
+          "receipts"
+        ],
+        "summary": "Void Receipt",
+        "description": "Cancel a Receipt while its Shift is still open.",
+        "operationId": "receipts-void_receipt",
+        "parameters": [
+          {
+            "name": "receipt_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "title": "Receipt Id"
+            }
+          },
+          {
+            "name": "opname360_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Opname360 Session"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReceiptVoid"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -8444,6 +8664,30 @@
         ],
         "title": "PaymentStatus"
       },
+      "PaymentTotal": {
+        "properties": {
+          "method_name": {
+            "type": "string",
+            "title": "Method Name"
+          },
+          "is_cash": {
+            "type": "boolean",
+            "title": "Is Cash"
+          },
+          "amount": {
+            "type": "integer",
+            "title": "Amount"
+          }
+        },
+        "type": "object",
+        "required": [
+          "method_name",
+          "is_cash",
+          "amount"
+        ],
+        "title": "PaymentTotal",
+        "description": "What one Payment Method took in a Shift, net of money paid back."
+      },
       "ProductPage": {
         "properties": {
           "items": {
@@ -9417,6 +9661,27 @@
         ],
         "title": "ReceiptLinePublic"
       },
+      "ReceiptPage": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ReceiptSummary"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "total"
+        ],
+        "title": "ReceiptPage"
+      },
       "ReceiptPublic": {
         "properties": {
           "id": {
@@ -9578,6 +9843,73 @@
           "voided"
         ],
         "title": "ReceiptStatus"
+      },
+      "ReceiptSummary": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "number": {
+            "type": "string",
+            "title": "Number"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/ReceiptKind"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ReceiptStatus"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "cashier_name": {
+            "type": "string",
+            "title": "Cashier Name"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "methods": {
+            "type": "string",
+            "title": "Methods"
+          },
+          "line_count": {
+            "type": "integer",
+            "title": "Line Count"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "number",
+          "kind",
+          "status",
+          "created_at",
+          "cashier_name",
+          "total",
+          "methods",
+          "line_count"
+        ],
+        "title": "ReceiptSummary"
+      },
+      "ReceiptVoid": {
+        "properties": {
+          "reason": {
+            "type": "string",
+            "maxLength": 300,
+            "minLength": 1,
+            "title": "Reason"
+          }
+        },
+        "type": "object",
+        "required": [
+          "reason"
+        ],
+        "title": "ReceiptVoid"
       },
       "Resolution": {
         "type": "string",
@@ -9906,6 +10238,29 @@
               }
             ],
             "title": "Resolved At"
+          },
+          "payment_totals": {
+            "items": {
+              "$ref": "#/components/schemas/PaymentTotal"
+            },
+            "type": "array",
+            "title": "Payment Totals"
+          },
+          "sale_count": {
+            "type": "integer",
+            "title": "Sale Count"
+          },
+          "return_count": {
+            "type": "integer",
+            "title": "Return Count"
+          },
+          "void_count": {
+            "type": "integer",
+            "title": "Void Count"
+          },
+          "net_sales": {
+            "type": "integer",
+            "title": "Net Sales"
           }
         },
         "type": "object",
@@ -9926,9 +10281,37 @@
           "resolution",
           "charged_user_name",
           "resolved_by_name",
-          "resolved_at"
+          "resolved_at",
+          "payment_totals",
+          "sale_count",
+          "return_count",
+          "void_count",
+          "net_sales"
         ],
         "title": "ShiftPublic"
+      },
+      "ShiftResolve": {
+        "properties": {
+          "resolution": {
+            "$ref": "#/components/schemas/Resolution"
+          },
+          "charged_user_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Charged User Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "resolution"
+        ],
+        "title": "ShiftResolve"
       },
       "ShopSettingsPublic": {
         "properties": {

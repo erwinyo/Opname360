@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils'
 const SCREENS = [
   { to: '/kasir', label: 'Jual' },
   { to: '/kasir/retur', label: 'Retur / Tukar' },
+  { to: '/kasir/transaksi', label: 'Transaksi' },
 ]
 
 /** The open Shift, and the till's screens. */

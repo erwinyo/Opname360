@@ -3,8 +3,8 @@
 import { type DefaultError, type InfiniteData, infiniteQueryOptions, queryOptions, type UseMutationOptions } from '@tanstack/react-query';
 
 import { client } from '../client.gen';
-import { activityLogListEntries, authLogin, authLogout, authReadMe, categoriesCreateCategory, categoriesCreateSubCategory, categoriesDeleteCategory, categoriesDeleteSubCategory, categoriesListCategories, categoriesRenameSubCategory, categoriesUpdateCategory, countingAddCount, countingCancelCount, countingFindSkus, countingListSessions, countingReadSheet, employeeChargesListCharges, employeeChargesOutstandingTotals, goodsReceiptsCompleteReceipt, goodsReceiptsCreateReceipt, goodsReceiptsDiscardReceipt, goodsReceiptsListReceipts, goodsReceiptsReadReceipt, goodsReceiptsReverseReceipt, goodsReceiptsUpdateReceipt, healthHealthCheck, opnamesApproveOpname, opnamesCancelOpname, opnamesCloseCounting, opnamesConfirmZero, opnamesListLines, opnamesListOpnames, opnamesListStaff, opnamesOpeningAllowed, opnamesOpenOpname, opnamesReadOpname, opnamesRecountLine, opnamesReverseOpname, opnamesSaveResolution, type Options, paymentMethodsCreateMethod, paymentMethodsListMethods, paymentMethodsUpdateMethod, productionReceiptsCompleteReceipt, productionReceiptsCreateReceipt, productionReceiptsDiscardReceipt, productionReceiptsListReceipts, productionReceiptsReadReceipt, productionReceiptsReverseReceipt, productionReceiptsUpdateReceipt, productsCreateProduct, productsDeleteProduct, productsDownloadImportTemplate, productsListPriceChanges, productsListProducts, productsListSkus, productsPreviewImport, productsReadProduct, productsRunImport, productsSearchSkus, productsUpdateProduct, promotionsCreatePromotion, promotionsEndPromotion, promotionsListPromotions, promotionsReadPromotion, promotionsUpdatePromotion, receiptsCompleteReceipt, receiptsFindSkus, receiptsPrintReceipt, receiptsQuote, receiptsReadReceipt, receiptsReceiptForReturn, shiftsCloseShift, shiftsListShifts, shiftsOpenShift, shiftsReadCurrent, shiftsReadShift, shopSettingsReadSettings, shopSettingsSaveSettings, stockListLocations, stockListStock, stockReadStockCard, supplierReturnsCompleteReturn, supplierReturnsCreateReturn, supplierReturnsDiscardReturn, supplierReturnsListReturns, supplierReturnsReadReturn, supplierReturnsReverseReturn, supplierReturnsUpdateReturn, suppliersCreateSupplier, suppliersListSuppliers, suppliersUpdateSupplier, usersCreateUser, usersListUsers, usersResetPassword, usersUpdateUser } from '../sdk.gen';
-import type { ActivityLogListEntriesData, ActivityLogListEntriesError, ActivityLogListEntriesResponse, AuthLoginData, AuthLoginError, AuthLoginResponse, AuthLogoutData, AuthLogoutError, AuthLogoutResponse, AuthReadMeData, AuthReadMeError, AuthReadMeResponse, CategoriesCreateCategoryData, CategoriesCreateCategoryError, CategoriesCreateCategoryResponse, CategoriesCreateSubCategoryData, CategoriesCreateSubCategoryError, CategoriesCreateSubCategoryResponse, CategoriesDeleteCategoryData, CategoriesDeleteCategoryError, CategoriesDeleteCategoryResponse, CategoriesDeleteSubCategoryData, CategoriesDeleteSubCategoryError, CategoriesDeleteSubCategoryResponse, CategoriesListCategoriesData, CategoriesListCategoriesError, CategoriesListCategoriesResponse, CategoriesRenameSubCategoryData, CategoriesRenameSubCategoryError, CategoriesRenameSubCategoryResponse, CategoriesUpdateCategoryData, CategoriesUpdateCategoryError, CategoriesUpdateCategoryResponse, CountingAddCountData, CountingAddCountError, CountingAddCountResponse, CountingCancelCountData, CountingCancelCountError, CountingCancelCountResponse, CountingFindSkusData, CountingFindSkusError, CountingFindSkusResponse, CountingListSessionsData, CountingListSessionsError, CountingListSessionsResponse, CountingReadSheetData, CountingReadSheetError, CountingReadSheetResponse, EmployeeChargesListChargesData, EmployeeChargesListChargesError, EmployeeChargesListChargesResponse, EmployeeChargesOutstandingTotalsData, EmployeeChargesOutstandingTotalsError, EmployeeChargesOutstandingTotalsResponse, GoodsReceiptsCompleteReceiptData, GoodsReceiptsCompleteReceiptError, GoodsReceiptsCompleteReceiptResponse, GoodsReceiptsCreateReceiptData, GoodsReceiptsCreateReceiptError, GoodsReceiptsCreateReceiptResponse, GoodsReceiptsDiscardReceiptData, GoodsReceiptsDiscardReceiptError, GoodsReceiptsDiscardReceiptResponse, GoodsReceiptsListReceiptsData, GoodsReceiptsListReceiptsError, GoodsReceiptsListReceiptsResponse, GoodsReceiptsReadReceiptData, GoodsReceiptsReadReceiptError, GoodsReceiptsReadReceiptResponse, GoodsReceiptsReverseReceiptData, GoodsReceiptsReverseReceiptError, GoodsReceiptsReverseReceiptResponse, GoodsReceiptsUpdateReceiptData, GoodsReceiptsUpdateReceiptError, GoodsReceiptsUpdateReceiptResponse, HealthHealthCheckData, HealthHealthCheckResponse, OpnamesApproveOpnameData, OpnamesApproveOpnameError, OpnamesApproveOpnameResponse, OpnamesCancelOpnameData, OpnamesCancelOpnameError, OpnamesCancelOpnameResponse, OpnamesCloseCountingData, OpnamesCloseCountingError, OpnamesCloseCountingResponse, OpnamesConfirmZeroData, OpnamesConfirmZeroError, OpnamesConfirmZeroResponse, OpnamesListLinesData, OpnamesListLinesError, OpnamesListLinesResponse, OpnamesListOpnamesData, OpnamesListOpnamesError, OpnamesListOpnamesResponse, OpnamesListStaffData, OpnamesListStaffError, OpnamesListStaffResponse, OpnamesOpeningAllowedData, OpnamesOpeningAllowedError, OpnamesOpeningAllowedResponse, OpnamesOpenOpnameData, OpnamesOpenOpnameError, OpnamesOpenOpnameResponse, OpnamesReadOpnameData, OpnamesReadOpnameError, OpnamesReadOpnameResponse, OpnamesRecountLineData, OpnamesRecountLineError, OpnamesRecountLineResponse, OpnamesReverseOpnameData, OpnamesReverseOpnameError, OpnamesReverseOpnameResponse, OpnamesSaveResolutionData, OpnamesSaveResolutionError, OpnamesSaveResolutionResponse, PaymentMethodsCreateMethodData, PaymentMethodsCreateMethodError, PaymentMethodsCreateMethodResponse, PaymentMethodsListMethodsData, PaymentMethodsListMethodsError, PaymentMethodsListMethodsResponse, PaymentMethodsUpdateMethodData, PaymentMethodsUpdateMethodError, PaymentMethodsUpdateMethodResponse, ProductionReceiptsCompleteReceiptData, ProductionReceiptsCompleteReceiptError, ProductionReceiptsCompleteReceiptResponse, ProductionReceiptsCreateReceiptData, ProductionReceiptsCreateReceiptError, ProductionReceiptsCreateReceiptResponse, ProductionReceiptsDiscardReceiptData, ProductionReceiptsDiscardReceiptError, ProductionReceiptsDiscardReceiptResponse, ProductionReceiptsListReceiptsData, ProductionReceiptsListReceiptsError, ProductionReceiptsListReceiptsResponse, ProductionReceiptsReadReceiptData, ProductionReceiptsReadReceiptError, ProductionReceiptsReadReceiptResponse, ProductionReceiptsReverseReceiptData, ProductionReceiptsReverseReceiptError, ProductionReceiptsReverseReceiptResponse, ProductionReceiptsUpdateReceiptData, ProductionReceiptsUpdateReceiptError, ProductionReceiptsUpdateReceiptResponse, ProductsCreateProductData, ProductsCreateProductError, ProductsCreateProductResponse, ProductsDeleteProductData, ProductsDeleteProductError, ProductsDeleteProductResponse, ProductsDownloadImportTemplateData, ProductsDownloadImportTemplateError, ProductsListPriceChangesData, ProductsListPriceChangesError, ProductsListPriceChangesResponse, ProductsListProductsData, ProductsListProductsError, ProductsListProductsResponse, ProductsListSkusData, ProductsListSkusError, ProductsListSkusResponse, ProductsPreviewImportData, ProductsPreviewImportError, ProductsPreviewImportResponse, ProductsReadProductData, ProductsReadProductError, ProductsReadProductResponse, ProductsRunImportData, ProductsRunImportError, ProductsRunImportResponse, ProductsSearchSkusData, ProductsSearchSkusError, ProductsSearchSkusResponse, ProductsUpdateProductData, ProductsUpdateProductError, ProductsUpdateProductResponse, PromotionsCreatePromotionData, PromotionsCreatePromotionError, PromotionsCreatePromotionResponse, PromotionsEndPromotionData, PromotionsEndPromotionError, PromotionsEndPromotionResponse, PromotionsListPromotionsData, PromotionsListPromotionsError, PromotionsListPromotionsResponse, PromotionsReadPromotionData, PromotionsReadPromotionError, PromotionsReadPromotionResponse, PromotionsUpdatePromotionData, PromotionsUpdatePromotionError, PromotionsUpdatePromotionResponse, ReceiptsCompleteReceiptData, ReceiptsCompleteReceiptError, ReceiptsCompleteReceiptResponse, ReceiptsFindSkusData, ReceiptsFindSkusError, ReceiptsFindSkusResponse, ReceiptsPrintReceiptData, ReceiptsPrintReceiptError, ReceiptsPrintReceiptResponse, ReceiptsQuoteData, ReceiptsQuoteError, ReceiptsQuoteResponse, ReceiptsReadReceiptData, ReceiptsReadReceiptError, ReceiptsReadReceiptResponse, ReceiptsReceiptForReturnData, ReceiptsReceiptForReturnError, ReceiptsReceiptForReturnResponse, ShiftsCloseShiftData, ShiftsCloseShiftError, ShiftsCloseShiftResponse, ShiftsListShiftsData, ShiftsListShiftsError, ShiftsListShiftsResponse, ShiftsOpenShiftData, ShiftsOpenShiftError, ShiftsOpenShiftResponse, ShiftsReadCurrentData, ShiftsReadCurrentError, ShiftsReadCurrentResponse, ShiftsReadShiftData, ShiftsReadShiftError, ShiftsReadShiftResponse, ShopSettingsReadSettingsData, ShopSettingsReadSettingsError, ShopSettingsReadSettingsResponse, ShopSettingsSaveSettingsData, ShopSettingsSaveSettingsError, ShopSettingsSaveSettingsResponse, StockListLocationsData, StockListLocationsError, StockListLocationsResponse, StockListStockData, StockListStockError, StockListStockResponse, StockReadStockCardData, StockReadStockCardError, StockReadStockCardResponse, SupplierReturnsCompleteReturnData, SupplierReturnsCompleteReturnError, SupplierReturnsCompleteReturnResponse, SupplierReturnsCreateReturnData, SupplierReturnsCreateReturnError, SupplierReturnsCreateReturnResponse, SupplierReturnsDiscardReturnData, SupplierReturnsDiscardReturnError, SupplierReturnsDiscardReturnResponse, SupplierReturnsListReturnsData, SupplierReturnsListReturnsError, SupplierReturnsListReturnsResponse, SupplierReturnsReadReturnData, SupplierReturnsReadReturnError, SupplierReturnsReadReturnResponse, SupplierReturnsReverseReturnData, SupplierReturnsReverseReturnError, SupplierReturnsReverseReturnResponse, SupplierReturnsUpdateReturnData, SupplierReturnsUpdateReturnError, SupplierReturnsUpdateReturnResponse, SuppliersCreateSupplierData, SuppliersCreateSupplierError, SuppliersCreateSupplierResponse, SuppliersListSuppliersData, SuppliersListSuppliersError, SuppliersListSuppliersResponse, SuppliersUpdateSupplierData, SuppliersUpdateSupplierError, SuppliersUpdateSupplierResponse, UsersCreateUserData, UsersCreateUserError, UsersCreateUserResponse, UsersListUsersData, UsersListUsersError, UsersListUsersResponse, UsersResetPasswordData, UsersResetPasswordError, UsersResetPasswordResponse, UsersUpdateUserData, UsersUpdateUserError, UsersUpdateUserResponse } from '../types.gen';
+import { activityLogListEntries, authLogin, authLogout, authReadMe, categoriesCreateCategory, categoriesCreateSubCategory, categoriesDeleteCategory, categoriesDeleteSubCategory, categoriesListCategories, categoriesRenameSubCategory, categoriesUpdateCategory, countingAddCount, countingCancelCount, countingFindSkus, countingListSessions, countingReadSheet, employeeChargesListCharges, employeeChargesOutstandingTotals, goodsReceiptsCompleteReceipt, goodsReceiptsCreateReceipt, goodsReceiptsDiscardReceipt, goodsReceiptsListReceipts, goodsReceiptsReadReceipt, goodsReceiptsReverseReceipt, goodsReceiptsUpdateReceipt, healthHealthCheck, opnamesApproveOpname, opnamesCancelOpname, opnamesCloseCounting, opnamesConfirmZero, opnamesListLines, opnamesListOpnames, opnamesListStaff, opnamesOpeningAllowed, opnamesOpenOpname, opnamesReadOpname, opnamesRecountLine, opnamesReverseOpname, opnamesSaveResolution, type Options, paymentMethodsCreateMethod, paymentMethodsListMethods, paymentMethodsUpdateMethod, productionReceiptsCompleteReceipt, productionReceiptsCreateReceipt, productionReceiptsDiscardReceipt, productionReceiptsListReceipts, productionReceiptsReadReceipt, productionReceiptsReverseReceipt, productionReceiptsUpdateReceipt, productsCreateProduct, productsDeleteProduct, productsDownloadImportTemplate, productsListPriceChanges, productsListProducts, productsListSkus, productsPreviewImport, productsReadProduct, productsRunImport, productsSearchSkus, productsUpdateProduct, promotionsCreatePromotion, promotionsEndPromotion, promotionsListPromotions, promotionsReadPromotion, promotionsUpdatePromotion, receiptsCompleteReceipt, receiptsFindSkus, receiptsListReceipts, receiptsPrintReceipt, receiptsQuote, receiptsReadReceipt, receiptsReceiptForReturn, receiptsVoidReceipt, shiftsCloseShift, shiftsListShifts, shiftsOpenShift, shiftsReadCurrent, shiftsReadShift, shiftsResolveShift, shopSettingsReadSettings, shopSettingsSaveSettings, stockListLocations, stockListStock, stockReadStockCard, supplierReturnsCompleteReturn, supplierReturnsCreateReturn, supplierReturnsDiscardReturn, supplierReturnsListReturns, supplierReturnsReadReturn, supplierReturnsReverseReturn, supplierReturnsUpdateReturn, suppliersCreateSupplier, suppliersListSuppliers, suppliersUpdateSupplier, usersCreateUser, usersListUsers, usersResetPassword, usersUpdateUser } from '../sdk.gen';
+import type { ActivityLogListEntriesData, ActivityLogListEntriesError, ActivityLogListEntriesResponse, AuthLoginData, AuthLoginError, AuthLoginResponse, AuthLogoutData, AuthLogoutError, AuthLogoutResponse, AuthReadMeData, AuthReadMeError, AuthReadMeResponse, CategoriesCreateCategoryData, CategoriesCreateCategoryError, CategoriesCreateCategoryResponse, CategoriesCreateSubCategoryData, CategoriesCreateSubCategoryError, CategoriesCreateSubCategoryResponse, CategoriesDeleteCategoryData, CategoriesDeleteCategoryError, CategoriesDeleteCategoryResponse, CategoriesDeleteSubCategoryData, CategoriesDeleteSubCategoryError, CategoriesDeleteSubCategoryResponse, CategoriesListCategoriesData, CategoriesListCategoriesError, CategoriesListCategoriesResponse, CategoriesRenameSubCategoryData, CategoriesRenameSubCategoryError, CategoriesRenameSubCategoryResponse, CategoriesUpdateCategoryData, CategoriesUpdateCategoryError, CategoriesUpdateCategoryResponse, CountingAddCountData, CountingAddCountError, CountingAddCountResponse, CountingCancelCountData, CountingCancelCountError, CountingCancelCountResponse, CountingFindSkusData, CountingFindSkusError, CountingFindSkusResponse, CountingListSessionsData, CountingListSessionsError, CountingListSessionsResponse, CountingReadSheetData, CountingReadSheetError, CountingReadSheetResponse, EmployeeChargesListChargesData, EmployeeChargesListChargesError, EmployeeChargesListChargesResponse, EmployeeChargesOutstandingTotalsData, EmployeeChargesOutstandingTotalsError, EmployeeChargesOutstandingTotalsResponse, GoodsReceiptsCompleteReceiptData, GoodsReceiptsCompleteReceiptError, GoodsReceiptsCompleteReceiptResponse, GoodsReceiptsCreateReceiptData, GoodsReceiptsCreateReceiptError, GoodsReceiptsCreateReceiptResponse, GoodsReceiptsDiscardReceiptData, GoodsReceiptsDiscardReceiptError, GoodsReceiptsDiscardReceiptResponse, GoodsReceiptsListReceiptsData, GoodsReceiptsListReceiptsError, GoodsReceiptsListReceiptsResponse, GoodsReceiptsReadReceiptData, GoodsReceiptsReadReceiptError, GoodsReceiptsReadReceiptResponse, GoodsReceiptsReverseReceiptData, GoodsReceiptsReverseReceiptError, GoodsReceiptsReverseReceiptResponse, GoodsReceiptsUpdateReceiptData, GoodsReceiptsUpdateReceiptError, GoodsReceiptsUpdateReceiptResponse, HealthHealthCheckData, HealthHealthCheckResponse, OpnamesApproveOpnameData, OpnamesApproveOpnameError, OpnamesApproveOpnameResponse, OpnamesCancelOpnameData, OpnamesCancelOpnameError, OpnamesCancelOpnameResponse, OpnamesCloseCountingData, OpnamesCloseCountingError, OpnamesCloseCountingResponse, OpnamesConfirmZeroData, OpnamesConfirmZeroError, OpnamesConfirmZeroResponse, OpnamesListLinesData, OpnamesListLinesError, OpnamesListLinesResponse, OpnamesListOpnamesData, OpnamesListOpnamesError, OpnamesListOpnamesResponse, OpnamesListStaffData, OpnamesListStaffError, OpnamesListStaffResponse, OpnamesOpeningAllowedData, OpnamesOpeningAllowedError, OpnamesOpeningAllowedResponse, OpnamesOpenOpnameData, OpnamesOpenOpnameError, OpnamesOpenOpnameResponse, OpnamesReadOpnameData, OpnamesReadOpnameError, OpnamesReadOpnameResponse, OpnamesRecountLineData, OpnamesRecountLineError, OpnamesRecountLineResponse, OpnamesReverseOpnameData, OpnamesReverseOpnameError, OpnamesReverseOpnameResponse, OpnamesSaveResolutionData, OpnamesSaveResolutionError, OpnamesSaveResolutionResponse, PaymentMethodsCreateMethodData, PaymentMethodsCreateMethodError, PaymentMethodsCreateMethodResponse, PaymentMethodsListMethodsData, PaymentMethodsListMethodsError, PaymentMethodsListMethodsResponse, PaymentMethodsUpdateMethodData, PaymentMethodsUpdateMethodError, PaymentMethodsUpdateMethodResponse, ProductionReceiptsCompleteReceiptData, ProductionReceiptsCompleteReceiptError, ProductionReceiptsCompleteReceiptResponse, ProductionReceiptsCreateReceiptData, ProductionReceiptsCreateReceiptError, ProductionReceiptsCreateReceiptResponse, ProductionReceiptsDiscardReceiptData, ProductionReceiptsDiscardReceiptError, ProductionReceiptsDiscardReceiptResponse, ProductionReceiptsListReceiptsData, ProductionReceiptsListReceiptsError, ProductionReceiptsListReceiptsResponse, ProductionReceiptsReadReceiptData, ProductionReceiptsReadReceiptError, ProductionReceiptsReadReceiptResponse, ProductionReceiptsReverseReceiptData, ProductionReceiptsReverseReceiptError, ProductionReceiptsReverseReceiptResponse, ProductionReceiptsUpdateReceiptData, ProductionReceiptsUpdateReceiptError, ProductionReceiptsUpdateReceiptResponse, ProductsCreateProductData, ProductsCreateProductError, ProductsCreateProductResponse, ProductsDeleteProductData, ProductsDeleteProductError, ProductsDeleteProductResponse, ProductsDownloadImportTemplateData, ProductsDownloadImportTemplateError, ProductsListPriceChangesData, ProductsListPriceChangesError, ProductsListPriceChangesResponse, ProductsListProductsData, ProductsListProductsError, ProductsListProductsResponse, ProductsListSkusData, ProductsListSkusError, ProductsListSkusResponse, ProductsPreviewImportData, ProductsPreviewImportError, ProductsPreviewImportResponse, ProductsReadProductData, ProductsReadProductError, ProductsReadProductResponse, ProductsRunImportData, ProductsRunImportError, ProductsRunImportResponse, ProductsSearchSkusData, ProductsSearchSkusError, ProductsSearchSkusResponse, ProductsUpdateProductData, ProductsUpdateProductError, ProductsUpdateProductResponse, PromotionsCreatePromotionData, PromotionsCreatePromotionError, PromotionsCreatePromotionResponse, PromotionsEndPromotionData, PromotionsEndPromotionError, PromotionsEndPromotionResponse, PromotionsListPromotionsData, PromotionsListPromotionsError, PromotionsListPromotionsResponse, PromotionsReadPromotionData, PromotionsReadPromotionError, PromotionsReadPromotionResponse, PromotionsUpdatePromotionData, PromotionsUpdatePromotionError, PromotionsUpdatePromotionResponse, ReceiptsCompleteReceiptData, ReceiptsCompleteReceiptError, ReceiptsCompleteReceiptResponse, ReceiptsFindSkusData, ReceiptsFindSkusError, ReceiptsFindSkusResponse, ReceiptsListReceiptsData, ReceiptsListReceiptsError, ReceiptsListReceiptsResponse, ReceiptsPrintReceiptData, ReceiptsPrintReceiptError, ReceiptsPrintReceiptResponse, ReceiptsQuoteData, ReceiptsQuoteError, ReceiptsQuoteResponse, ReceiptsReadReceiptData, ReceiptsReadReceiptError, ReceiptsReadReceiptResponse, ReceiptsReceiptForReturnData, ReceiptsReceiptForReturnError, ReceiptsReceiptForReturnResponse, ReceiptsVoidReceiptData, ReceiptsVoidReceiptError, ReceiptsVoidReceiptResponse, ShiftsCloseShiftData, ShiftsCloseShiftError, ShiftsCloseShiftResponse, ShiftsListShiftsData, ShiftsListShiftsError, ShiftsListShiftsResponse, ShiftsOpenShiftData, ShiftsOpenShiftError, ShiftsOpenShiftResponse, ShiftsReadCurrentData, ShiftsReadCurrentError, ShiftsReadCurrentResponse, ShiftsReadShiftData, ShiftsReadShiftError, ShiftsReadShiftResponse, ShiftsResolveShiftData, ShiftsResolveShiftError, ShiftsResolveShiftResponse, ShopSettingsReadSettingsData, ShopSettingsReadSettingsError, ShopSettingsReadSettingsResponse, ShopSettingsSaveSettingsData, ShopSettingsSaveSettingsError, ShopSettingsSaveSettingsResponse, StockListLocationsData, StockListLocationsError, StockListLocationsResponse, StockListStockData, StockListStockError, StockListStockResponse, StockReadStockCardData, StockReadStockCardError, StockReadStockCardResponse, SupplierReturnsCompleteReturnData, SupplierReturnsCompleteReturnError, SupplierReturnsCompleteReturnResponse, SupplierReturnsCreateReturnData, SupplierReturnsCreateReturnError, SupplierReturnsCreateReturnResponse, SupplierReturnsDiscardReturnData, SupplierReturnsDiscardReturnError, SupplierReturnsDiscardReturnResponse, SupplierReturnsListReturnsData, SupplierReturnsListReturnsError, SupplierReturnsListReturnsResponse, SupplierReturnsReadReturnData, SupplierReturnsReadReturnError, SupplierReturnsReadReturnResponse, SupplierReturnsReverseReturnData, SupplierReturnsReverseReturnError, SupplierReturnsReverseReturnResponse, SupplierReturnsUpdateReturnData, SupplierReturnsUpdateReturnError, SupplierReturnsUpdateReturnResponse, SuppliersCreateSupplierData, SuppliersCreateSupplierError, SuppliersCreateSupplierResponse, SuppliersListSuppliersData, SuppliersListSuppliersError, SuppliersListSuppliersResponse, SuppliersUpdateSupplierData, SuppliersUpdateSupplierError, SuppliersUpdateSupplierResponse, UsersCreateUserData, UsersCreateUserError, UsersCreateUserResponse, UsersListUsersData, UsersListUsersError, UsersListUsersResponse, UsersResetPasswordData, UsersResetPasswordError, UsersResetPasswordResponse, UsersUpdateUserData, UsersUpdateUserError, UsersUpdateUserResponse } from '../types.gen';
 
 export type QueryKey<TOptions extends Options> = [
     Pick<TOptions, 'baseUrl' | 'body' | 'headers' | 'path' | 'query'> & {
@@ -1833,6 +1833,94 @@ export const shiftsReadShiftOptions = (options: Options<ShiftsReadShiftData>) =>
     queryKey: shiftsReadShiftQueryKey(options)
 });
 
+/**
+ * Resolve Shift
+ *
+ * Who bears a short drawer: the company, or a named employee.
+ */
+export const shiftsResolveShiftMutation = (options?: Partial<Options<ShiftsResolveShiftData>>): UseMutationOptions<ShiftsResolveShiftResponse, ShiftsResolveShiftError, Options<ShiftsResolveShiftData>> => {
+    const mutationOptions: UseMutationOptions<ShiftsResolveShiftResponse, ShiftsResolveShiftError, Options<ShiftsResolveShiftData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await shiftsResolveShift({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+export const receiptsListReceiptsQueryKey = (options: Options<ReceiptsListReceiptsData>) => createQueryKey('receiptsListReceipts', options);
+
+/**
+ * List Receipts
+ *
+ * One Shift's Receipts. A Cashier sees only their own Shifts.
+ */
+export const receiptsListReceiptsOptions = (options: Options<ReceiptsListReceiptsData>) => queryOptions<ReceiptsListReceiptsResponse, ReceiptsListReceiptsError, ReceiptsListReceiptsResponse, ReturnType<typeof receiptsListReceiptsQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await receiptsListReceipts({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: receiptsListReceiptsQueryKey(options)
+});
+
+export const receiptsListReceiptsInfiniteQueryKey = (options: Options<ReceiptsListReceiptsData>): QueryKey<Options<ReceiptsListReceiptsData>> => createQueryKey('receiptsListReceipts', options, true);
+
+/**
+ * List Receipts
+ *
+ * One Shift's Receipts. A Cashier sees only their own Shifts.
+ */
+export const receiptsListReceiptsInfiniteOptions = (options: Options<ReceiptsListReceiptsData>) => {
+    const opts = infiniteQueryOptions<ReceiptsListReceiptsResponse, ReceiptsListReceiptsError, InfiniteData<ReceiptsListReceiptsResponse>, QueryKey<Options<ReceiptsListReceiptsData>>, number | Pick<QueryKey<Options<ReceiptsListReceiptsData>>[0], 'body' | 'headers' | 'path' | 'query'>>(
+    // @ts-ignore
+    {
+        queryFn: async ({ pageParam, queryKey, signal }) => {
+            // @ts-ignore
+            const page: Pick<QueryKey<Options<ReceiptsListReceiptsData>>[0], 'body' | 'headers' | 'path' | 'query'> = typeof pageParam === 'object' ? pageParam : {
+                query: {
+                    offset: pageParam
+                }
+            };
+            const params = createInfiniteParams(queryKey, page);
+            const { data } = await receiptsListReceipts({
+                ...options,
+                ...params,
+                signal,
+                throwOnError: true
+            });
+            return data;
+        },
+        queryKey: receiptsListReceiptsInfiniteQueryKey(options)
+    });
+    return opts as Omit<typeof opts, 'initialData'>;
+};
+
+/**
+ * Complete Receipt
+ */
+export const receiptsCompleteReceiptMutation = (options?: Partial<Options<ReceiptsCompleteReceiptData>>): UseMutationOptions<ReceiptsCompleteReceiptResponse, ReceiptsCompleteReceiptError, Options<ReceiptsCompleteReceiptData>> => {
+    const mutationOptions: UseMutationOptions<ReceiptsCompleteReceiptResponse, ReceiptsCompleteReceiptError, Options<ReceiptsCompleteReceiptData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await receiptsCompleteReceipt({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
 export const receiptsFindSkusQueryKey = (options: Options<ReceiptsFindSkusData>) => createQueryKey('receiptsFindSkus', options);
 
 /**
@@ -1891,23 +1979,6 @@ export const receiptsQuoteMutation = (options?: Partial<Options<ReceiptsQuoteDat
     return mutationOptions;
 };
 
-/**
- * Complete Receipt
- */
-export const receiptsCompleteReceiptMutation = (options?: Partial<Options<ReceiptsCompleteReceiptData>>): UseMutationOptions<ReceiptsCompleteReceiptResponse, ReceiptsCompleteReceiptError, Options<ReceiptsCompleteReceiptData>> => {
-    const mutationOptions: UseMutationOptions<ReceiptsCompleteReceiptResponse, ReceiptsCompleteReceiptError, Options<ReceiptsCompleteReceiptData>> = {
-        mutationFn: async (fnOptions) => {
-            const { data } = await receiptsCompleteReceipt({
-                ...options,
-                ...fnOptions,
-                throwOnError: true
-            });
-            return data;
-        }
-    };
-    return mutationOptions;
-};
-
 export const receiptsReadReceiptQueryKey = (options: Options<ReceiptsReadReceiptData>) => createQueryKey('receiptsReadReceipt', options);
 
 /**
@@ -1935,6 +2006,25 @@ export const receiptsPrintReceiptMutation = (options?: Partial<Options<ReceiptsP
     const mutationOptions: UseMutationOptions<ReceiptsPrintReceiptResponse, ReceiptsPrintReceiptError, Options<ReceiptsPrintReceiptData>> = {
         mutationFn: async (fnOptions) => {
             const { data } = await receiptsPrintReceipt({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Void Receipt
+ *
+ * Cancel a Receipt while its Shift is still open.
+ */
+export const receiptsVoidReceiptMutation = (options?: Partial<Options<ReceiptsVoidReceiptData>>): UseMutationOptions<ReceiptsVoidReceiptResponse, ReceiptsVoidReceiptError, Options<ReceiptsVoidReceiptData>> => {
+    const mutationOptions: UseMutationOptions<ReceiptsVoidReceiptResponse, ReceiptsVoidReceiptError, Options<ReceiptsVoidReceiptData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await receiptsVoidReceipt({
                 ...options,
                 ...fnOptions,
                 throwOnError: true

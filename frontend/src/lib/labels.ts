@@ -5,6 +5,7 @@ import type {
   OpnameStatus,
   PaymentStatus,
   PromotionStatus,
+  ReceiptKind,
   Resolution,
   ShortageReason,
   TargetKind,
@@ -72,6 +73,12 @@ export const TARGET_KIND_LABELS: Record<TargetKind, string> = {
   sub_categories: 'Sub-kategori',
   products: 'Produk',
   skus: 'SKU',
+}
+
+export const RECEIPT_KIND_LABELS: Record<ReceiptKind, string> = {
+  sale: 'Penjualan',
+  return: 'Retur',
+  exchange: 'Tukar tambah',
 }
 
 /** Where a Stock Movement's document can be opened, if it has a screen. */

@@ -246,3 +246,31 @@ class ReceiptPublic(SQLModel):
     voided_at: datetime | None
     lines: list[ReceiptLinePublic]
     payments: list[PaymentPublic]
+
+
+class ReceiptVoid(SQLModel):
+    reason: str = Field(min_length=1, max_length=300)
+
+
+class ReceiptSummary(SQLModel):
+    id: int
+    number: str
+    kind: ReceiptKind
+    status: ReceiptStatus
+    created_at: datetime
+    cashier_name: str
+    total: int
+    # "Tunai, QRIS"
+    methods: str
+    line_count: int
+
+
+class ReceiptFilter(SQLModel):
+    shift_id: int
+    offset: int = Field(default=0, ge=0)
+    limit: int = Field(default=100, ge=1, le=500)
+
+
+class ReceiptPage(SQLModel):
+    items: list[ReceiptSummary]
+    total: int

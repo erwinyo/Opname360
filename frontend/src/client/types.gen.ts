@@ -1246,6 +1246,26 @@ export type PaymentPublic = {
 export type PaymentStatus = 'paid' | 'owed';
 
 /**
+ * PaymentTotal
+ *
+ * What one Payment Method took in a Shift, net of money paid back.
+ */
+export type PaymentTotal = {
+    /**
+     * Method Name
+     */
+    method_name: string;
+    /**
+     * Is Cash
+     */
+    is_cash: boolean;
+    /**
+     * Amount
+     */
+    amount: number;
+};
+
+/**
  * ProductPage
  */
 export type ProductPage = {
@@ -1808,6 +1828,20 @@ export type ReceiptLinePublic = {
 };
 
 /**
+ * ReceiptPage
+ */
+export type ReceiptPage = {
+    /**
+     * Items
+     */
+    items: Array<ReceiptSummary>;
+    /**
+     * Total
+     */
+    total: number;
+};
+
+/**
  * ReceiptPublic
  */
 export type ReceiptPublic = {
@@ -1895,6 +1929,52 @@ export type ReceiptPublic = {
  * ReceiptStatus
  */
 export type ReceiptStatus = 'completed' | 'voided';
+
+/**
+ * ReceiptSummary
+ */
+export type ReceiptSummary = {
+    /**
+     * Id
+     */
+    id: number;
+    /**
+     * Number
+     */
+    number: string;
+    kind: ReceiptKind;
+    status: ReceiptStatus;
+    /**
+     * Created At
+     */
+    created_at: string;
+    /**
+     * Cashier Name
+     */
+    cashier_name: string;
+    /**
+     * Total
+     */
+    total: number;
+    /**
+     * Methods
+     */
+    methods: string;
+    /**
+     * Line Count
+     */
+    line_count: number;
+};
+
+/**
+ * ReceiptVoid
+ */
+export type ReceiptVoid = {
+    /**
+     * Reason
+     */
+    reason: string;
+};
 
 /**
  * Resolution
@@ -2097,6 +2177,37 @@ export type ShiftPublic = {
      * Resolved At
      */
     resolved_at: string | null;
+    /**
+     * Payment Totals
+     */
+    payment_totals: Array<PaymentTotal>;
+    /**
+     * Sale Count
+     */
+    sale_count: number;
+    /**
+     * Return Count
+     */
+    return_count: number;
+    /**
+     * Void Count
+     */
+    void_count: number;
+    /**
+     * Net Sales
+     */
+    net_sales: number;
+};
+
+/**
+ * ShiftResolve
+ */
+export type ShiftResolve = {
+    resolution: Resolution;
+    /**
+     * Charged User Id
+     */
+    charged_user_id?: number | null;
 };
 
 /**
@@ -5509,6 +5620,99 @@ export type ShiftsReadShiftResponses = {
 
 export type ShiftsReadShiftResponse = ShiftsReadShiftResponses[keyof ShiftsReadShiftResponses];
 
+export type ShiftsResolveShiftData = {
+    body: ShiftResolve;
+    path: {
+        /**
+         * Shift Id
+         */
+        shift_id: number;
+    };
+    query?: never;
+    url: '/api/v1/shifts/{shift_id}/resolution';
+};
+
+export type ShiftsResolveShiftErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type ShiftsResolveShiftError = ShiftsResolveShiftErrors[keyof ShiftsResolveShiftErrors];
+
+export type ShiftsResolveShiftResponses = {
+    /**
+     * Successful Response
+     */
+    200: ShiftPublic;
+};
+
+export type ShiftsResolveShiftResponse = ShiftsResolveShiftResponses[keyof ShiftsResolveShiftResponses];
+
+export type ReceiptsListReceiptsData = {
+    body?: never;
+    path?: never;
+    query: {
+        /**
+         * Shift Id
+         */
+        shift_id: number;
+        /**
+         * Offset
+         */
+        offset?: number;
+        /**
+         * Limit
+         */
+        limit?: number;
+    };
+    url: '/api/v1/receipts/';
+};
+
+export type ReceiptsListReceiptsErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type ReceiptsListReceiptsError = ReceiptsListReceiptsErrors[keyof ReceiptsListReceiptsErrors];
+
+export type ReceiptsListReceiptsResponses = {
+    /**
+     * Successful Response
+     */
+    200: ReceiptPage;
+};
+
+export type ReceiptsListReceiptsResponse = ReceiptsListReceiptsResponses[keyof ReceiptsListReceiptsResponses];
+
+export type ReceiptsCompleteReceiptData = {
+    body: ReceiptCreate;
+    path?: never;
+    query?: never;
+    url: '/api/v1/receipts/';
+};
+
+export type ReceiptsCompleteReceiptErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type ReceiptsCompleteReceiptError = ReceiptsCompleteReceiptErrors[keyof ReceiptsCompleteReceiptErrors];
+
+export type ReceiptsCompleteReceiptResponses = {
+    /**
+     * Successful Response
+     */
+    201: ReceiptPublic;
+};
+
+export type ReceiptsCompleteReceiptResponse = ReceiptsCompleteReceiptResponses[keyof ReceiptsCompleteReceiptResponses];
+
 export type ReceiptsFindSkusData = {
     body?: never;
     path?: never;
@@ -5596,31 +5800,6 @@ export type ReceiptsQuoteResponses = {
 
 export type ReceiptsQuoteResponse = ReceiptsQuoteResponses[keyof ReceiptsQuoteResponses];
 
-export type ReceiptsCompleteReceiptData = {
-    body: ReceiptCreate;
-    path?: never;
-    query?: never;
-    url: '/api/v1/receipts/';
-};
-
-export type ReceiptsCompleteReceiptErrors = {
-    /**
-     * Validation Error
-     */
-    422: HttpValidationError;
-};
-
-export type ReceiptsCompleteReceiptError = ReceiptsCompleteReceiptErrors[keyof ReceiptsCompleteReceiptErrors];
-
-export type ReceiptsCompleteReceiptResponses = {
-    /**
-     * Successful Response
-     */
-    201: ReceiptPublic;
-};
-
-export type ReceiptsCompleteReceiptResponse = ReceiptsCompleteReceiptResponses[keyof ReceiptsCompleteReceiptResponses];
-
 export type ReceiptsReadReceiptData = {
     body?: never;
     path: {
@@ -5680,6 +5859,36 @@ export type ReceiptsPrintReceiptResponses = {
 };
 
 export type ReceiptsPrintReceiptResponse = ReceiptsPrintReceiptResponses[keyof ReceiptsPrintReceiptResponses];
+
+export type ReceiptsVoidReceiptData = {
+    body: ReceiptVoid;
+    path: {
+        /**
+         * Receipt Id
+         */
+        receipt_id: number;
+    };
+    query?: never;
+    url: '/api/v1/receipts/{receipt_id}/void';
+};
+
+export type ReceiptsVoidReceiptErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type ReceiptsVoidReceiptError = ReceiptsVoidReceiptErrors[keyof ReceiptsVoidReceiptErrors];
+
+export type ReceiptsVoidReceiptResponses = {
+    /**
+     * Successful Response
+     */
+    200: ReceiptPublic;
+};
+
+export type ReceiptsVoidReceiptResponse = ReceiptsVoidReceiptResponses[keyof ReceiptsVoidReceiptResponses];
 
 export type PromotionsListPromotionsData = {
     body?: never;

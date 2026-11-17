@@ -192,7 +192,10 @@ def test_a_sale_writes_its_stock_movements_and_cogs_even_into_negative(
     assert receipt['total'] == 170500
 
     movements = session.exec(
-        select(StockMovement).where(StockMovement.document_id == receipt['id'])
+        select(StockMovement).where(
+            StockMovement.document_type == 'receipt',
+            StockMovement.document_id == receipt['id'],
+        )
     ).all()
     assert {
         (m.sku_id, m.reason, m.quantity, m.value, m.document_type)

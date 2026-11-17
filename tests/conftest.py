@@ -356,3 +356,57 @@ def promote(
     )
     assert response.status_code == 201, response.text
     return response.json()
+
+
+def posted(
+    session: Session,
+    document_type: str,
+    document_id: int,
+    event: str | None = None,
+) -> dict[str, Decimal]:
+    """What a document posted, per account name: a debit above zero, a
+    credit below."""
+    from sqlmodel import col, select
+
+    from opname360.models import Account, JournalEntry, JournalLine
+
+    query = (
+        select(Account.name, JournalLine.debit, JournalLine.credit)
+        .join(JournalLine, col(JournalLine.account_id) == Account.id)
+        .join(JournalEntry, col(JournalLine.entry_id) == JournalEntry.id)
+        .where(
+            JournalEntry.document_type == document_type,
+            JournalEntry.document_id == document_id,
+        )
+    )
+    if event is not None:
+        query = query.where(JournalEntry.event == event)
+    totals: dict[str, Decimal] = {}
+    for name, debit, credit in session.exec(query).all():
+        totals[name] = totals.get(name, Decimal(0)) + debit - credit
+    return {name: amount for name, amount in totals.items() if amount}
+
+
+def account_balance(session: Session, name: str) -> Decimal:
+    """Debit minus credit of the account called `name`, over all time."""
+    from sqlmodel import func, select
+
+    from opname360.models import Account, JournalLine
+
+    total = session.exec(
+        select(func.sum(JournalLine.debit - JournalLine.credit))
+        .join(Account, JournalLine.account_id == Account.id)
+        .where(Account.name == name)
+    ).one()
+    return total or Decimal(0)
+
+
+def stock_value(session: Session) -> Decimal:
+    """The total Stock Value, as in the Stok screen."""
+    from sqlmodel import func, select
+
+    from opname360.models import StockBalance
+
+    return session.exec(select(func.sum(StockBalance.value))).one() or Decimal(
+        0
+    )

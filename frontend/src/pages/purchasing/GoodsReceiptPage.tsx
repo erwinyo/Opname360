@@ -63,6 +63,7 @@ import {
   variantLabel,
 } from '@/lib/format'
 import { PAYMENT_LABELS } from '@/lib/labels'
+import { AccountSelect } from '@/pages/ledger/shared'
 
 import { SupplierDialog } from './SuppliersPage'
 
@@ -168,6 +169,10 @@ function ReceiptForm({ receipt }: { receipt?: GoodsReceiptPublic }) {
   const [payment, setPayment] = useState<PaymentStatus>(
     receipt?.payment_status ?? 'paid',
   )
+  // Empty means Kas Besar.
+  const [paidFrom, setPaidFrom] = useState(
+    receipt?.paid_from_account_id ? String(receipt.paid_from_account_id) : '',
+  )
   const [note, setNote] = useState(receipt?.note ?? '')
   const [lines, setLines] = useState<Line[]>(
     receipt ? receipt.lines.map(lineFromSaved) : [],
@@ -201,6 +206,8 @@ function ReceiptForm({ receipt }: { receipt?: GoodsReceiptPublic }) {
       received_on: receivedOn,
       supplier_invoice: invoice,
       payment_status: payment,
+      paid_from_account_id:
+        payment === 'paid' && paidFrom ? Number(paidFrom) : null,
       note,
       lines: lines.map((line) => ({
         sku_id: line.skuId,
@@ -353,6 +360,19 @@ function ReceiptForm({ receipt }: { receipt?: GoodsReceiptPublic }) {
               </SelectContent>
             </Select>
           </Field>
+          {payment === 'paid' && (
+            <Field id="paid-from" label="Dibayar dari">
+              <AccountSelect
+                id="paid-from"
+                value={paidFrom}
+                onChange={setPaidFrom}
+                filter={(account) =>
+                  account.is_cash && account.role !== 'cash_drawer'
+                }
+                placeholder="Kas Besar"
+              />
+            </Field>
+          )}
           <Field id="invoice" label="No. faktur pemasok">
             <Input
               id="invoice"
@@ -618,7 +638,12 @@ function ReceiptView({ receipt }: { receipt: GoodsReceiptPublic }) {
         facts={[
           ['Pemasok', receipt.supplier_name],
           ['Tanggal terima', formatDate(receipt.received_on)],
-          ['Pembayaran', PAYMENT_LABELS[receipt.payment_status]],
+          [
+            'Pembayaran',
+            receipt.paid_from_name
+              ? `${PAYMENT_LABELS[receipt.payment_status]}, dari ${receipt.paid_from_name}`
+              : PAYMENT_LABELS[receipt.payment_status],
+          ],
           ['No. faktur pemasok', receipt.supplier_invoice ?? '–'],
           ['Lokasi', receipt.location_name],
           [

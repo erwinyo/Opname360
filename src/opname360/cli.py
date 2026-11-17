@@ -10,6 +10,7 @@ from sqlmodel import Session
 from opname360.core.db import engine
 from opname360.core.errors import AppError
 from opname360.models import Role, UserCreate
+from opname360.services import posting
 from opname360.services import users as users_service
 
 
@@ -43,6 +44,19 @@ def create_owner(
         typer.echo(error.detail, err=True)
         raise typer.Exit(code=1) from error
     typer.echo(f'Owner "{user.username}" created.')
+
+
+@app.command()
+def ledger_backfill() -> None:
+    """Post every document completed before the Ledger existed, dated when
+    it happened. Safe to run again: nothing is posted twice."""
+    try:
+        with Session(engine) as session:
+            written = posting.backfill(session)
+    except AppError as error:
+        typer.echo(error.detail, err=True)
+        raise typer.Exit(code=1) from error
+    typer.echo(f'{written} jurnal dibuat.')
 
 
 @app.command()

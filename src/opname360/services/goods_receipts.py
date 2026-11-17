@@ -16,6 +16,7 @@ from opname360.models import (
     GoodsReceiptSummary,
     Location,
     MovementReason,
+    PaymentStatus,
     Sku,
     Supplier,
     SupplierReturn,
@@ -27,6 +28,8 @@ from opname360.services import (
     activity_log,
     costing,
     documents,
+    ledger,
+    posting,
     stock,
     suppliers,
 )
@@ -127,6 +130,9 @@ def receipt_public(
             ),
             'reversal': documents.reversal_public(
                 session, DOCUMENT_TYPE, receipt.id
+            ),
+            'paid_from_name': ledger.account_name(
+                session, receipt.paid_from_account_id
             ),
             'lines': lines,
         },
@@ -237,6 +243,7 @@ def complete(
         entity_type=DOCUMENT_TYPE,
         entity_id=receipt.id,
     )
+    posting.goods_receipt(session, receipt, actor=actor)
     session.commit()
     return receipt
 
@@ -297,6 +304,11 @@ def _apply(
         receipt_in.supplier_invoice or ''
     ).strip() or None
     receipt.payment_status = receipt_in.payment_status
+    receipt.paid_from_account_id = (
+        ledger.paying_account(session, receipt_in.paid_from_account_id)
+        if receipt_in.payment_status == PaymentStatus.paid
+        else None
+    )
     receipt.note = (receipt_in.note or '').strip() or None
     for line in list(receipt.lines):
         session.delete(line)

@@ -20,7 +20,13 @@ from opname360.models import (
     User,
 )
 from opname360.models._types import utc_now
-from opname360.services import activity_log, costing, documents, stock
+from opname360.services import (
+    activity_log,
+    costing,
+    documents,
+    posting,
+    stock,
+)
 
 
 PREFIX = 'HP'  # Hasil Produksi
@@ -206,6 +212,7 @@ def complete(
         entity_type=DOCUMENT_TYPE,
         entity_id=receipt.id,
     )
+    posting.production_receipt(session, receipt, actor=actor)
     session.commit()
     return receipt
 

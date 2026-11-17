@@ -1066,6 +1066,14 @@ export type GoodsReceiptPublic = {
   supplier_invoice: string | null
   payment_status: PaymentStatus
   /**
+   * Paid From Account Id
+   */
+  paid_from_account_id: number | null
+  /**
+   * Paid From Name
+   */
+  paid_from_name: string | null
+  /**
    * Note
    */
   note: string | null
@@ -1119,6 +1127,10 @@ export type GoodsReceiptSave = {
    */
   supplier_invoice?: string | null
   payment_status?: PaymentStatus
+  /**
+   * Paid From Account Id
+   */
+  paid_from_account_id?: number | null
   /**
    * Note
    */

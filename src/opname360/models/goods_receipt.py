@@ -30,6 +30,10 @@ class GoodsReceipt(SQLModel, table=True):
     received_on: date
     supplier_invoice: str | None = Field(default=None, max_length=50)
     payment_status: PaymentStatus = Field(sa_type=enum_type(PaymentStatus))
+    # Paid at once: the cash or bank account it was paid from (slice 5).
+    paid_from_account_id: int | None = Field(
+        default=None, foreign_key='account.id'
+    )
     note: str | None = Field(default=None, max_length=500)
     total_cost: Decimal = Field(default=0, max_digits=20, decimal_places=4)
     created_by: int | None = Field(default=None, foreign_key='user.id')
@@ -87,6 +91,8 @@ class GoodsReceiptSave(SQLModel):
     received_on: date
     supplier_invoice: str | None = Field(default=None, max_length=50)
     payment_status: PaymentStatus = PaymentStatus.paid
+    # When paid: Kas Besar unless another cash or bank account is chosen.
+    paid_from_account_id: int | None = None
     note: str | None = Field(default=None, max_length=500)
     lines: list[GoodsReceiptLineSave] = []
 
@@ -125,6 +131,8 @@ class GoodsReceiptPublic(SQLModel):
     received_on: date
     supplier_invoice: str | None
     payment_status: PaymentStatus
+    paid_from_account_id: int | None
+    paid_from_name: str | None
     note: str | None
     total_cost: Decimal
     created_by_name: str | None

@@ -23,7 +23,13 @@ from opname360.models import (
     User,
 )
 from opname360.models._types import utc_now
-from opname360.services import activity_log, costing, documents, goods_receipts
+from opname360.services import (
+    activity_log,
+    costing,
+    documents,
+    goods_receipts,
+    posting,
+)
 
 
 PREFIX = 'RB'  # Retur Beli
@@ -252,6 +258,7 @@ def complete(
         entity_type=DOCUMENT_TYPE,
         entity_id=supplier_return.id,
     )
+    posting.supplier_return(session, supplier_return, actor=actor)
     session.commit()
     return supplier_return
 

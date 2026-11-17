@@ -61,6 +61,7 @@ from opname360.services import (
     costing,
     documents,
     employee_charges,
+    posting,
     stock,
 )
 
@@ -1329,6 +1330,7 @@ def approve(
         entity_type=DOCUMENT_TYPE,
         entity_id=opname.id,
     )
+    posting.stock_opname(session, opname, actor=actor)
     session.commit()
     return opname
 
@@ -1354,6 +1356,14 @@ def _approval_problem(
     return None
 
 
+def charge_amount(line: OpnameLine, value: Decimal) -> int:
+    """What an employee is charged for a Shortage whose Stock Movement
+    moved `value`: the amount the Owner set, or the Shortage at cost."""
+    if line.charge_amount is not None:
+        return line.charge_amount
+    return int(costing.money(-value).to_integral_value())
+
+
 def _charge(
     session: Session,
     opname: StockOpname,
@@ -1366,11 +1376,7 @@ def _charge(
     Shortage at the cost it left stock at (rule 13)."""
     assert line.charged_user_id is not None
     assert opname.id is not None
-    amount = (
-        line.charge_amount
-        if line.charge_amount is not None
-        else int(costing.money(-value).to_integral_value())
-    )
+    amount = charge_amount(line, value)
     label = sku_label(sku.product.name, sku.size, sku.color)
     shortage = -_variance(line)
     session.add(

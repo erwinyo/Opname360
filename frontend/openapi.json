@@ -10150,6 +10150,28 @@
           "payment_status": {
             "$ref": "#/components/schemas/PaymentStatus"
           },
+          "paid_from_account_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Paid From Account Id"
+          },
+          "paid_from_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Paid From Name"
+          },
           "note": {
             "anyOf": [
               {
@@ -10234,6 +10256,8 @@
           "received_on",
           "supplier_invoice",
           "payment_status",
+          "paid_from_account_id",
+          "paid_from_name",
           "note",
           "total_cost",
           "created_by_name",
@@ -10282,6 +10306,17 @@
           "payment_status": {
             "$ref": "#/components/schemas/PaymentStatus",
             "default": "paid"
+          },
+          "paid_from_account_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Paid From Account Id"
           },
           "note": {
             "anyOf": [

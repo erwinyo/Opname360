@@ -81,6 +81,27 @@ def account_of(session: Session, role: AccountRole) -> int:
     return account_id
 
 
+def account_name(session: Session, account_id: int | None) -> str | None:
+    account = session.get(Account, account_id) if account_id else None
+    return account.name if account else None
+
+
+def paying_account(session: Session, account_id: int | None) -> int:
+    """A cash or bank account money can be paid from: Kas Besar unless
+    another is chosen. The drawer only pays out through its Shift."""
+    if account_id is None:
+        return account_of(session, AccountRole.cash_main)
+    account = session.get(Account, account_id)
+    if (
+        account is None
+        or not account.is_active
+        or not account.is_cash
+        or account.role == AccountRole.cash_drawer
+    ):
+        raise ConflictError('Pilih akun kas atau bank yang aktif.')
+    return account_id
+
+
 def lock_date(session: Session) -> date | None:
     settings = session.get(ShopSettings, 1)
     return settings.lock_date if settings else None
@@ -189,13 +210,14 @@ def _mirror(
     entry: JournalEntry,
     *,
     description: str,
-    actor: User,
+    actor: User | None,
     event: str | None,
+    on: date | None = None,
 ) -> JournalEntry | None:
-    """The opposite of `entry`, dated today (rule 2)."""
+    """The opposite of `entry`, dated today unless backfilling (rule 2)."""
     return post(
         session,
-        entry_date=today(),
+        entry_date=on or today(),
         description=description,
         amounts=[
             Amount(a.account_id, -a.amount, a.supplier_id, a.user_id)
@@ -219,7 +241,8 @@ def mirror_document(
     document_type: str,
     document_id: int,
     reversal_number: str,
-    actor: User,
+    actor: User | None,
+    on: date | None = None,
 ) -> None:
     """A document's Reversal mirrors every entry the document posted."""
     entries = session.exec(
@@ -238,6 +261,7 @@ def mirror_document(
             description=f'Pembatalan {entry.description} ({reversal_number})',
             actor=actor,
             event=f'reverse-{entry.event}'[:30],
+            on=on,
         )
 
 

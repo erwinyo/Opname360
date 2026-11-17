@@ -2,6 +2,7 @@ import { useMutation } from '@tanstack/react-query'
 import {
   BoxesIcon,
   ClipboardCheckIcon,
+  CreditCardIcon,
   HandCoinsIcon,
   HistoryIcon,
   HouseIcon,
@@ -12,6 +13,8 @@ import {
   PrinterIcon,
   ScanBarcodeIcon,
   ScissorsIcon,
+  ShoppingCartIcon,
+  StoreIcon,
   TagsIcon,
   TruckIcon,
   Undo2Icon,
@@ -40,6 +43,7 @@ type NavItem = { to: string; label: string; icon: LucideIcon; roles: Role[] }
 type NavGroup = { label?: string; items: NavItem[] }
 
 const BACK_OFFICE: Role[] = ['owner', 'admin']
+const TILL: Role[] = ['owner', 'cashier']
 
 const NAV: NavGroup[] = [
   {
@@ -50,6 +54,7 @@ const NAV: NavGroup[] = [
         icon: HouseIcon,
         roles: ['owner', 'admin', 'cashier'],
       },
+      { to: '/kasir', label: 'Kasir', icon: ShoppingCartIcon, roles: TILL },
       {
         to: '/hitung',
         label: 'Hitung Stok',
@@ -98,7 +103,12 @@ const NAV: NavGroup[] = [
     label: 'Katalog',
     items: [
       { to: '/produk', label: 'Produk', icon: PackageIcon, roles: BACK_OFFICE },
-      { to: '/kategori', label: 'Kategori', icon: TagsIcon, roles: BACK_OFFICE },
+      {
+        to: '/kategori',
+        label: 'Kategori',
+        icon: TagsIcon,
+        roles: BACK_OFFICE,
+      },
       {
         to: '/label',
         label: 'Cetak Label',
@@ -116,6 +126,18 @@ const NAV: NavGroup[] = [
         to: '/log-aktivitas',
         label: 'Log Aktivitas',
         icon: HistoryIcon,
+        roles: ['owner'],
+      },
+      {
+        to: '/pengaturan-toko',
+        label: 'Pengaturan Toko',
+        icon: StoreIcon,
+        roles: ['owner'],
+      },
+      {
+        to: '/metode-pembayaran',
+        label: 'Metode Pembayaran',
+        icon: CreditCardIcon,
         roles: ['owner'],
       },
     ],

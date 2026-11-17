@@ -18,6 +18,9 @@ import { EmployeeChargesPage } from '@/pages/opname/EmployeeChargesPage'
 import { OpenOpnamePage } from '@/pages/opname/OpenOpnamePage'
 import { OpnamePage } from '@/pages/opname/OpnamePage'
 import { OpnamesPage } from '@/pages/opname/OpnamesPage'
+import { CloseShiftPage } from '@/pages/pos/CloseShiftPage'
+import { ShiftPage } from '@/pages/pos/ShiftPage'
+import { TillPage } from '@/pages/pos/TillPage'
 import { ProductionReceiptPage } from '@/pages/production/ProductionReceiptPage'
 import { ProductionReceiptsPage } from '@/pages/production/ProductionReceiptsPage'
 import { GoodsReceiptPage } from '@/pages/purchasing/GoodsReceiptPage'
@@ -25,6 +28,8 @@ import { GoodsReceiptsPage } from '@/pages/purchasing/GoodsReceiptsPage'
 import { SupplierReturnPage } from '@/pages/purchasing/SupplierReturnPage'
 import { SupplierReturnsPage } from '@/pages/purchasing/SupplierReturnsPage'
 import { SuppliersPage } from '@/pages/purchasing/SuppliersPage'
+import { PaymentMethodsPage } from '@/pages/settings/PaymentMethodsPage'
+import { ShopSettingsPage } from '@/pages/settings/ShopSettingsPage'
 import { StockCardPage } from '@/pages/stock/StockCardPage'
 import { StockPage } from '@/pages/stock/StockPage'
 import { UsersPage } from '@/pages/users/UsersPage'
@@ -57,6 +62,13 @@ export function App() {
         <Route index element={<HomePage user={user} />} />
         <Route path="hitung" element={<CountingPage />} />
         <Route path="hitung/:opnameId" element={<CountPage />} />
+        <Route path="shift/:shiftId" element={<ShiftPage user={user} />} />
+        {user.role !== 'admin' && (
+          <>
+            <Route path="kasir" element={<TillPage />} />
+            <Route path="kasir/tutup" element={<CloseShiftPage />} />
+          </>
+        )}
         {user.role !== 'cashier' && (
           <>
             <Route path="produk" element={<ProductsPage />} />
@@ -106,6 +118,8 @@ export function App() {
             <Route path="pengguna" element={<UsersPage me={user} />} />
             <Route path="log-aktivitas" element={<ActivityLogPage />} />
             <Route path="ganti-rugi" element={<EmployeeChargesPage />} />
+            <Route path="pengaturan-toko" element={<ShopSettingsPage />} />
+            <Route path="metode-pembayaran" element={<PaymentMethodsPage />} />
           </>
         )}
         <Route path="*" element={<Navigate to="/" replace />} />

@@ -85,6 +85,12 @@ from opname360.models.opname import (
     UnknownBarcodePublic,
     ZeroConfirm,
 )
+from opname360.models.payment_method import (
+    PaymentMethod,
+    PaymentMethodCreate,
+    PaymentMethodPublic,
+    PaymentMethodUpdate,
+)
 from opname360.models.production_receipt import (
     ProductionReceipt,
     ProductionReceiptFilter,
@@ -95,6 +101,20 @@ from opname360.models.production_receipt import (
     ProductionReceiptPublic,
     ProductionReceiptSave,
     ProductionReceiptSummary,
+)
+from opname360.models.shift import (
+    Shift,
+    ShiftClose,
+    ShiftCurrent,
+    ShiftFilter,
+    ShiftOpen,
+    ShiftPage,
+    ShiftPublic,
+)
+from opname360.models.shop_settings import (
+    ShopSettings,
+    ShopSettingsPublic,
+    ShopSettingsSave,
 )
 from opname360.models.stock import (
     CostLayer,
@@ -196,6 +216,10 @@ __all__ = [
     'OpnameStatus',
     'OpnameSummary',
     'PasswordReset',
+    'PaymentMethod',
+    'PaymentMethodCreate',
+    'PaymentMethodPublic',
+    'PaymentMethodUpdate',
     'PaymentStatus',
     'Product',
     'ProductFilter',
@@ -216,6 +240,16 @@ __all__ = [
     'ReversalCreate',
     'ReversalPublic',
     'Role',
+    'Shift',
+    'ShiftClose',
+    'ShiftCurrent',
+    'ShiftFilter',
+    'ShiftOpen',
+    'ShiftPage',
+    'ShiftPublic',
+    'ShopSettings',
+    'ShopSettingsPublic',
+    'ShopSettingsSave',
     'ShortageReason',
     'Sku',
     'SkuOption',

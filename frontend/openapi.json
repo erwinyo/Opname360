@@ -4772,6 +4772,627 @@
         }
       }
     },
+    "/api/v1/shop-settings/": {
+      "get": {
+        "tags": [
+          "shop_settings"
+        ],
+        "summary": "Read Settings",
+        "description": "Everyone reads them: the till prints them on Receipts.",
+        "operationId": "shop_settings-read_settings",
+        "parameters": [
+          {
+            "name": "opname360_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Opname360 Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShopSettingsPublic"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "shop_settings"
+        ],
+        "summary": "Save Settings",
+        "operationId": "shop_settings-save_settings",
+        "parameters": [
+          {
+            "name": "opname360_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Opname360 Session"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ShopSettingsSave"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShopSettingsPublic"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/payment-methods/": {
+      "get": {
+        "tags": [
+          "payment_methods"
+        ],
+        "summary": "List Methods",
+        "operationId": "payment_methods-list_methods",
+        "parameters": [
+          {
+            "name": "active_only",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false,
+              "title": "Active Only"
+            }
+          },
+          {
+            "name": "opname360_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Opname360 Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PaymentMethodPublic"
+                  },
+                  "title": "Response Payment Methods-List Methods"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "payment_methods"
+        ],
+        "summary": "Create Method",
+        "operationId": "payment_methods-create_method",
+        "parameters": [
+          {
+            "name": "opname360_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Opname360 Session"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PaymentMethodCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentMethodPublic"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/payment-methods/{method_id}": {
+      "patch": {
+        "tags": [
+          "payment_methods"
+        ],
+        "summary": "Update Method",
+        "operationId": "payment_methods-update_method",
+        "parameters": [
+          {
+            "name": "method_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "title": "Method Id"
+            }
+          },
+          {
+            "name": "opname360_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Opname360 Session"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PaymentMethodUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentMethodPublic"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/shifts/current": {
+      "get": {
+        "tags": [
+          "shifts"
+        ],
+        "summary": "Read Current",
+        "description": "The drawer's open Shift, if any. No cash figures: the count is blind.",
+        "operationId": "shifts-read_current",
+        "parameters": [
+          {
+            "name": "opname360_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Opname360 Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ShiftCurrent"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "title": "Response Shifts-Read Current"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/shifts/": {
+      "post": {
+        "tags": [
+          "shifts"
+        ],
+        "summary": "Open Shift",
+        "operationId": "shifts-open_shift",
+        "parameters": [
+          {
+            "name": "opname360_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Opname360 Session"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ShiftOpen"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShiftCurrent"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "shifts"
+        ],
+        "summary": "List Shifts",
+        "operationId": "shifts-list_shifts",
+        "parameters": [
+          {
+            "name": "needs_resolution",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false,
+              "title": "Needs Resolution"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "title": "Offset"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "opname360_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Opname360 Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShiftPage"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/shifts/{shift_id}/close": {
+      "post": {
+        "tags": [
+          "shifts"
+        ],
+        "summary": "Close Shift",
+        "operationId": "shifts-close_shift",
+        "parameters": [
+          {
+            "name": "shift_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "title": "Shift Id"
+            }
+          },
+          {
+            "name": "opname360_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Opname360 Session"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ShiftClose"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShiftPublic"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/shifts/{shift_id}": {
+      "get": {
+        "tags": [
+          "shifts"
+        ],
+        "summary": "Read Shift",
+        "operationId": "shifts-read_shift",
+        "parameters": [
+          {
+            "name": "shift_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "title": "Shift Id"
+            }
+          },
+          {
+            "name": "opname360_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Opname360 Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShiftPublic"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/activity-log/": {
       "get": {
         "tags": [
@@ -6889,6 +7510,91 @@
         ],
         "title": "PasswordReset"
       },
+      "PaymentMethodCreate": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 50,
+            "minLength": 1,
+            "title": "Name"
+          },
+          "is_active": {
+            "type": "boolean",
+            "title": "Is Active",
+            "default": true
+          },
+          "is_cash": {
+            "type": "boolean",
+            "title": "Is Cash",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "title": "PaymentMethodCreate"
+      },
+      "PaymentMethodPublic": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 50,
+            "minLength": 1,
+            "title": "Name"
+          },
+          "is_active": {
+            "type": "boolean",
+            "title": "Is Active",
+            "default": true
+          },
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "is_cash": {
+            "type": "boolean",
+            "title": "Is Cash"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "id",
+          "is_cash"
+        ],
+        "title": "PaymentMethodPublic"
+      },
+      "PaymentMethodUpdate": {
+        "properties": {
+          "name": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 50,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "is_active": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Is Active"
+          }
+        },
+        "type": "object",
+        "title": "PaymentMethodUpdate"
+      },
       "PaymentStatus": {
         "type": "string",
         "enum": [
@@ -7412,6 +8118,367 @@
           "cashier"
         ],
         "title": "Role"
+      },
+      "ShiftClose": {
+        "properties": {
+          "counted_cash": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Counted Cash"
+          }
+        },
+        "type": "object",
+        "required": [
+          "counted_cash"
+        ],
+        "title": "ShiftClose"
+      },
+      "ShiftCurrent": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "number": {
+            "type": "string",
+            "title": "Number"
+          },
+          "cashier_id": {
+            "type": "integer",
+            "title": "Cashier Id"
+          },
+          "cashier_name": {
+            "type": "string",
+            "title": "Cashier Name"
+          },
+          "opening_float": {
+            "type": "integer",
+            "title": "Opening Float"
+          },
+          "opened_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Opened At"
+          },
+          "is_mine": {
+            "type": "boolean",
+            "title": "Is Mine"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "number",
+          "cashier_id",
+          "cashier_name",
+          "opening_float",
+          "opened_at",
+          "is_mine"
+        ],
+        "title": "ShiftCurrent",
+        "description": "The open Shift as the till sees it: no cash figures (blind count)."
+      },
+      "ShiftOpen": {
+        "properties": {
+          "opening_float": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Opening Float"
+          }
+        },
+        "type": "object",
+        "required": [
+          "opening_float"
+        ],
+        "title": "ShiftOpen"
+      },
+      "ShiftPage": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ShiftPublic"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "total"
+        ],
+        "title": "ShiftPage"
+      },
+      "ShiftPublic": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "number": {
+            "type": "string",
+            "title": "Number"
+          },
+          "location_name": {
+            "type": "string",
+            "title": "Location Name"
+          },
+          "cashier_id": {
+            "type": "integer",
+            "title": "Cashier Id"
+          },
+          "cashier_name": {
+            "type": "string",
+            "title": "Cashier Name"
+          },
+          "opening_float": {
+            "type": "integer",
+            "title": "Opening Float"
+          },
+          "opened_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Opened At"
+          },
+          "closed_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Closed At"
+          },
+          "closed_by_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Closed By Name"
+          },
+          "expected_cash": {
+            "type": "integer",
+            "title": "Expected Cash"
+          },
+          "counted_cash": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Counted Cash"
+          },
+          "cash_variance": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cash Variance"
+          },
+          "needs_resolution": {
+            "type": "boolean",
+            "title": "Needs Resolution"
+          },
+          "resolution": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Resolution"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "charged_user_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Charged User Name"
+          },
+          "resolved_by_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resolved By Name"
+          },
+          "resolved_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resolved At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "number",
+          "location_name",
+          "cashier_id",
+          "cashier_name",
+          "opening_float",
+          "opened_at",
+          "closed_at",
+          "closed_by_name",
+          "expected_cash",
+          "counted_cash",
+          "cash_variance",
+          "needs_resolution",
+          "resolution",
+          "charged_user_name",
+          "resolved_by_name",
+          "resolved_at"
+        ],
+        "title": "ShiftPublic"
+      },
+      "ShopSettingsPublic": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Name"
+          },
+          "address": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 300
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Address"
+          },
+          "receipt_footer": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 300
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Receipt Footer"
+          },
+          "opens_at": {
+            "type": "string",
+            "format": "time",
+            "title": "Opens At"
+          },
+          "closes_at": {
+            "type": "string",
+            "format": "time",
+            "title": "Closes At"
+          },
+          "return_window_days": {
+            "type": "integer",
+            "maximum": 365.0,
+            "minimum": 0.0,
+            "title": "Return Window Days"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "opens_at",
+          "closes_at",
+          "return_window_days"
+        ],
+        "title": "ShopSettingsPublic"
+      },
+      "ShopSettingsSave": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Name"
+          },
+          "address": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 300
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Address"
+          },
+          "receipt_footer": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 300
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Receipt Footer"
+          },
+          "opens_at": {
+            "type": "string",
+            "format": "time",
+            "title": "Opens At"
+          },
+          "closes_at": {
+            "type": "string",
+            "format": "time",
+            "title": "Closes At"
+          },
+          "return_window_days": {
+            "type": "integer",
+            "maximum": 365.0,
+            "minimum": 0.0,
+            "title": "Return Window Days"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "opens_at",
+          "closes_at",
+          "return_window_days"
+        ],
+        "title": "ShopSettingsSave"
       },
       "ShortageReason": {
         "type": "string",

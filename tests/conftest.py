@@ -235,3 +235,19 @@ def lines_of(client: TestClient, opname_id: int, **query: object) -> list:
     )
     assert response.status_code == 200, response.text
     return response.json()['items']
+
+
+SHIFTS = '/api/v1/shifts/'
+
+
+def open_shift(client: TestClient, opening_float: int = 200000) -> dict:
+    """Open the drawer's Shift as whoever the client is signed in as."""
+    response = client.post(SHIFTS, json={'opening_float': opening_float})
+    assert response.status_code == 201, response.text
+    return response.json()
+
+
+def close_shift(client: TestClient, shift_id: int, counted_cash: int):
+    return client.post(
+        f'{SHIFTS}{shift_id}/close', json={'counted_cash': counted_cash}
+    )

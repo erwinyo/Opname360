@@ -20,12 +20,16 @@ def rebuild(url: str) -> None:
     command.upgrade(config, 'head')
 
 
+# Rows the migrations seed.
+SEEDED = {'location', 'shop_settings', 'payment_method'}
+
+
 def wipe(engine: Engine) -> None:
-    """Delete every row a test committed, keeping the seeded Location."""
+    """Delete every row a test committed, keeping what the migrations seed."""
     tables = ', '.join(
         f'"{table.name}"'
         for table in SQLModel.metadata.sorted_tables
-        if table.name != 'location'
+        if table.name not in SEEDED
     )
     with engine.begin() as connection:
         connection.execute(text(f'TRUNCATE {tables} RESTART IDENTITY CASCADE'))

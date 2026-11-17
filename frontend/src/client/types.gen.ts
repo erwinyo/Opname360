@@ -1102,6 +1102,60 @@ export type PasswordReset = {
 };
 
 /**
+ * PaymentMethodCreate
+ */
+export type PaymentMethodCreate = {
+    /**
+     * Name
+     */
+    name: string;
+    /**
+     * Is Active
+     */
+    is_active?: boolean;
+    /**
+     * Is Cash
+     */
+    is_cash?: boolean;
+};
+
+/**
+ * PaymentMethodPublic
+ */
+export type PaymentMethodPublic = {
+    /**
+     * Name
+     */
+    name: string;
+    /**
+     * Is Active
+     */
+    is_active?: boolean;
+    /**
+     * Id
+     */
+    id: number;
+    /**
+     * Is Cash
+     */
+    is_cash: boolean;
+};
+
+/**
+ * PaymentMethodUpdate
+ */
+export type PaymentMethodUpdate = {
+    /**
+     * Name
+     */
+    name?: string | null;
+    /**
+     * Is Active
+     */
+    is_active?: boolean | null;
+};
+
+/**
  * PaymentStatus
  */
 export type PaymentStatus = 'paid' | 'owed';
@@ -1402,6 +1456,207 @@ export type ReversalPublic = {
  * Role
  */
 export type Role = 'owner' | 'admin' | 'cashier';
+
+/**
+ * ShiftClose
+ */
+export type ShiftClose = {
+    /**
+     * Counted Cash
+     */
+    counted_cash: number;
+};
+
+/**
+ * ShiftCurrent
+ *
+ * The open Shift as the till sees it: no cash figures (blind count).
+ */
+export type ShiftCurrent = {
+    /**
+     * Id
+     */
+    id: number;
+    /**
+     * Number
+     */
+    number: string;
+    /**
+     * Cashier Id
+     */
+    cashier_id: number;
+    /**
+     * Cashier Name
+     */
+    cashier_name: string;
+    /**
+     * Opening Float
+     */
+    opening_float: number;
+    /**
+     * Opened At
+     */
+    opened_at: string;
+    /**
+     * Is Mine
+     */
+    is_mine: boolean;
+};
+
+/**
+ * ShiftOpen
+ */
+export type ShiftOpen = {
+    /**
+     * Opening Float
+     */
+    opening_float: number;
+};
+
+/**
+ * ShiftPage
+ */
+export type ShiftPage = {
+    /**
+     * Items
+     */
+    items: Array<ShiftPublic>;
+    /**
+     * Total
+     */
+    total: number;
+};
+
+/**
+ * ShiftPublic
+ */
+export type ShiftPublic = {
+    /**
+     * Id
+     */
+    id: number;
+    /**
+     * Number
+     */
+    number: string;
+    /**
+     * Location Name
+     */
+    location_name: string;
+    /**
+     * Cashier Id
+     */
+    cashier_id: number;
+    /**
+     * Cashier Name
+     */
+    cashier_name: string;
+    /**
+     * Opening Float
+     */
+    opening_float: number;
+    /**
+     * Opened At
+     */
+    opened_at: string;
+    /**
+     * Closed At
+     */
+    closed_at: string | null;
+    /**
+     * Closed By Name
+     */
+    closed_by_name: string | null;
+    /**
+     * Expected Cash
+     */
+    expected_cash: number;
+    /**
+     * Counted Cash
+     */
+    counted_cash: number | null;
+    /**
+     * Cash Variance
+     */
+    cash_variance: number | null;
+    /**
+     * Needs Resolution
+     */
+    needs_resolution: boolean;
+    resolution: Resolution | null;
+    /**
+     * Charged User Name
+     */
+    charged_user_name: string | null;
+    /**
+     * Resolved By Name
+     */
+    resolved_by_name: string | null;
+    /**
+     * Resolved At
+     */
+    resolved_at: string | null;
+};
+
+/**
+ * ShopSettingsPublic
+ */
+export type ShopSettingsPublic = {
+    /**
+     * Name
+     */
+    name: string;
+    /**
+     * Address
+     */
+    address?: string | null;
+    /**
+     * Receipt Footer
+     */
+    receipt_footer?: string | null;
+    /**
+     * Opens At
+     */
+    opens_at: string;
+    /**
+     * Closes At
+     */
+    closes_at: string;
+    /**
+     * Return Window Days
+     */
+    return_window_days: number;
+};
+
+/**
+ * ShopSettingsSave
+ */
+export type ShopSettingsSave = {
+    /**
+     * Name
+     */
+    name: string;
+    /**
+     * Address
+     */
+    address?: string | null;
+    /**
+     * Receipt Footer
+     */
+    receipt_footer?: string | null;
+    /**
+     * Opens At
+     */
+    opens_at: string;
+    /**
+     * Closes At
+     */
+    closes_at: string;
+    /**
+     * Return Window Days
+     */
+    return_window_days: number;
+};
 
 /**
  * ShortageReason
@@ -4416,6 +4671,293 @@ export type EmployeeChargesOutstandingTotalsResponses = {
 };
 
 export type EmployeeChargesOutstandingTotalsResponse = EmployeeChargesOutstandingTotalsResponses[keyof EmployeeChargesOutstandingTotalsResponses];
+
+export type ShopSettingsReadSettingsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/shop-settings/';
+};
+
+export type ShopSettingsReadSettingsErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type ShopSettingsReadSettingsError = ShopSettingsReadSettingsErrors[keyof ShopSettingsReadSettingsErrors];
+
+export type ShopSettingsReadSettingsResponses = {
+    /**
+     * Successful Response
+     */
+    200: ShopSettingsPublic;
+};
+
+export type ShopSettingsReadSettingsResponse = ShopSettingsReadSettingsResponses[keyof ShopSettingsReadSettingsResponses];
+
+export type ShopSettingsSaveSettingsData = {
+    body: ShopSettingsSave;
+    path?: never;
+    query?: never;
+    url: '/api/v1/shop-settings/';
+};
+
+export type ShopSettingsSaveSettingsErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type ShopSettingsSaveSettingsError = ShopSettingsSaveSettingsErrors[keyof ShopSettingsSaveSettingsErrors];
+
+export type ShopSettingsSaveSettingsResponses = {
+    /**
+     * Successful Response
+     */
+    200: ShopSettingsPublic;
+};
+
+export type ShopSettingsSaveSettingsResponse = ShopSettingsSaveSettingsResponses[keyof ShopSettingsSaveSettingsResponses];
+
+export type PaymentMethodsListMethodsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Active Only
+         */
+        active_only?: boolean;
+    };
+    url: '/api/v1/payment-methods/';
+};
+
+export type PaymentMethodsListMethodsErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type PaymentMethodsListMethodsError = PaymentMethodsListMethodsErrors[keyof PaymentMethodsListMethodsErrors];
+
+export type PaymentMethodsListMethodsResponses = {
+    /**
+     * Response Payment Methods-List Methods
+     *
+     * Successful Response
+     */
+    200: Array<PaymentMethodPublic>;
+};
+
+export type PaymentMethodsListMethodsResponse = PaymentMethodsListMethodsResponses[keyof PaymentMethodsListMethodsResponses];
+
+export type PaymentMethodsCreateMethodData = {
+    body: PaymentMethodCreate;
+    path?: never;
+    query?: never;
+    url: '/api/v1/payment-methods/';
+};
+
+export type PaymentMethodsCreateMethodErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type PaymentMethodsCreateMethodError = PaymentMethodsCreateMethodErrors[keyof PaymentMethodsCreateMethodErrors];
+
+export type PaymentMethodsCreateMethodResponses = {
+    /**
+     * Successful Response
+     */
+    201: PaymentMethodPublic;
+};
+
+export type PaymentMethodsCreateMethodResponse = PaymentMethodsCreateMethodResponses[keyof PaymentMethodsCreateMethodResponses];
+
+export type PaymentMethodsUpdateMethodData = {
+    body: PaymentMethodUpdate;
+    path: {
+        /**
+         * Method Id
+         */
+        method_id: number;
+    };
+    query?: never;
+    url: '/api/v1/payment-methods/{method_id}';
+};
+
+export type PaymentMethodsUpdateMethodErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type PaymentMethodsUpdateMethodError = PaymentMethodsUpdateMethodErrors[keyof PaymentMethodsUpdateMethodErrors];
+
+export type PaymentMethodsUpdateMethodResponses = {
+    /**
+     * Successful Response
+     */
+    200: PaymentMethodPublic;
+};
+
+export type PaymentMethodsUpdateMethodResponse = PaymentMethodsUpdateMethodResponses[keyof PaymentMethodsUpdateMethodResponses];
+
+export type ShiftsReadCurrentData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/shifts/current';
+};
+
+export type ShiftsReadCurrentErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type ShiftsReadCurrentError = ShiftsReadCurrentErrors[keyof ShiftsReadCurrentErrors];
+
+export type ShiftsReadCurrentResponses = {
+    /**
+     * Response Shifts-Read Current
+     *
+     * Successful Response
+     */
+    200: ShiftCurrent | null;
+};
+
+export type ShiftsReadCurrentResponse = ShiftsReadCurrentResponses[keyof ShiftsReadCurrentResponses];
+
+export type ShiftsListShiftsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Needs Resolution
+         */
+        needs_resolution?: boolean;
+        /**
+         * Offset
+         */
+        offset?: number;
+        /**
+         * Limit
+         */
+        limit?: number;
+    };
+    url: '/api/v1/shifts/';
+};
+
+export type ShiftsListShiftsErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type ShiftsListShiftsError = ShiftsListShiftsErrors[keyof ShiftsListShiftsErrors];
+
+export type ShiftsListShiftsResponses = {
+    /**
+     * Successful Response
+     */
+    200: ShiftPage;
+};
+
+export type ShiftsListShiftsResponse = ShiftsListShiftsResponses[keyof ShiftsListShiftsResponses];
+
+export type ShiftsOpenShiftData = {
+    body: ShiftOpen;
+    path?: never;
+    query?: never;
+    url: '/api/v1/shifts/';
+};
+
+export type ShiftsOpenShiftErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type ShiftsOpenShiftError = ShiftsOpenShiftErrors[keyof ShiftsOpenShiftErrors];
+
+export type ShiftsOpenShiftResponses = {
+    /**
+     * Successful Response
+     */
+    201: ShiftCurrent;
+};
+
+export type ShiftsOpenShiftResponse = ShiftsOpenShiftResponses[keyof ShiftsOpenShiftResponses];
+
+export type ShiftsCloseShiftData = {
+    body: ShiftClose;
+    path: {
+        /**
+         * Shift Id
+         */
+        shift_id: number;
+    };
+    query?: never;
+    url: '/api/v1/shifts/{shift_id}/close';
+};
+
+export type ShiftsCloseShiftErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type ShiftsCloseShiftError = ShiftsCloseShiftErrors[keyof ShiftsCloseShiftErrors];
+
+export type ShiftsCloseShiftResponses = {
+    /**
+     * Successful Response
+     */
+    200: ShiftPublic;
+};
+
+export type ShiftsCloseShiftResponse = ShiftsCloseShiftResponses[keyof ShiftsCloseShiftResponses];
+
+export type ShiftsReadShiftData = {
+    body?: never;
+    path: {
+        /**
+         * Shift Id
+         */
+        shift_id: number;
+    };
+    query?: never;
+    url: '/api/v1/shifts/{shift_id}';
+};
+
+export type ShiftsReadShiftErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type ShiftsReadShiftError = ShiftsReadShiftErrors[keyof ShiftsReadShiftErrors];
+
+export type ShiftsReadShiftResponses = {
+    /**
+     * Successful Response
+     */
+    200: ShiftPublic;
+};
+
+export type ShiftsReadShiftResponse = ShiftsReadShiftResponses[keyof ShiftsReadShiftResponses];
 
 export type ActivityLogListEntriesData = {
     body?: never;

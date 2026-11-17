@@ -66,3 +66,16 @@ def require_admin(user: CurrentUserDep) -> User:
 
 
 AdminDep = Annotated[User, Depends(require_admin)]
+
+
+def require_seller(user: CurrentUserDep) -> User:
+    """The till: Cashier or Owner. An Admin doesn't sell."""
+    if user.role not in (Role.owner, Role.cashier):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail='Menu kasir hanya untuk Kasir dan Pemilik.',
+        )
+    return user
+
+
+SellerDep = Annotated[User, Depends(require_seller)]

@@ -5,6 +5,7 @@ import {
   PackageIcon,
   PackagePlusIcon,
   ScanBarcodeIcon,
+  ShoppingCartIcon,
   TagsIcon,
   UsersIcon,
 } from 'lucide-react'
@@ -24,6 +25,13 @@ type Shortcut = {
 }
 
 const SHORTCUTS: Shortcut[] = [
+  {
+    to: '/kasir',
+    title: 'Kasir',
+    description: 'Buka shift, jual, retur, dan tutup shift.',
+    icon: ShoppingCartIcon,
+    roles: ['owner', 'cashier'],
+  },
   {
     to: '/stok-opname',
     title: 'Stok Opname',

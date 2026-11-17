@@ -217,6 +217,7 @@ class SkuOption(SQLModel):
     """A SKU as offered when scanning or searching to add a document line."""
 
     id: int
+    product_id: int
     product_name: str
     size: str | None
     color: str | None

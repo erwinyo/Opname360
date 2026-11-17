@@ -14,6 +14,7 @@ from opname360.models import (
     PaymentIn,
     PaymentMethod,
     PaymentPublic,
+    Promotion,
     Quote,
     QuotedLine,
     Receipt,
@@ -27,7 +28,14 @@ from opname360.models import (
     TillSku,
     User,
 )
-from opname360.services import activity_log, catalogue, costing, documents
+from opname360.models._types import utc_now
+from opname360.services import (
+    activity_log,
+    catalogue,
+    costing,
+    documents,
+    promotions,
+)
 from opname360.services import shifts as shifts_service
 
 
@@ -62,6 +70,7 @@ class _Priced:
     sku: Sku
     quantity: Decimal
     unit_price: int
+    promotion: Promotion | None
     discount: int
 
     @property
@@ -74,7 +83,8 @@ class _Priced:
 
 
 def _price(session: Session, cart: Cart) -> list[_Priced]:
-    """Each SKU once, at its Selling Price now (rule 6)."""
+    """Each SKU once, at its Selling Price now, less the biggest running
+    Promotion (rules 6 and 7)."""
     quantities: dict[int, Decimal] = {}
     for line in cart.lines:
         quantities[line.sku_id] = (
@@ -86,20 +96,27 @@ def _price(session: Session, cart: Cart) -> list[_Priced]:
             select(Sku).where(col(Sku.id).in_(quantities))
         ).all()
     }
-    priced = []
-    for sku_id, quantity in quantities.items():
+    for sku_id in quantities:
         sku = skus.get(sku_id)
         if sku is None:
             raise NotFoundError('Barang di keranjang tidak ditemukan.')
         if not sku.is_active:
             label = sku_label(sku.product.name, sku.size, sku.color)
             raise ConflictError(f'{label} sudah tidak dijual.')
+    discounts = promotions.best_discounts(
+        session, list(skus.values()), utc_now()
+    )
+    priced = []
+    for sku_id, quantity in quantities.items():
+        sku = skus[sku_id]
+        promotion, unit_discount = discounts.get(sku_id, (None, Decimal(0)))
         priced.append(
             _Priced(
                 sku=sku,
                 quantity=quantity,
                 unit_price=sku.selling_price,
-                discount=0,
+                promotion=promotion,
+                discount=whole_rupiah(unit_discount * quantity),
             )
         )
     return priced
@@ -127,7 +144,7 @@ def _quoted(line: _Priced) -> QuotedLine:
         stock_unit=sku.stock_unit,
         quantity=line.quantity,
         unit_price=line.unit_price,
-        promotion_name=None,
+        promotion_name=line.promotion.name if line.promotion else None,
         discount=line.discount,
         line_total=line.line_total,
     )
@@ -187,6 +204,7 @@ def complete(
                 sku_id=line.sku.id,
                 quantity=line.quantity,
                 unit_price=line.unit_price,
+                promotion_id=line.promotion.id if line.promotion else None,
                 discount=line.discount,
                 line_total=line.line_total,
                 unit_cogs=costing.money(-movement.value / line.quantity),
@@ -323,7 +341,9 @@ def receipt_public(session: Session, receipt: Receipt) -> ReceiptPublic:
                     'color': sku.color,
                     'code': sku.code,
                     'stock_unit': sku.stock_unit,
-                    'promotion_name': None,
+                    'promotion_name': _promotion_name(
+                        session, line.promotion_id
+                    ),
                 },
             )
         )
@@ -349,3 +369,8 @@ def receipt_public(session: Session, receipt: Receipt) -> ReceiptPublic:
             'payments': payments,
         },
     )
+
+
+def _promotion_name(session: Session, promotion_id: int | None) -> str | None:
+    promotion = session.get(Promotion, promotion_id) if promotion_id else None
+    return promotion.name if promotion else None

@@ -82,6 +82,10 @@ class ReceiptLine(SQLModel, table=True):
     quantity: Decimal = Field(max_digits=14, decimal_places=3)
     # The Selling Price at that moment (the original's, for a return).
     unit_price: int = Field(sa_type=BigInteger)
+    # The one that applied: the biggest discount of those running.
+    promotion_id: int | None = Field(
+        default=None, foreign_key='promotion.id', index=True
+    )
     # Signed like the quantity. Price times quantity, minus this, is the
     # line total.
     discount: int = Field(default=0, sa_type=BigInteger)

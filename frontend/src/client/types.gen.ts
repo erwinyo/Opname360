@@ -276,6 +276,11 @@ export type CountingSummary = {
 };
 
 /**
+ * DiscountKind
+ */
+export type DiscountKind = 'percentage' | 'fixed';
+
+/**
  * DocumentStatus
  */
 export type DocumentStatus = 'draft' | 'completed' | 'reversed';
@@ -1488,6 +1493,112 @@ export type ProductionReceiptSummary = {
 };
 
 /**
+ * PromotionPage
+ */
+export type PromotionPage = {
+    /**
+     * Items
+     */
+    items: Array<PromotionPublic>;
+    /**
+     * Total
+     */
+    total: number;
+};
+
+/**
+ * PromotionPublic
+ */
+export type PromotionPublic = {
+    /**
+     * Id
+     */
+    id: number;
+    /**
+     * Name
+     */
+    name: string;
+    discount_kind: DiscountKind;
+    /**
+     * Value
+     */
+    value: number;
+    target_kind: TargetKind;
+    /**
+     * Targets
+     */
+    targets: Array<PromotionTargetPublic>;
+    /**
+     * Starts At
+     */
+    starts_at: string;
+    /**
+     * Ends At
+     */
+    ends_at: string;
+    status: PromotionStatus;
+    /**
+     * Used
+     */
+    used: boolean;
+    /**
+     * Created By Name
+     */
+    created_by_name: string | null;
+    /**
+     * Created At
+     */
+    created_at: string;
+};
+
+/**
+ * PromotionSave
+ */
+export type PromotionSave = {
+    /**
+     * Name
+     */
+    name: string;
+    discount_kind: DiscountKind;
+    /**
+     * Value
+     */
+    value: number;
+    target_kind: TargetKind;
+    /**
+     * Target Ids
+     */
+    target_ids: Array<number>;
+    /**
+     * Starts At
+     */
+    starts_at: string;
+    /**
+     * Ends At
+     */
+    ends_at: string;
+};
+
+/**
+ * PromotionStatus
+ */
+export type PromotionStatus = 'upcoming' | 'running' | 'ended';
+
+/**
+ * PromotionTargetPublic
+ */
+export type PromotionTargetPublic = {
+    /**
+     * Id
+     */
+    id: number;
+    /**
+     * Label
+     */
+    label: string;
+};
+
+/**
  * Quote
  */
 export type Quote = {
@@ -1997,6 +2108,10 @@ export type SkuOption = {
      * Id
      */
     id: number;
+    /**
+     * Product Id
+     */
+    product_id: number;
     /**
      * Product Name
      */
@@ -2633,6 +2748,11 @@ export type SupplierUpdate = {
      */
     is_active?: boolean | null;
 };
+
+/**
+ * TargetKind
+ */
+export type TargetKind = 'skus' | 'products' | 'sub_categories' | 'categories';
 
 /**
  * TillSku
@@ -5464,6 +5584,159 @@ export type ReceiptsPrintReceiptResponses = {
 };
 
 export type ReceiptsPrintReceiptResponse = ReceiptsPrintReceiptResponses[keyof ReceiptsPrintReceiptResponses];
+
+export type PromotionsListPromotionsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Status
+         */
+        status?: PromotionStatus | null;
+        /**
+         * Offset
+         */
+        offset?: number;
+        /**
+         * Limit
+         */
+        limit?: number;
+    };
+    url: '/api/v1/promotions/';
+};
+
+export type PromotionsListPromotionsErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type PromotionsListPromotionsError = PromotionsListPromotionsErrors[keyof PromotionsListPromotionsErrors];
+
+export type PromotionsListPromotionsResponses = {
+    /**
+     * Successful Response
+     */
+    200: PromotionPage;
+};
+
+export type PromotionsListPromotionsResponse = PromotionsListPromotionsResponses[keyof PromotionsListPromotionsResponses];
+
+export type PromotionsCreatePromotionData = {
+    body: PromotionSave;
+    path?: never;
+    query?: never;
+    url: '/api/v1/promotions/';
+};
+
+export type PromotionsCreatePromotionErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type PromotionsCreatePromotionError = PromotionsCreatePromotionErrors[keyof PromotionsCreatePromotionErrors];
+
+export type PromotionsCreatePromotionResponses = {
+    /**
+     * Successful Response
+     */
+    201: PromotionPublic;
+};
+
+export type PromotionsCreatePromotionResponse = PromotionsCreatePromotionResponses[keyof PromotionsCreatePromotionResponses];
+
+export type PromotionsReadPromotionData = {
+    body?: never;
+    path: {
+        /**
+         * Promotion Id
+         */
+        promotion_id: number;
+    };
+    query?: never;
+    url: '/api/v1/promotions/{promotion_id}';
+};
+
+export type PromotionsReadPromotionErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type PromotionsReadPromotionError = PromotionsReadPromotionErrors[keyof PromotionsReadPromotionErrors];
+
+export type PromotionsReadPromotionResponses = {
+    /**
+     * Successful Response
+     */
+    200: PromotionPublic;
+};
+
+export type PromotionsReadPromotionResponse = PromotionsReadPromotionResponses[keyof PromotionsReadPromotionResponses];
+
+export type PromotionsUpdatePromotionData = {
+    body: PromotionSave;
+    path: {
+        /**
+         * Promotion Id
+         */
+        promotion_id: number;
+    };
+    query?: never;
+    url: '/api/v1/promotions/{promotion_id}';
+};
+
+export type PromotionsUpdatePromotionErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type PromotionsUpdatePromotionError = PromotionsUpdatePromotionErrors[keyof PromotionsUpdatePromotionErrors];
+
+export type PromotionsUpdatePromotionResponses = {
+    /**
+     * Successful Response
+     */
+    200: PromotionPublic;
+};
+
+export type PromotionsUpdatePromotionResponse = PromotionsUpdatePromotionResponses[keyof PromotionsUpdatePromotionResponses];
+
+export type PromotionsEndPromotionData = {
+    body?: never;
+    path: {
+        /**
+         * Promotion Id
+         */
+        promotion_id: number;
+    };
+    query?: never;
+    url: '/api/v1/promotions/{promotion_id}/end';
+};
+
+export type PromotionsEndPromotionErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type PromotionsEndPromotionError = PromotionsEndPromotionErrors[keyof PromotionsEndPromotionErrors];
+
+export type PromotionsEndPromotionResponses = {
+    /**
+     * Successful Response
+     */
+    200: PromotionPublic;
+};
+
+export type PromotionsEndPromotionResponse = PromotionsEndPromotionResponses[keyof PromotionsEndPromotionResponses];
 
 export type ActivityLogListEntriesData = {
     body?: never;

@@ -5694,6 +5694,337 @@
         }
       }
     },
+    "/api/v1/promotions/": {
+      "get": {
+        "tags": [
+          "promotions"
+        ],
+        "summary": "List Promotions",
+        "operationId": "promotions-list_promotions",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/PromotionStatus"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "title": "Offset"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "opname360_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Opname360 Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PromotionPage"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "promotions"
+        ],
+        "summary": "Create Promotion",
+        "operationId": "promotions-create_promotion",
+        "parameters": [
+          {
+            "name": "opname360_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Opname360 Session"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PromotionSave"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PromotionPublic"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/promotions/{promotion_id}": {
+      "get": {
+        "tags": [
+          "promotions"
+        ],
+        "summary": "Read Promotion",
+        "operationId": "promotions-read_promotion",
+        "parameters": [
+          {
+            "name": "promotion_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "title": "Promotion Id"
+            }
+          },
+          {
+            "name": "opname360_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Opname360 Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PromotionPublic"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "promotions"
+        ],
+        "summary": "Update Promotion",
+        "operationId": "promotions-update_promotion",
+        "parameters": [
+          {
+            "name": "promotion_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "title": "Promotion Id"
+            }
+          },
+          {
+            "name": "opname360_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Opname360 Session"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PromotionSave"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PromotionPublic"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/promotions/{promotion_id}/end": {
+      "post": {
+        "tags": [
+          "promotions"
+        ],
+        "summary": "End Promotion",
+        "description": "End it now. A Promotion already on a Receipt can only be ended.",
+        "operationId": "promotions-end_promotion",
+        "parameters": [
+          {
+            "name": "promotion_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "title": "Promotion Id"
+            }
+          },
+          {
+            "name": "opname360_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Opname360 Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PromotionPublic"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/activity-log/": {
       "get": {
         "tags": [
@@ -6234,6 +6565,14 @@
           "can_count"
         ],
         "title": "CountingSummary"
+      },
+      "DiscountKind": {
+        "type": "string",
+        "enum": [
+          "percentage",
+          "fixed"
+        ],
+        "title": "DiscountKind"
       },
       "DocumentStatus": {
         "type": "string",
@@ -8472,6 +8811,183 @@
         ],
         "title": "ProductionReceiptSummary"
       },
+      "PromotionPage": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/PromotionPublic"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "total"
+        ],
+        "title": "PromotionPage"
+      },
+      "PromotionPublic": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "discount_kind": {
+            "$ref": "#/components/schemas/DiscountKind"
+          },
+          "value": {
+            "type": "integer",
+            "title": "Value"
+          },
+          "target_kind": {
+            "$ref": "#/components/schemas/TargetKind"
+          },
+          "targets": {
+            "items": {
+              "$ref": "#/components/schemas/PromotionTargetPublic"
+            },
+            "type": "array",
+            "title": "Targets"
+          },
+          "starts_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Starts At"
+          },
+          "ends_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Ends At"
+          },
+          "status": {
+            "$ref": "#/components/schemas/PromotionStatus"
+          },
+          "used": {
+            "type": "boolean",
+            "title": "Used"
+          },
+          "created_by_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created By Name"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "discount_kind",
+          "value",
+          "target_kind",
+          "targets",
+          "starts_at",
+          "ends_at",
+          "status",
+          "used",
+          "created_by_name",
+          "created_at"
+        ],
+        "title": "PromotionPublic"
+      },
+      "PromotionSave": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Name"
+          },
+          "discount_kind": {
+            "$ref": "#/components/schemas/DiscountKind"
+          },
+          "value": {
+            "type": "integer",
+            "exclusiveMinimum": 0.0,
+            "title": "Value"
+          },
+          "target_kind": {
+            "$ref": "#/components/schemas/TargetKind"
+          },
+          "target_ids": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array",
+            "maxItems": 2000,
+            "minItems": 1,
+            "title": "Target Ids"
+          },
+          "starts_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Starts At"
+          },
+          "ends_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Ends At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "discount_kind",
+          "value",
+          "target_kind",
+          "target_ids",
+          "starts_at",
+          "ends_at"
+        ],
+        "title": "PromotionSave"
+      },
+      "PromotionStatus": {
+        "type": "string",
+        "enum": [
+          "upcoming",
+          "running",
+          "ended"
+        ],
+        "title": "PromotionStatus"
+      },
+      "PromotionTargetPublic": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "label"
+        ],
+        "title": "PromotionTargetPublic"
+      },
       "Quote": {
         "properties": {
           "lines": {
@@ -9359,6 +9875,10 @@
             "type": "integer",
             "title": "Id"
           },
+          "product_id": {
+            "type": "integer",
+            "title": "Product Id"
+          },
           "product_name": {
             "type": "string",
             "title": "Product Name"
@@ -9438,6 +9958,7 @@
         "type": "object",
         "required": [
           "id",
+          "product_id",
           "product_name",
           "size",
           "color",
@@ -10527,6 +11048,16 @@
         },
         "type": "object",
         "title": "SupplierUpdate"
+      },
+      "TargetKind": {
+        "type": "string",
+        "enum": [
+          "skus",
+          "products",
+          "sub_categories",
+          "categories"
+        ],
+        "title": "TargetKind"
       },
       "TillSku": {
         "properties": {

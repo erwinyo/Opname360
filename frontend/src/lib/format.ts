@@ -73,3 +73,10 @@ export function skuName(sku: {
 }): string {
   return [sku.product_name, variantLabel(sku)].filter(Boolean).join(' · ')
 }
+
+/** An ISO time as a `datetime-local` input wants it, in the browser's time. */
+export function toLocalInput(iso: string | Date): string {
+  const at = new Date(iso)
+  const pad = (n: number) => String(n).padStart(2, '0')
+  return `${at.getFullYear()}-${pad(at.getMonth() + 1)}-${pad(at.getDate())}T${pad(at.getHours())}:${pad(at.getMinutes())}`
+}

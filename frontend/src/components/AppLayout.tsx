@@ -10,6 +10,7 @@ import {
   MenuIcon,
   PackageIcon,
   PackagePlusIcon,
+  PercentIcon,
   PrinterIcon,
   ScanBarcodeIcon,
   ScissorsIcon,
@@ -116,6 +117,7 @@ const NAV: NavGroup[] = [
         roles: BACK_OFFICE,
       },
       { to: '/pemasok', label: 'Pemasok', icon: TruckIcon, roles: BACK_OFFICE },
+      { to: '/promo', label: 'Promo', icon: PercentIcon, roles: BACK_OFFICE },
     ],
   },
   {

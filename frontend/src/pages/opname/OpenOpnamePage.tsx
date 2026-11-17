@@ -1,7 +1,6 @@
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { XIcon } from 'lucide-react'
 import { useState } from 'react'
-import type { FormEvent, ReactNode } from 'react'
+import type { FormEvent } from 'react'
 import { useNavigate } from 'react-router'
 import { toast } from 'sonner'
 
@@ -12,6 +11,12 @@ import {
   opnamesOpenOpnameMutation,
   opnamesOpeningAllowedOptions,
 } from '@/client/@tanstack/react-query.gen'
+import {
+  CategoryChecks,
+  Check,
+  Chips,
+  SubCategoryChecks,
+} from '@/components/CatalogueChecks'
 import { BackLink } from '@/components/documents'
 import { Field } from '@/components/FormDialog'
 import { SkuFinder } from '@/components/SkuFinder'
@@ -30,32 +35,7 @@ import { errorMessage } from '@/lib/api'
 import { ROLE_LABELS } from '@/lib/auth'
 import { skuName } from '@/lib/format'
 import { SCOPE_LABELS } from '@/lib/labels'
-
-function toggle(ids: number[], id: number): number[] {
-  return ids.includes(id) ? ids.filter((x) => x !== id) : [...ids, id]
-}
-
-function Check({
-  checked,
-  onChange,
-  children,
-}: {
-  checked: boolean
-  onChange: () => void
-  children: ReactNode
-}) {
-  return (
-    <label className="flex min-h-9 cursor-pointer items-center gap-2.5 rounded-md px-2 hover:bg-muted">
-      <input
-        type="checkbox"
-        checked={checked}
-        onChange={onChange}
-        className="size-4 accent-primary"
-      />
-      {children}
-    </label>
-  )
-}
+import { toggle } from '@/lib/utils'
 
 export function OpenOpnamePage() {
   const navigate = useNavigate()
@@ -162,43 +142,19 @@ export function OpenOpnamePage() {
         )}
 
         {!opening && scope === 'categories' && (
-          <fieldset className="grid gap-1 sm:grid-cols-2">
-            <legend className="sr-only">Kategori</legend>
-            {categories.data?.map((category) => (
-              <Check
-                key={category.id}
-                checked={categoryIds.includes(category.id)}
-                onChange={() =>
-                  setCategoryIds((ids) => toggle(ids, category.id))
-                }
-              >
-                {category.name}
-              </Check>
-            ))}
-          </fieldset>
+          <CategoryChecks
+            categories={categories.data ?? []}
+            selected={categoryIds}
+            onToggle={(id) => setCategoryIds((ids) => toggle(ids, id))}
+          />
         )}
 
         {!opening && scope === 'sub_categories' && (
-          <div className="grid gap-4 sm:grid-cols-2">
-            {categories.data?.map((category) => (
-              <fieldset key={category.id} className="grid gap-1">
-                <legend className="mb-1 text-sm font-medium text-muted-foreground">
-                  {category.name}
-                </legend>
-                {category.sub_categories.map((sub) => (
-                  <Check
-                    key={sub.id}
-                    checked={subCategoryIds.includes(sub.id)}
-                    onChange={() =>
-                      setSubCategoryIds((ids) => toggle(ids, sub.id))
-                    }
-                  >
-                    {sub.name}
-                  </Check>
-                ))}
-              </fieldset>
-            ))}
-          </div>
+          <SubCategoryChecks
+            categories={categories.data ?? []}
+            selected={subCategoryIds}
+            onToggle={(id) => setSubCategoryIds((ids) => toggle(ids, id))}
+          />
         )}
 
         {!opening && scope === 'skus' && (
@@ -212,32 +168,12 @@ export function OpenOpnamePage() {
                 )
               }
             />
-            {skus.length > 0 && (
-              <ul className="mt-3 flex flex-wrap gap-2">
-                {skus.map((sku) => (
-                  <li
-                    key={sku.id}
-                    className="flex items-center gap-1 rounded-full border bg-background py-0.5 pr-1 pl-3 text-sm"
-                  >
-                    {skuName(sku)}
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      className="size-6 rounded-full"
-                      aria-label={`Hapus ${skuName(sku)}`}
-                      onClick={() =>
-                        setSkus((picked) =>
-                          picked.filter((other) => other.id !== sku.id),
-                        )
-                      }
-                    >
-                      <XIcon />
-                    </Button>
-                  </li>
-                ))}
-              </ul>
-            )}
+            <Chips
+              items={skus.map((sku) => ({ id: sku.id, label: skuName(sku) }))}
+              onRemove={(id) =>
+                setSkus((picked) => picked.filter((sku) => sku.id !== id))
+              }
+            />
           </div>
         )}
       </section>

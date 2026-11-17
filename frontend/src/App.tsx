@@ -22,6 +22,8 @@ import { CloseShiftPage } from '@/pages/pos/CloseShiftPage'
 import { ReceiptPage } from '@/pages/pos/ReceiptPage'
 import { ShiftPage } from '@/pages/pos/ShiftPage'
 import { TillPage } from '@/pages/pos/TillPage'
+import { PromotionFormPage } from '@/pages/promotions/PromotionFormPage'
+import { PromotionsPage } from '@/pages/promotions/PromotionsPage'
 import { ProductionReceiptPage } from '@/pages/production/ProductionReceiptPage'
 import { ProductionReceiptsPage } from '@/pages/production/ProductionReceiptsPage'
 import { GoodsReceiptPage } from '@/pages/purchasing/GoodsReceiptPage'
@@ -113,6 +115,9 @@ export function App() {
               element={<SupplierReturnPage />}
             />
             <Route path="pemasok" element={<SuppliersPage />} />
+            <Route path="promo" element={<PromotionsPage />} />
+            <Route path="promo/baru" element={<PromotionFormPage />} />
+            <Route path="promo/:promotionId" element={<PromotionFormPage />} />
           </>
         )}
         {user.role === 'owner' && (

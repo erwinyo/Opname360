@@ -4,8 +4,10 @@ import type {
   OpnameScope,
   OpnameStatus,
   PaymentStatus,
+  PromotionStatus,
   Resolution,
   ShortageReason,
+  TargetKind,
 } from '@/client'
 
 export const STATUS_LABELS: Record<DocumentStatus, string> = {
@@ -57,6 +59,19 @@ export const SHORTAGE_REASON_LABELS: Record<ShortageReason, string> = {
 export const RESOLUTION_LABELS: Record<Resolution, string> = {
   company_loss: 'Kerugian perusahaan',
   employee_charge: 'Ganti rugi karyawan',
+}
+
+export const PROMOTION_STATUS_LABELS: Record<PromotionStatus, string> = {
+  running: 'Berjalan',
+  upcoming: 'Akan datang',
+  ended: 'Selesai',
+}
+
+export const TARGET_KIND_LABELS: Record<TargetKind, string> = {
+  categories: 'Kategori',
+  sub_categories: 'Sub-kategori',
+  products: 'Produk',
+  skus: 'SKU',
 }
 
 /** Where a Stock Movement's document can be opened, if it has a screen. */

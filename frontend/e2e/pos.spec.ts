@@ -71,6 +71,24 @@ test('pos: open a shift, sell, close', async ({ browser }) => {
   await signIn(till, 'rina', 'sandi-rina-1')
   await expect(till.getByRole('heading', { name: /^Halo/ })).toBeVisible()
 
+  await test.step('the owner puts size S on promotion', async () => {
+    await openMenu(owner, 'Promo')
+    await owner.getByRole('link', { name: 'Buat promo' }).click()
+    await owner.getByLabel('Nama promo').fill('Kaos S hemat')
+    await owner.getByLabel('Diskon (%)').fill('10')
+    await owner.getByLabel('Berlaku untuk').click()
+    await owner.getByRole('option', { name: 'SKU' }).click()
+    await owner.getByLabel('Tambah barang').fill(small.barcode)
+    await owner.getByLabel('Tambah barang').press('Enter')
+    await expect(owner.getByText('Kaos Olahraga · S')).toBeVisible()
+    await shot(owner, 'pos-00-promotion')
+    await owner.getByRole('button', { name: 'Simpan' }).click()
+    await expect(
+      owner.getByRole('link', { name: 'Kaos S hemat' }),
+    ).toBeVisible()
+    await shot(owner, 'pos-00-promotions')
+  })
+
   await test.step('the cashier opens a shift', async () => {
     await openMenu(till, 'Kasir')
     await till.getByLabel('Modal kas').fill('200000')
@@ -84,24 +102,25 @@ test('pos: open a shift, sell, close', async ({ browser }) => {
     await scan(till, small.barcode)
     await scan(till, medium.barcode)
     await expect(till.getByLabel('Jumlah Kaos Olahraga · S')).toHaveValue('2')
-    await expect(till.getByText('Rp 185.000').last()).toBeVisible()
+    await expect(till.getByText('Kaos S hemat: -Rp 12.000')).toBeVisible()
+    await expect(till.getByText('Rp 173.000').last()).toBeVisible()
     await shot(till, 'pos-02-cart')
     await till.getByRole('button', { name: 'Bayar' }).click()
     await till.getByRole('button', { name: 'Rp 200.000' }).click()
     await expect(till.getByText('Kembali')).toBeVisible()
     await shot(till, 'pos-03-pay')
     await till.getByRole('button', { name: 'Selesai' }).click()
-    await expect(till.getByText('Kembali Rp 15.000')).toBeVisible()
+    await expect(till.getByText('Kembali Rp 27.000')).toBeVisible()
     await shot(till, 'pos-04-done')
     await till.getByRole('link', { name: /^PJ-/ }).click()
-    await expect(till.getByText('Rp 120.000')).toBeVisible()
+    await expect(till.getByText('Kaos S hemat')).toBeVisible()
     await shot(till, 'pos-04-receipt')
     await till.getByRole('button', { name: 'Kembali' }).click()
   })
 
   await test.step('closes the shift with a blind count', async () => {
     await till.getByRole('link', { name: 'Tutup shift' }).click()
-    await till.getByLabel('Uang tunai di laci').fill('380000')
+    await till.getByLabel('Uang tunai di laci').fill('368000')
     await till.getByRole('button', { name: 'Tutup shift' }).click()
     await till
       .getByRole('dialog')

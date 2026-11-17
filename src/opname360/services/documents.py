@@ -1,6 +1,6 @@
 """What every stock document shares: numbers, locking and Reversals."""
 
-from datetime import datetime
+from datetime import date, datetime
 from typing import Protocol
 from zoneinfo import ZoneInfo
 
@@ -17,7 +17,7 @@ from opname360.models import (
     User,
 )
 from opname360.models._types import utc_now
-from opname360.services import activity_log, costing
+from opname360.services import activity_log, costing, ledger
 
 
 REVERSAL_PREFIX = 'BTL'  # Batal
@@ -34,13 +34,14 @@ def shop_now() -> datetime:
     return utc_now().astimezone(ZoneInfo(settings.timezone))
 
 
-def next_number(session: Session, prefix: str) -> str:
-    """The next document number for `prefix` this month: BM-2611-0001.
+def next_number(session: Session, prefix: str, on: date | None = None) -> str:
+    """The next document number for `prefix` this month (or the month of
+    `on`): BM-2611-0001.
 
     Safe when two documents are completed at once: the counter row is locked
     until the caller commits.
     """
-    period = shop_now().strftime('%y%m')
+    period = (on or shop_now()).strftime('%y%m')
     number = session.exec(
         insert(DocumentCounter)
         .values(prefix=prefix, period=period, last_number=1)
@@ -132,8 +133,8 @@ def write_reversal(
     reason: str,
     actor: User,
 ) -> Reversal:
-    """The Reversal itself: its number, the opposite Stock Movements and the
-    log line. The caller has checked the document may be reversed and marks
+    """The Reversal itself: its number, the opposite Stock Movements, the
+    mirror of its journal entries and the log line. The caller has checked the document may be reversed and marks
     it reversed."""
     reason = reason.strip()
     if not reason:
@@ -151,6 +152,13 @@ def write_reversal(
         document_type=document_type,
         document_id=document_id,
         number=reversal.number,
+        actor=actor,
+    )
+    ledger.mirror_document(
+        session,
+        document_type=document_type,
+        document_id=document_id,
+        reversal_number=reversal.number,
         actor=actor,
     )
     activity_log.record(

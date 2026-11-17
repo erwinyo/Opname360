@@ -1,5 +1,6 @@
 import { useMutation } from '@tanstack/react-query'
 import {
+  BookOpenIcon,
   BoxesIcon,
   CalendarDaysIcon,
   ChartColumnStackedIcon,
@@ -10,8 +11,11 @@ import {
   HandCoinsIcon,
   HistoryIcon,
   HouseIcon,
+  ListChecksIcon,
+  ListTreeIcon,
   LogOutIcon,
   MenuIcon,
+  NotebookPenIcon,
   PackageIcon,
   PackagePlusIcon,
   PercentIcon,
@@ -107,6 +111,30 @@ const NAV: NavGroup[] = [
         icon: ScaleIcon,
         roles: BACK_OFFICE,
       },
+    ],
+  },
+  {
+    label: 'Pembukuan',
+    items: [
+      {
+        to: '/jurnal',
+        label: 'Jurnal',
+        icon: NotebookPenIcon,
+        roles: BACK_OFFICE,
+      },
+      {
+        to: '/buku-besar',
+        label: 'Buku Besar',
+        icon: BookOpenIcon,
+        roles: BACK_OFFICE,
+      },
+      {
+        to: '/neraca-saldo',
+        label: 'Neraca Saldo',
+        icon: ListChecksIcon,
+        roles: BACK_OFFICE,
+      },
+      { to: '/akun', label: 'Akun', icon: ListTreeIcon, roles: BACK_OFFICE },
     ],
   },
   {

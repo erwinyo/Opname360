@@ -9,6 +9,7 @@ from opname360.api.routes import (
     employee_charges,
     goods_receipts,
     health,
+    ledger,
     opnames,
     payment_methods,
     production_receipts,
@@ -47,6 +48,7 @@ api_router.include_router(shifts.router)
 api_router.include_router(receipts.router)
 api_router.include_router(promotions.router)
 api_router.include_router(reports.router)
+api_router.include_router(ledger.router)
 api_router.include_router(activity_log.router)
 
 

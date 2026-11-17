@@ -88,6 +88,36 @@ import type {
   GoodsReceiptsUpdateReceiptResponses,
   HealthHealthCheckData,
   HealthHealthCheckResponses,
+  LedgerCreateAccountData,
+  LedgerCreateAccountErrors,
+  LedgerCreateAccountResponses,
+  LedgerCreateManualEntryData,
+  LedgerCreateManualEntryErrors,
+  LedgerCreateManualEntryResponses,
+  LedgerDeleteAccountData,
+  LedgerDeleteAccountErrors,
+  LedgerDeleteAccountResponses,
+  LedgerListAccountsData,
+  LedgerListAccountsErrors,
+  LedgerListAccountsResponses,
+  LedgerListEntriesData,
+  LedgerListEntriesErrors,
+  LedgerListEntriesResponses,
+  LedgerReadAccountBookData,
+  LedgerReadAccountBookErrors,
+  LedgerReadAccountBookResponses,
+  LedgerReadEntryData,
+  LedgerReadEntryErrors,
+  LedgerReadEntryResponses,
+  LedgerReverseEntryData,
+  LedgerReverseEntryErrors,
+  LedgerReverseEntryResponses,
+  LedgerTrialBalanceData,
+  LedgerTrialBalanceErrors,
+  LedgerTrialBalanceResponses,
+  LedgerUpdateAccountData,
+  LedgerUpdateAccountErrors,
+  LedgerUpdateAccountResponses,
   OpnamesApproveOpnameData,
   OpnamesApproveOpnameErrors,
   OpnamesApproveOpnameResponses,
@@ -2481,6 +2511,194 @@ export const reportsLive = <ThrowOnError extends boolean = false>(
     ReportsLiveErrors,
     ThrowOnError
   >({ url: '/api/v1/reports/live', ...options })
+
+/**
+ * List Accounts
+ */
+export const ledgerListAccounts = <ThrowOnError extends boolean = false>(
+  options?: Options<LedgerListAccountsData, ThrowOnError>,
+): RequestResult<
+  LedgerListAccountsResponses,
+  LedgerListAccountsErrors,
+  ThrowOnError
+> =>
+  (options?.client ?? client).get<
+    LedgerListAccountsResponses,
+    LedgerListAccountsErrors,
+    ThrowOnError
+  >({ url: '/api/v1/ledger/accounts', ...options })
+
+/**
+ * Create Account
+ */
+export const ledgerCreateAccount = <ThrowOnError extends boolean = false>(
+  options: Options<LedgerCreateAccountData, ThrowOnError>,
+): RequestResult<
+  LedgerCreateAccountResponses,
+  LedgerCreateAccountErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    LedgerCreateAccountResponses,
+    LedgerCreateAccountErrors,
+    ThrowOnError
+  >({
+    url: '/api/v1/ledger/accounts',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  })
+
+/**
+ * Delete Account
+ */
+export const ledgerDeleteAccount = <ThrowOnError extends boolean = false>(
+  options: Options<LedgerDeleteAccountData, ThrowOnError>,
+): RequestResult<
+  LedgerDeleteAccountResponses,
+  LedgerDeleteAccountErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).delete<
+    LedgerDeleteAccountResponses,
+    LedgerDeleteAccountErrors,
+    ThrowOnError
+  >({ url: '/api/v1/ledger/accounts/{account_id}', ...options })
+
+/**
+ * Update Account
+ */
+export const ledgerUpdateAccount = <ThrowOnError extends boolean = false>(
+  options: Options<LedgerUpdateAccountData, ThrowOnError>,
+): RequestResult<
+  LedgerUpdateAccountResponses,
+  LedgerUpdateAccountErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).put<
+    LedgerUpdateAccountResponses,
+    LedgerUpdateAccountErrors,
+    ThrowOnError
+  >({
+    url: '/api/v1/ledger/accounts/{account_id}',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  })
+
+/**
+ * Read Account Book
+ */
+export const ledgerReadAccountBook = <ThrowOnError extends boolean = false>(
+  options: Options<LedgerReadAccountBookData, ThrowOnError>,
+): RequestResult<
+  LedgerReadAccountBookResponses,
+  LedgerReadAccountBookErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    LedgerReadAccountBookResponses,
+    LedgerReadAccountBookErrors,
+    ThrowOnError
+  >({ url: '/api/v1/ledger/accounts/{account_id}/book', ...options })
+
+/**
+ * List Entries
+ */
+export const ledgerListEntries = <ThrowOnError extends boolean = false>(
+  options?: Options<LedgerListEntriesData, ThrowOnError>,
+): RequestResult<
+  LedgerListEntriesResponses,
+  LedgerListEntriesErrors,
+  ThrowOnError
+> =>
+  (options?.client ?? client).get<
+    LedgerListEntriesResponses,
+    LedgerListEntriesErrors,
+    ThrowOnError
+  >({ url: '/api/v1/ledger/journal', ...options })
+
+/**
+ * Create Manual Entry
+ */
+export const ledgerCreateManualEntry = <ThrowOnError extends boolean = false>(
+  options: Options<LedgerCreateManualEntryData, ThrowOnError>,
+): RequestResult<
+  LedgerCreateManualEntryResponses,
+  LedgerCreateManualEntryErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    LedgerCreateManualEntryResponses,
+    LedgerCreateManualEntryErrors,
+    ThrowOnError
+  >({
+    url: '/api/v1/ledger/journal',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  })
+
+/**
+ * Read Entry
+ */
+export const ledgerReadEntry = <ThrowOnError extends boolean = false>(
+  options: Options<LedgerReadEntryData, ThrowOnError>,
+): RequestResult<
+  LedgerReadEntryResponses,
+  LedgerReadEntryErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    LedgerReadEntryResponses,
+    LedgerReadEntryErrors,
+    ThrowOnError
+  >({ url: '/api/v1/ledger/journal/{entry_id}', ...options })
+
+/**
+ * Reverse Entry
+ */
+export const ledgerReverseEntry = <ThrowOnError extends boolean = false>(
+  options: Options<LedgerReverseEntryData, ThrowOnError>,
+): RequestResult<
+  LedgerReverseEntryResponses,
+  LedgerReverseEntryErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    LedgerReverseEntryResponses,
+    LedgerReverseEntryErrors,
+    ThrowOnError
+  >({
+    url: '/api/v1/ledger/journal/{entry_id}/reverse',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  })
+
+/**
+ * Trial Balance
+ */
+export const ledgerTrialBalance = <ThrowOnError extends boolean = false>(
+  options: Options<LedgerTrialBalanceData, ThrowOnError>,
+): RequestResult<
+  LedgerTrialBalanceResponses,
+  LedgerTrialBalanceErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    LedgerTrialBalanceResponses,
+    LedgerTrialBalanceErrors,
+    ThrowOnError
+  >({ url: '/api/v1/ledger/trial-balance', ...options })
 
 /**
  * List Entries

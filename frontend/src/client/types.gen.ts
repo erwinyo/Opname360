@@ -106,6 +106,175 @@ export type AbcRow = {
 }
 
 /**
+ * AccountBook
+ */
+export type AccountBook = {
+  account: AccountPublic
+  /**
+   * Start
+   */
+  start: string
+  /**
+   * End
+   */
+  end: string
+  /**
+   * Opening Balance
+   */
+  opening_balance: string
+  /**
+   * Lines
+   */
+  lines: Array<AccountBookLine>
+  /**
+   * Total Debit
+   */
+  total_debit: string
+  /**
+   * Total Credit
+   */
+  total_credit: string
+  /**
+   * Closing Balance
+   */
+  closing_balance: string
+}
+
+/**
+ * AccountBookLine
+ */
+export type AccountBookLine = {
+  /**
+   * Entry Id
+   */
+  entry_id: number
+  /**
+   * Number
+   */
+  number: string
+  /**
+   * Entry Date
+   */
+  entry_date: string
+  /**
+   * Description
+   */
+  description: string
+  /**
+   * Document Type
+   */
+  document_type: string | null
+  /**
+   * Document Id
+   */
+  document_id: number | null
+  /**
+   * Debit
+   */
+  debit: string
+  /**
+   * Credit
+   */
+  credit: string
+  /**
+   * Balance
+   */
+  balance: string
+}
+
+/**
+ * AccountPublic
+ */
+export type AccountPublic = {
+  /**
+   * Id
+   */
+  id: number
+  /**
+   * Code
+   */
+  code: string
+  /**
+   * Name
+   */
+  name: string
+  type: AccountType
+  /**
+   * Is Cash
+   */
+  is_cash: boolean
+  role: AccountRole | null
+  /**
+   * Is Active
+   */
+  is_active: boolean
+  /**
+   * Balance
+   */
+  balance: string
+  /**
+   * Used
+   */
+  used: boolean
+}
+
+/**
+ * AccountRole
+ *
+ * What the system posts to. Each role is played by one account.
+ */
+export type AccountRole =
+  | 'cash_main'
+  | 'cash_drawer'
+  | 'bank'
+  | 'inventory'
+  | 'employee_receivable'
+  | 'accounts_payable'
+  | 'opening_balance'
+  | 'retained_earnings'
+  | 'sales'
+  | 'sales_discount'
+  | 'sales_return'
+  | 'other_income'
+  | 'inventory_surplus'
+  | 'cash_over'
+  | 'cogs'
+  | 'inventory_shortage'
+  | 'damaged_goods'
+  | 'cash_short'
+  | 'production_cost'
+  | 'salary'
+
+/**
+ * AccountSave
+ */
+export type AccountSave = {
+  /**
+   * Code
+   */
+  code: string
+  /**
+   * Name
+   */
+  name: string
+  type: AccountType
+  /**
+   * Is Cash
+   */
+  is_cash?: boolean
+  /**
+   * Is Active
+   */
+  is_active?: boolean
+}
+
+/**
+ * AccountType
+ */
+export type AccountType =
+  'asset' | 'liability' | 'equity' | 'revenue' | 'cogs' | 'expense'
+
+/**
  * ActivityLogEntry
  */
 export type ActivityLogEntry = {
@@ -676,6 +845,11 @@ export type EmployeeChargeTotal = {
 }
 
 /**
+ * EntrySource
+ */
+export type EntrySource = 'document' | 'manual' | 'opening'
+
+/**
  * FastMoving
  */
 export type FastMoving = {
@@ -1148,6 +1322,163 @@ export type ImportResult = {
 }
 
 /**
+ * JournalEntryPublic
+ */
+export type JournalEntryPublic = {
+  /**
+   * Id
+   */
+  id: number
+  /**
+   * Number
+   */
+  number: string
+  /**
+   * Entry Date
+   */
+  entry_date: string
+  /**
+   * Description
+   */
+  description: string
+  source: EntrySource
+  /**
+   * Document Type
+   */
+  document_type: string | null
+  /**
+   * Document Id
+   */
+  document_id: number | null
+  /**
+   * Document Number
+   */
+  document_number: string | null
+  /**
+   * Event
+   */
+  event: string | null
+  /**
+   * Reverses Id
+   */
+  reverses_id: number | null
+  /**
+   * Reverses Number
+   */
+  reverses_number: string | null
+  /**
+   * Reversed By Id
+   */
+  reversed_by_id: number | null
+  /**
+   * Reversed By Number
+   */
+  reversed_by_number: string | null
+  /**
+   * Created By Name
+   */
+  created_by_name: string | null
+  /**
+   * Created At
+   */
+  created_at: string
+  /**
+   * Total
+   */
+  total: string
+  /**
+   * Lines
+   */
+  lines: Array<JournalLinePublic>
+}
+
+/**
+ * JournalLineIn
+ */
+export type JournalLineIn = {
+  /**
+   * Account Id
+   */
+  account_id: number
+  /**
+   * Debit
+   */
+  debit?: number | string
+  /**
+   * Credit
+   */
+  credit?: number | string
+  /**
+   * Supplier Id
+   */
+  supplier_id?: number | null
+  /**
+   * User Id
+   */
+  user_id?: number | null
+}
+
+/**
+ * JournalLinePublic
+ */
+export type JournalLinePublic = {
+  /**
+   * Id
+   */
+  id: number
+  /**
+   * Account Id
+   */
+  account_id: number
+  /**
+   * Account Code
+   */
+  account_code: string
+  /**
+   * Account Name
+   */
+  account_name: string
+  /**
+   * Debit
+   */
+  debit: string
+  /**
+   * Credit
+   */
+  credit: string
+  /**
+   * Supplier Id
+   */
+  supplier_id: number | null
+  /**
+   * Supplier Name
+   */
+  supplier_name: string | null
+  /**
+   * User Id
+   */
+  user_id: number | null
+  /**
+   * User Name
+   */
+  user_name: string | null
+}
+
+/**
+ * JournalPage
+ */
+export type JournalPage = {
+  /**
+   * Items
+   */
+  items: Array<JournalEntryPublic>
+  /**
+   * Total
+   */
+  total: number
+}
+
+/**
  * LineResolutionSave
  *
  * The approver's decision on one line. Unset fields are cleared.
@@ -1201,6 +1532,24 @@ export type LoginRequest = {
    * Password
    */
   password: string
+}
+
+/**
+ * ManualEntryIn
+ */
+export type ManualEntryIn = {
+  /**
+   * Entry Date
+   */
+  entry_date: string
+  /**
+   * Description
+   */
+  description: string
+  /**
+   * Lines
+   */
+  lines: Array<JournalLineIn>
 }
 
 /**
@@ -3572,6 +3921,55 @@ export type TillSku = {
    * Selling Price
    */
   selling_price: number
+}
+
+/**
+ * TrialBalance
+ */
+export type TrialBalance = {
+  /**
+   * On
+   */
+  on: string
+  /**
+   * Rows
+   */
+  rows: Array<TrialBalanceRow>
+  /**
+   * Total Debit
+   */
+  total_debit: string
+  /**
+   * Total Credit
+   */
+  total_credit: string
+}
+
+/**
+ * TrialBalanceRow
+ */
+export type TrialBalanceRow = {
+  /**
+   * Account Id
+   */
+  account_id: number
+  /**
+   * Code
+   */
+  code: string
+  /**
+   * Name
+   */
+  name: string
+  type: AccountType
+  /**
+   * Debit
+   */
+  debit: string
+  /**
+   * Credit
+   */
+  credit: string
 }
 
 /**
@@ -7544,6 +7942,346 @@ export type ReportsLiveResponses = {
    */
   200: unknown
 }
+
+export type LedgerListAccountsData = {
+  body?: never
+  path?: never
+  query?: never
+  url: '/api/v1/ledger/accounts'
+}
+
+export type LedgerListAccountsErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError
+}
+
+export type LedgerListAccountsError =
+  LedgerListAccountsErrors[keyof LedgerListAccountsErrors]
+
+export type LedgerListAccountsResponses = {
+  /**
+   * Response Ledger-List Accounts
+   *
+   * Successful Response
+   */
+  200: Array<AccountPublic>
+}
+
+export type LedgerListAccountsResponse =
+  LedgerListAccountsResponses[keyof LedgerListAccountsResponses]
+
+export type LedgerCreateAccountData = {
+  body: AccountSave
+  path?: never
+  query?: never
+  url: '/api/v1/ledger/accounts'
+}
+
+export type LedgerCreateAccountErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError
+}
+
+export type LedgerCreateAccountError =
+  LedgerCreateAccountErrors[keyof LedgerCreateAccountErrors]
+
+export type LedgerCreateAccountResponses = {
+  /**
+   * Successful Response
+   */
+  201: AccountPublic
+}
+
+export type LedgerCreateAccountResponse =
+  LedgerCreateAccountResponses[keyof LedgerCreateAccountResponses]
+
+export type LedgerDeleteAccountData = {
+  body?: never
+  path: {
+    /**
+     * Account Id
+     */
+    account_id: number
+  }
+  query?: never
+  url: '/api/v1/ledger/accounts/{account_id}'
+}
+
+export type LedgerDeleteAccountErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError
+}
+
+export type LedgerDeleteAccountError =
+  LedgerDeleteAccountErrors[keyof LedgerDeleteAccountErrors]
+
+export type LedgerDeleteAccountResponses = {
+  /**
+   * Successful Response
+   */
+  204: void
+}
+
+export type LedgerDeleteAccountResponse =
+  LedgerDeleteAccountResponses[keyof LedgerDeleteAccountResponses]
+
+export type LedgerUpdateAccountData = {
+  body: AccountSave
+  path: {
+    /**
+     * Account Id
+     */
+    account_id: number
+  }
+  query?: never
+  url: '/api/v1/ledger/accounts/{account_id}'
+}
+
+export type LedgerUpdateAccountErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError
+}
+
+export type LedgerUpdateAccountError =
+  LedgerUpdateAccountErrors[keyof LedgerUpdateAccountErrors]
+
+export type LedgerUpdateAccountResponses = {
+  /**
+   * Successful Response
+   */
+  200: AccountPublic
+}
+
+export type LedgerUpdateAccountResponse =
+  LedgerUpdateAccountResponses[keyof LedgerUpdateAccountResponses]
+
+export type LedgerReadAccountBookData = {
+  body?: never
+  path: {
+    /**
+     * Account Id
+     */
+    account_id: number
+  }
+  query: {
+    /**
+     * Start
+     */
+    start: string
+    /**
+     * End
+     */
+    end: string
+  }
+  url: '/api/v1/ledger/accounts/{account_id}/book'
+}
+
+export type LedgerReadAccountBookErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError
+}
+
+export type LedgerReadAccountBookError =
+  LedgerReadAccountBookErrors[keyof LedgerReadAccountBookErrors]
+
+export type LedgerReadAccountBookResponses = {
+  /**
+   * Successful Response
+   */
+  200: AccountBook
+}
+
+export type LedgerReadAccountBookResponse =
+  LedgerReadAccountBookResponses[keyof LedgerReadAccountBookResponses]
+
+export type LedgerListEntriesData = {
+  body?: never
+  path?: never
+  query?: {
+    /**
+     * Start
+     */
+    start?: string | null
+    /**
+     * End
+     */
+    end?: string | null
+    /**
+     * Account Id
+     */
+    account_id?: number | null
+    /**
+     * Source
+     */
+    source?: EntrySource | null
+    /**
+     * Search
+     */
+    search?: string | null
+    /**
+     * Offset
+     */
+    offset?: number
+    /**
+     * Limit
+     */
+    limit?: number
+  }
+  url: '/api/v1/ledger/journal'
+}
+
+export type LedgerListEntriesErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError
+}
+
+export type LedgerListEntriesError =
+  LedgerListEntriesErrors[keyof LedgerListEntriesErrors]
+
+export type LedgerListEntriesResponses = {
+  /**
+   * Successful Response
+   */
+  200: JournalPage
+}
+
+export type LedgerListEntriesResponse =
+  LedgerListEntriesResponses[keyof LedgerListEntriesResponses]
+
+export type LedgerCreateManualEntryData = {
+  body: ManualEntryIn
+  path?: never
+  query?: never
+  url: '/api/v1/ledger/journal'
+}
+
+export type LedgerCreateManualEntryErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError
+}
+
+export type LedgerCreateManualEntryError =
+  LedgerCreateManualEntryErrors[keyof LedgerCreateManualEntryErrors]
+
+export type LedgerCreateManualEntryResponses = {
+  /**
+   * Successful Response
+   */
+  201: JournalEntryPublic
+}
+
+export type LedgerCreateManualEntryResponse =
+  LedgerCreateManualEntryResponses[keyof LedgerCreateManualEntryResponses]
+
+export type LedgerReadEntryData = {
+  body?: never
+  path: {
+    /**
+     * Entry Id
+     */
+    entry_id: number
+  }
+  query?: never
+  url: '/api/v1/ledger/journal/{entry_id}'
+}
+
+export type LedgerReadEntryErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError
+}
+
+export type LedgerReadEntryError =
+  LedgerReadEntryErrors[keyof LedgerReadEntryErrors]
+
+export type LedgerReadEntryResponses = {
+  /**
+   * Successful Response
+   */
+  200: JournalEntryPublic
+}
+
+export type LedgerReadEntryResponse =
+  LedgerReadEntryResponses[keyof LedgerReadEntryResponses]
+
+export type LedgerReverseEntryData = {
+  body: ReversalCreate
+  path: {
+    /**
+     * Entry Id
+     */
+    entry_id: number
+  }
+  query?: never
+  url: '/api/v1/ledger/journal/{entry_id}/reverse'
+}
+
+export type LedgerReverseEntryErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError
+}
+
+export type LedgerReverseEntryError =
+  LedgerReverseEntryErrors[keyof LedgerReverseEntryErrors]
+
+export type LedgerReverseEntryResponses = {
+  /**
+   * Successful Response
+   */
+  200: JournalEntryPublic
+}
+
+export type LedgerReverseEntryResponse =
+  LedgerReverseEntryResponses[keyof LedgerReverseEntryResponses]
+
+export type LedgerTrialBalanceData = {
+  body?: never
+  path?: never
+  query: {
+    /**
+     * On
+     */
+    on: string
+  }
+  url: '/api/v1/ledger/trial-balance'
+}
+
+export type LedgerTrialBalanceErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError
+}
+
+export type LedgerTrialBalanceError =
+  LedgerTrialBalanceErrors[keyof LedgerTrialBalanceErrors]
+
+export type LedgerTrialBalanceResponses = {
+  /**
+   * Successful Response
+   */
+  200: TrialBalance
+}
+
+export type LedgerTrialBalanceResponse =
+  LedgerTrialBalanceResponses[keyof LedgerTrialBalanceResponses]
 
 export type ActivityLogListEntriesData = {
   body?: never

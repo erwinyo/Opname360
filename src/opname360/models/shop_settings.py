@@ -1,4 +1,4 @@
-from datetime import time
+from datetime import date, time
 from typing import Self
 
 from pydantic import model_validator
@@ -29,6 +29,8 @@ class ShopSettings(ShopSettingsBase, table=True):
     __tablename__ = 'shop_settings'
 
     id: int = Field(default=1, primary_key=True)
+    # The books are closed up to and including this day (slice 5, rule 12).
+    lock_date: date | None = None
 
 
 class ShopSettingsSave(ShopSettingsBase):

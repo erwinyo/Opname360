@@ -21,7 +21,7 @@ def rebuild(url: str) -> None:
 
 
 # Rows the migrations seed.
-SEEDED = {'location', 'shop_settings', 'payment_method'}
+SEEDED = {'location', 'shop_settings', 'payment_method', 'account'}
 
 
 def wipe(engine: Engine) -> None:

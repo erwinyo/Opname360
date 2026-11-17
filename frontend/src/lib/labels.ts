@@ -1,5 +1,7 @@
 import type {
+  AccountType,
   DocumentStatus,
+  EntrySource,
   MovementReason,
   OpnameScope,
   OpnameStatus,
@@ -82,6 +84,21 @@ export const RECEIPT_KIND_LABELS: Record<ReceiptKind, string> = {
 }
 
 /** Where a Stock Movement's document can be opened, if it has a screen. */
+export const ACCOUNT_TYPE_LABELS: Record<AccountType, string> = {
+  asset: 'Aset',
+  liability: 'Kewajiban',
+  equity: 'Ekuitas',
+  revenue: 'Pendapatan',
+  cogs: 'Harga pokok',
+  expense: 'Beban',
+}
+
+export const ENTRY_SOURCE_LABELS: Record<EntrySource, string> = {
+  document: 'Otomatis dari dokumen',
+  manual: 'Jurnal umum',
+  opening: 'Saldo awal',
+}
+
 export function documentPath(type: string, id: number): string | null {
   if (type === 'goods_receipt') return `/barang-masuk/${id}`
   if (type === 'production_receipt') return `/hasil-produksi/${id}`

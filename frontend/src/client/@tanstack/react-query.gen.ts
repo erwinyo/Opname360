@@ -36,6 +36,16 @@ import {
   goodsReceiptsReverseReceipt,
   goodsReceiptsUpdateReceipt,
   healthHealthCheck,
+  ledgerCreateAccount,
+  ledgerCreateManualEntry,
+  ledgerDeleteAccount,
+  ledgerListAccounts,
+  ledgerListEntries,
+  ledgerReadAccountBook,
+  ledgerReadEntry,
+  ledgerReverseEntry,
+  ledgerTrialBalance,
+  ledgerUpdateAccount,
   opnamesApproveOpname,
   opnamesCancelOpname,
   opnamesCloseCounting,
@@ -202,6 +212,36 @@ import type {
   GoodsReceiptsUpdateReceiptResponse,
   HealthHealthCheckData,
   HealthHealthCheckResponse,
+  LedgerCreateAccountData,
+  LedgerCreateAccountError,
+  LedgerCreateAccountResponse,
+  LedgerCreateManualEntryData,
+  LedgerCreateManualEntryError,
+  LedgerCreateManualEntryResponse,
+  LedgerDeleteAccountData,
+  LedgerDeleteAccountError,
+  LedgerDeleteAccountResponse,
+  LedgerListAccountsData,
+  LedgerListAccountsError,
+  LedgerListAccountsResponse,
+  LedgerListEntriesData,
+  LedgerListEntriesError,
+  LedgerListEntriesResponse,
+  LedgerReadAccountBookData,
+  LedgerReadAccountBookError,
+  LedgerReadAccountBookResponse,
+  LedgerReadEntryData,
+  LedgerReadEntryError,
+  LedgerReadEntryResponse,
+  LedgerReverseEntryData,
+  LedgerReverseEntryError,
+  LedgerReverseEntryResponse,
+  LedgerTrialBalanceData,
+  LedgerTrialBalanceError,
+  LedgerTrialBalanceResponse,
+  LedgerUpdateAccountData,
+  LedgerUpdateAccountError,
+  LedgerUpdateAccountResponse,
   OpnamesApproveOpnameData,
   OpnamesApproveOpnameError,
   OpnamesApproveOpnameResponse,
@@ -4683,6 +4723,384 @@ export const reportsDashboardOptions = (
       return data
     },
     queryKey: reportsDashboardQueryKey(options),
+  })
+
+export const ledgerListAccountsQueryKey = (
+  options?: Options<LedgerListAccountsData>,
+) => createQueryKey('ledgerListAccounts', options)
+
+/**
+ * List Accounts
+ */
+export const ledgerListAccountsOptions = (
+  options?: Options<LedgerListAccountsData>,
+) =>
+  queryOptions<
+    LedgerListAccountsResponse,
+    LedgerListAccountsError,
+    LedgerListAccountsResponse,
+    ReturnType<typeof ledgerListAccountsQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await ledgerListAccounts({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      })
+      return data
+    },
+    queryKey: ledgerListAccountsQueryKey(options),
+  })
+
+/**
+ * Create Account
+ */
+export const ledgerCreateAccountMutation = (
+  options?: Partial<Options<LedgerCreateAccountData>>,
+): UseMutationOptions<
+  LedgerCreateAccountResponse,
+  LedgerCreateAccountError,
+  Options<LedgerCreateAccountData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    LedgerCreateAccountResponse,
+    LedgerCreateAccountError,
+    Options<LedgerCreateAccountData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await ledgerCreateAccount({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      })
+      return data
+    },
+  }
+  return mutationOptions
+}
+
+/**
+ * Delete Account
+ */
+export const ledgerDeleteAccountMutation = (
+  options?: Partial<Options<LedgerDeleteAccountData>>,
+): UseMutationOptions<
+  LedgerDeleteAccountResponse,
+  LedgerDeleteAccountError,
+  Options<LedgerDeleteAccountData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    LedgerDeleteAccountResponse,
+    LedgerDeleteAccountError,
+    Options<LedgerDeleteAccountData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await ledgerDeleteAccount({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      })
+      return data
+    },
+  }
+  return mutationOptions
+}
+
+/**
+ * Update Account
+ */
+export const ledgerUpdateAccountMutation = (
+  options?: Partial<Options<LedgerUpdateAccountData>>,
+): UseMutationOptions<
+  LedgerUpdateAccountResponse,
+  LedgerUpdateAccountError,
+  Options<LedgerUpdateAccountData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    LedgerUpdateAccountResponse,
+    LedgerUpdateAccountError,
+    Options<LedgerUpdateAccountData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await ledgerUpdateAccount({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      })
+      return data
+    },
+  }
+  return mutationOptions
+}
+
+export const ledgerReadAccountBookQueryKey = (
+  options: Options<LedgerReadAccountBookData>,
+) => createQueryKey('ledgerReadAccountBook', options)
+
+/**
+ * Read Account Book
+ */
+export const ledgerReadAccountBookOptions = (
+  options: Options<LedgerReadAccountBookData>,
+) =>
+  queryOptions<
+    LedgerReadAccountBookResponse,
+    LedgerReadAccountBookError,
+    LedgerReadAccountBookResponse,
+    ReturnType<typeof ledgerReadAccountBookQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await ledgerReadAccountBook({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      })
+      return data
+    },
+    queryKey: ledgerReadAccountBookQueryKey(options),
+  })
+
+export const ledgerReadAccountBookInfiniteQueryKey = (
+  options: Options<LedgerReadAccountBookData>,
+): QueryKey<Options<LedgerReadAccountBookData>> =>
+  createQueryKey('ledgerReadAccountBook', options, true)
+
+/**
+ * Read Account Book
+ */
+export const ledgerReadAccountBookInfiniteOptions = (
+  options: Options<LedgerReadAccountBookData>,
+) => {
+  const opts = infiniteQueryOptions<
+    LedgerReadAccountBookResponse,
+    LedgerReadAccountBookError,
+    InfiniteData<LedgerReadAccountBookResponse>,
+    QueryKey<Options<LedgerReadAccountBookData>>,
+    | string
+    | Pick<
+        QueryKey<Options<LedgerReadAccountBookData>>[0],
+        'body' | 'headers' | 'path' | 'query'
+      >
+  >(
+    // @ts-ignore
+    {
+      queryFn: async ({ pageParam, queryKey, signal }) => {
+        // @ts-ignore
+        const page: Pick<
+          QueryKey<Options<LedgerReadAccountBookData>>[0],
+          'body' | 'headers' | 'path' | 'query'
+        > =
+          typeof pageParam === 'object'
+            ? pageParam
+            : {
+                query: {
+                  start: pageParam,
+                },
+              }
+        const params = createInfiniteParams(queryKey, page)
+        const { data } = await ledgerReadAccountBook({
+          ...options,
+          ...params,
+          signal,
+          throwOnError: true,
+        })
+        return data
+      },
+      queryKey: ledgerReadAccountBookInfiniteQueryKey(options),
+    },
+  )
+  return opts as Omit<typeof opts, 'initialData'>
+}
+
+export const ledgerListEntriesQueryKey = (
+  options?: Options<LedgerListEntriesData>,
+) => createQueryKey('ledgerListEntries', options)
+
+/**
+ * List Entries
+ */
+export const ledgerListEntriesOptions = (
+  options?: Options<LedgerListEntriesData>,
+) =>
+  queryOptions<
+    LedgerListEntriesResponse,
+    LedgerListEntriesError,
+    LedgerListEntriesResponse,
+    ReturnType<typeof ledgerListEntriesQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await ledgerListEntries({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      })
+      return data
+    },
+    queryKey: ledgerListEntriesQueryKey(options),
+  })
+
+export const ledgerListEntriesInfiniteQueryKey = (
+  options?: Options<LedgerListEntriesData>,
+): QueryKey<Options<LedgerListEntriesData>> =>
+  createQueryKey('ledgerListEntries', options, true)
+
+/**
+ * List Entries
+ */
+export const ledgerListEntriesInfiniteOptions = (
+  options?: Options<LedgerListEntriesData>,
+) => {
+  const opts = infiniteQueryOptions<
+    LedgerListEntriesResponse,
+    LedgerListEntriesError,
+    InfiniteData<LedgerListEntriesResponse>,
+    QueryKey<Options<LedgerListEntriesData>>,
+    | string
+    | null
+    | Pick<
+        QueryKey<Options<LedgerListEntriesData>>[0],
+        'body' | 'headers' | 'path' | 'query'
+      >
+  >(
+    // @ts-ignore
+    {
+      queryFn: async ({ pageParam, queryKey, signal }) => {
+        // @ts-ignore
+        const page: Pick<
+          QueryKey<Options<LedgerListEntriesData>>[0],
+          'body' | 'headers' | 'path' | 'query'
+        > =
+          typeof pageParam === 'object'
+            ? pageParam
+            : {
+                query: {
+                  start: pageParam,
+                },
+              }
+        const params = createInfiniteParams(queryKey, page)
+        const { data } = await ledgerListEntries({
+          ...options,
+          ...params,
+          signal,
+          throwOnError: true,
+        })
+        return data
+      },
+      queryKey: ledgerListEntriesInfiniteQueryKey(options),
+    },
+  )
+  return opts as Omit<typeof opts, 'initialData'>
+}
+
+/**
+ * Create Manual Entry
+ */
+export const ledgerCreateManualEntryMutation = (
+  options?: Partial<Options<LedgerCreateManualEntryData>>,
+): UseMutationOptions<
+  LedgerCreateManualEntryResponse,
+  LedgerCreateManualEntryError,
+  Options<LedgerCreateManualEntryData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    LedgerCreateManualEntryResponse,
+    LedgerCreateManualEntryError,
+    Options<LedgerCreateManualEntryData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await ledgerCreateManualEntry({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      })
+      return data
+    },
+  }
+  return mutationOptions
+}
+
+export const ledgerReadEntryQueryKey = (
+  options: Options<LedgerReadEntryData>,
+) => createQueryKey('ledgerReadEntry', options)
+
+/**
+ * Read Entry
+ */
+export const ledgerReadEntryOptions = (options: Options<LedgerReadEntryData>) =>
+  queryOptions<
+    LedgerReadEntryResponse,
+    LedgerReadEntryError,
+    LedgerReadEntryResponse,
+    ReturnType<typeof ledgerReadEntryQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await ledgerReadEntry({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      })
+      return data
+    },
+    queryKey: ledgerReadEntryQueryKey(options),
+  })
+
+/**
+ * Reverse Entry
+ */
+export const ledgerReverseEntryMutation = (
+  options?: Partial<Options<LedgerReverseEntryData>>,
+): UseMutationOptions<
+  LedgerReverseEntryResponse,
+  LedgerReverseEntryError,
+  Options<LedgerReverseEntryData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    LedgerReverseEntryResponse,
+    LedgerReverseEntryError,
+    Options<LedgerReverseEntryData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await ledgerReverseEntry({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      })
+      return data
+    },
+  }
+  return mutationOptions
+}
+
+export const ledgerTrialBalanceQueryKey = (
+  options: Options<LedgerTrialBalanceData>,
+) => createQueryKey('ledgerTrialBalance', options)
+
+/**
+ * Trial Balance
+ */
+export const ledgerTrialBalanceOptions = (
+  options: Options<LedgerTrialBalanceData>,
+) =>
+  queryOptions<
+    LedgerTrialBalanceResponse,
+    LedgerTrialBalanceError,
+    LedgerTrialBalanceResponse,
+    ReturnType<typeof ledgerTrialBalanceQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await ledgerTrialBalance({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      })
+      return data
+    },
+    queryKey: ledgerTrialBalanceQueryKey(options),
   })
 
 export const activityLogListEntriesQueryKey = (

@@ -39,6 +39,12 @@ import { HourlyPage } from '@/pages/reports/HourlyPage'
 import { SalesPage } from '@/pages/reports/SalesPage'
 import { SalesReceiptsPage } from '@/pages/reports/SalesReceiptsPage'
 import { VariancesPage } from '@/pages/reports/VariancesPage'
+import { AccountBookPage } from '@/pages/ledger/AccountBookPage'
+import { AccountsPage } from '@/pages/ledger/AccountsPage'
+import { JournalEntryPage } from '@/pages/ledger/JournalEntryPage'
+import { JournalPage } from '@/pages/ledger/JournalPage'
+import { ManualEntryPage } from '@/pages/ledger/ManualEntryPage'
+import { TrialBalancePage } from '@/pages/ledger/TrialBalancePage'
 import { PaymentMethodsPage } from '@/pages/settings/PaymentMethodsPage'
 import { ShopSettingsPage } from '@/pages/settings/ShopSettingsPage'
 import { StockCardPage } from '@/pages/stock/StockCardPage'
@@ -142,6 +148,12 @@ export function App() {
             <Route path="laporan/fast-moving" element={<FastMovingPage />} />
             <Route path="laporan/kontribusi-omzet" element={<AbcPage />} />
             <Route path="laporan/selisih-opname" element={<VariancesPage />} />
+            <Route path="akun" element={<AccountsPage />} />
+            <Route path="jurnal" element={<JournalPage />} />
+            <Route path="jurnal/baru" element={<ManualEntryPage />} />
+            <Route path="jurnal/:entryId" element={<JournalEntryPage />} />
+            <Route path="buku-besar" element={<AccountBookPage />} />
+            <Route path="neraca-saldo" element={<TrialBalancePage />} />
           </>
         )}
         {user.role === 'owner' && (

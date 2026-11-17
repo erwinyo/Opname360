@@ -33,6 +33,9 @@ import { SupplierReturnPage } from '@/pages/purchasing/SupplierReturnPage'
 import { SupplierReturnsPage } from '@/pages/purchasing/SupplierReturnsPage'
 import { SuppliersPage } from '@/pages/purchasing/SuppliersPage'
 import { DailyStockPage } from '@/pages/reports/DailyStockPage'
+import { HourlyPage } from '@/pages/reports/HourlyPage'
+import { SalesPage } from '@/pages/reports/SalesPage'
+import { SalesReceiptsPage } from '@/pages/reports/SalesReceiptsPage'
 import { PaymentMethodsPage } from '@/pages/settings/PaymentMethodsPage'
 import { ShopSettingsPage } from '@/pages/settings/ShopSettingsPage'
 import { StockCardPage } from '@/pages/stock/StockCardPage'
@@ -127,6 +130,12 @@ export function App() {
             <Route path="promo/baru" element={<PromotionFormPage />} />
             <Route path="promo/:promotionId" element={<PromotionFormPage />} />
             <Route path="laporan/stok-harian" element={<DailyStockPage />} />
+            <Route path="laporan/penjualan" element={<SalesPage />} />
+            <Route
+              path="laporan/penjualan/struk"
+              element={<SalesReceiptsPage />}
+            />
+            <Route path="laporan/laba-kotor" element={<HourlyPage />} />
           </>
         )}
         {user.role === 'owner' && (

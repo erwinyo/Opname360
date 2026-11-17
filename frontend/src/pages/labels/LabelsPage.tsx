@@ -149,7 +149,10 @@ function LabelSheet({ initial }: { initial: Item[] }) {
 
       <section className="mt-6 flex flex-wrap items-end gap-4 rounded-xl border bg-card p-4">
         <Field id="label-size" label="Ukuran label">
-          <Select value={size} onValueChange={(value) => setSize(value as Size)}>
+          <Select
+            value={size}
+            onValueChange={(value) => setSize(value as Size)}
+          >
             <SelectTrigger id="label-size" className="w-40">
               <SelectValue />
             </SelectTrigger>

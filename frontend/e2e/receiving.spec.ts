@@ -9,7 +9,7 @@ test('receive goods by scanning, in boxes, and see the stock', async ({
 }) => {
   await page.goto('/')
   await signIn(page, OWNER.username, OWNER.password)
-  await expect(page.getByRole('heading', { name: /Halo/ })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Dasbor' })).toBeVisible()
 
   await test.step('a pen sold per piece, bought per box of 12', async () => {
     const category = await page.request.post('/api/v1/categories/', {
@@ -126,8 +126,8 @@ test('receive goods by scanning, in boxes, and see the stock', async ({
     await expect(
       page.getByRole('heading', { name: 'Stok', exact: true }),
     ).toBeVisible()
-    await expect(
-      page.getByRole('row', { name: /Pulpen Biru/ }),
-    ).toContainText('24 pcs')
+    await expect(page.getByRole('row', { name: /Pulpen Biru/ })).toContainText(
+      '24 pcs',
+    )
   })
 })

@@ -44,12 +44,10 @@ async function seed(request: APIRequestContext) {
   return { skuId: product.skus[0].id as number, receipt }
 }
 
-test('return goods, cancel documents, record production', async ({
-  page,
-}) => {
+test('return goods, cancel documents, record production', async ({ page }) => {
   await page.goto('/')
   await signIn(page, OWNER.username, OWNER.password)
-  await expect(page.getByRole('heading', { name: /Halo/ })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Dasbor' })).toBeVisible()
   const { skuId, receipt } = await seed(page.request)
   let returnNumber = ''
 
@@ -112,9 +110,9 @@ test('return goods, cancel documents, record production', async ({
     await page.goto(`/stok/${skuId}`)
     await expect(page.getByText('0 pcs').first()).toBeVisible()
     await expect(page.getByRole('row', { name: /Pembatalan/ })).toHaveCount(2)
-    await expect(page.getByRole('row', { name: /Retur pembelian/ })).toHaveCount(
-      1,
-    )
+    await expect(
+      page.getByRole('row', { name: /Retur pembelian/ }),
+    ).toHaveCount(1)
     await shot(page, 'stock-card-reversals')
   })
 

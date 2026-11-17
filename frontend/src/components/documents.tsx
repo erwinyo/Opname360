@@ -24,9 +24,7 @@ export function BackLink({ to, label }: { to: string; label: string }) {
 
 export function StatusBadge({ status }: { status: DocumentStatus }) {
   if (status === 'reversed') {
-    return (
-      <Badge variant="destructive">{STATUS_LABELS.reversed}</Badge>
-    )
+    return <Badge variant="destructive">{STATUS_LABELS.reversed}</Badge>
   }
   return (
     <Badge variant={status === 'completed' ? 'secondary' : 'outline'}>

@@ -15,6 +15,7 @@ import { Link } from 'react-router'
 import type { Role, UserPublic } from '@/client'
 import { countingListSessionsOptions } from '@/client/@tanstack/react-query.gen'
 import { ROLE_LABELS } from '@/lib/auth'
+import { Dashboard } from '@/pages/reports/Dashboard'
 
 type Shortcut = {
   to: string
@@ -82,12 +83,18 @@ export function HomePage({ user }: { user: UserPublic }) {
   const toCount = counting.data?.filter((opname) => opname.can_count) ?? []
   return (
     <>
-      <h1 className="text-2xl font-semibold tracking-tight">
-        Halo, {user.full_name}
-      </h1>
-      <p className="mt-1 text-muted-foreground">
-        Anda masuk sebagai {ROLE_LABELS[user.role]}.
-      </p>
+      {user.role === 'cashier' ? (
+        <>
+          <h1 className="text-2xl font-semibold tracking-tight">
+            Halo, {user.full_name}
+          </h1>
+          <p className="mt-1 text-muted-foreground">
+            Anda masuk sebagai {ROLE_LABELS[user.role]}.
+          </p>
+        </>
+      ) : (
+        <Dashboard />
+      )}
 
       {toCount.length > 0 && (
         <div className="mt-6 grid gap-3">

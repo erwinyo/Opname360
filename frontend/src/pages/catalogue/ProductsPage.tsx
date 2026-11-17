@@ -90,8 +90,8 @@ export function ProductsPage() {
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Produk</h1>
           <p className="mt-1 text-muted-foreground">
-            Setiap ukuran atau warna yang dijual adalah satu SKU dengan
-            barcode sendiri.
+            Setiap ukuran atau warna yang dijual adalah satu SKU dengan barcode
+            sendiri.
           </p>
         </div>
         <span className="flex flex-wrap gap-2">

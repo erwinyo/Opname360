@@ -246,275 +246,289 @@ function ProductForm({ product }: { product?: ProductPublic }) {
 
   return (
     <>
-    <form onSubmit={submit} noValidate>
-      <BackLink />
-      <div className="mt-3 flex flex-wrap items-center gap-3">
-        <h1 className="text-2xl font-semibold tracking-tight">
-          {product ? product.name : 'Produk baru'}
-        </h1>
-        {product && (
-          <Button variant="outline" className="ml-auto" asChild>
-            <Link
-              to={`/label?sku=${product.skus.map((sku) => sku.id).join(',')}`}
-            >
-              <PrinterIcon />
-              Cetak label
-            </Link>
-          </Button>
-        )}
-      </div>
-
-      <section className="mt-6 grid gap-4 rounded-xl border bg-card p-4 sm:grid-cols-2">
-        <Field
-          id="product-name"
-          label="Nama produk"
-          hint="Tanpa ukuran atau warna, misalnya Kemeja Putih SD."
-          error={checked ? errors.name : undefined}
-        >
-          <Input
-            id="product-name"
-            value={name}
-            onChange={(event) => setName(event.target.value)}
-            autoFocus={!product}
-          />
-        </Field>
-        <Field
-          id="sub-category"
-          label="Sub-kategori"
-          error={checked ? errors.subCategory : undefined}
-        >
-          <Select value={subCategoryId} onValueChange={setSubCategoryId}>
-            <SelectTrigger id="sub-category" className="w-full">
-              <SelectValue placeholder="Pilih sub-kategori" />
-            </SelectTrigger>
-            <SelectContent>
-              {categories.data
-                ?.filter((category) => category.sub_categories.length > 0)
-                .map((category) => (
-                  <SelectGroup key={category.id}>
-                    <SelectLabel>{category.name}</SelectLabel>
-                    {category.sub_categories.map((sub) => (
-                      <SelectItem key={sub.id} value={String(sub.id)}>
-                        {sub.name}
-                      </SelectItem>
-                    ))}
-                  </SelectGroup>
-                ))}
-            </SelectContent>
-          </Select>
-          {noSubCategories && (
-            <p className="text-sm text-muted-foreground">
-              Belum ada sub-kategori.{' '}
-              <Link to="/kategori" className="text-primary underline">
-                Buat di menu Kategori
+      <form onSubmit={submit} noValidate>
+        <BackLink />
+        <div className="mt-3 flex flex-wrap items-center gap-3">
+          <h1 className="text-2xl font-semibold tracking-tight">
+            {product ? product.name : 'Produk baru'}
+          </h1>
+          {product && (
+            <Button variant="outline" className="ml-auto" asChild>
+              <Link
+                to={`/label?sku=${product.skus.map((sku) => sku.id).join(',')}`}
+              >
+                <PrinterIcon />
+                Cetak label
               </Link>
-              .
-            </p>
+            </Button>
           )}
-        </Field>
-      </section>
+        </div>
 
-      <h2 className="mt-8 font-semibold">SKU</h2>
-      <p className="mt-1 text-sm text-muted-foreground">
-        Satu SKU untuk tiap ukuran atau warna yang dijual. Kosongkan barcode
-        dan kode agar dibuatkan otomatis.
-      </p>
+        <section className="mt-6 grid gap-4 rounded-xl border bg-card p-4 sm:grid-cols-2">
+          <Field
+            id="product-name"
+            label="Nama produk"
+            hint="Tanpa ukuran atau warna, misalnya Kemeja Putih SD."
+            error={checked ? errors.name : undefined}
+          >
+            <Input
+              id="product-name"
+              value={name}
+              onChange={(event) => setName(event.target.value)}
+              autoFocus={!product}
+            />
+          </Field>
+          <Field
+            id="sub-category"
+            label="Sub-kategori"
+            error={checked ? errors.subCategory : undefined}
+          >
+            <Select value={subCategoryId} onValueChange={setSubCategoryId}>
+              <SelectTrigger id="sub-category" className="w-full">
+                <SelectValue placeholder="Pilih sub-kategori" />
+              </SelectTrigger>
+              <SelectContent>
+                {categories.data
+                  ?.filter((category) => category.sub_categories.length > 0)
+                  .map((category) => (
+                    <SelectGroup key={category.id}>
+                      <SelectLabel>{category.name}</SelectLabel>
+                      {category.sub_categories.map((sub) => (
+                        <SelectItem key={sub.id} value={String(sub.id)}>
+                          {sub.name}
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                  ))}
+              </SelectContent>
+            </Select>
+            {noSubCategories && (
+              <p className="text-sm text-muted-foreground">
+                Belum ada sub-kategori.{' '}
+                <Link to="/kategori" className="text-primary underline">
+                  Buat di menu Kategori
+                </Link>
+                .
+              </p>
+            )}
+          </Field>
+        </section>
 
-      <div className="mt-3 grid gap-3">
-        {rows.map((row, index) => {
-          const error = checked ? rowErrors[index] : {}
-          const label = variantLabel(row) || `SKU ${index + 1}`
-          const id = (field: string) => `sku-${row.key}-${field}`
-          return (
-            <fieldset
-              key={row.key}
-              className="rounded-xl border bg-card p-4"
-              aria-label={label}
-            >
-              <div className="grid grid-cols-2 gap-x-3 gap-y-4 md:grid-cols-4">
-                <Field id={id('size')} label="Ukuran">
-                  <Input
-                    id={id('size')}
-                    value={row.size}
-                    onChange={(e) => change(row.key, { size: e.target.value })}
-                  />
-                </Field>
-                <Field id={id('color')} label="Warna">
-                  <Input
-                    id={id('color')}
-                    value={row.color}
-                    onChange={(e) => change(row.key, { color: e.target.value })}
-                  />
-                </Field>
-                <Field id={id('price')} label="Harga jual" error={error.price}>
-                  <div className="relative">
-                    <span className="pointer-events-none absolute top-1/2 left-2.5 -translate-y-1/2 text-sm text-muted-foreground">
-                      Rp
-                    </span>
+        <h2 className="mt-8 font-semibold">SKU</h2>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Satu SKU untuk tiap ukuran atau warna yang dijual. Kosongkan barcode
+          dan kode agar dibuatkan otomatis.
+        </p>
+
+        <div className="mt-3 grid gap-3">
+          {rows.map((row, index) => {
+            const error = checked ? rowErrors[index] : {}
+            const label = variantLabel(row) || `SKU ${index + 1}`
+            const id = (field: string) => `sku-${row.key}-${field}`
+            return (
+              <fieldset
+                key={row.key}
+                className="rounded-xl border bg-card p-4"
+                aria-label={label}
+              >
+                <div className="grid grid-cols-2 gap-x-3 gap-y-4 md:grid-cols-4">
+                  <Field id={id('size')} label="Ukuran">
                     <Input
-                      id={id('price')}
-                      value={groupDigits(row.price)}
+                      id={id('size')}
+                      value={row.size}
                       onChange={(e) =>
-                        change(row.key, { price: onlyDigits(e.target.value) })
+                        change(row.key, { size: e.target.value })
                       }
-                      inputMode="numeric"
-                      className="pl-9 tabular-nums"
                     />
-                  </div>
-                </Field>
-                <Field id={id('unit')} label="Satuan" error={error.unit}>
-                  <Input
-                    id={id('unit')}
-                    value={row.unit}
-                    onChange={(e) => change(row.key, { unit: e.target.value })}
-                    list="stock-units"
-                  />
-                </Field>
-                <Field
-                  id={id('barcode')}
-                  label="Barcode"
-                  className="col-span-2 md:col-span-1"
-                >
-                  <Input
+                  </Field>
+                  <Field id={id('color')} label="Warna">
+                    <Input
+                      id={id('color')}
+                      value={row.color}
+                      onChange={(e) =>
+                        change(row.key, { color: e.target.value })
+                      }
+                    />
+                  </Field>
+                  <Field
+                    id={id('price')}
+                    label="Harga jual"
+                    error={error.price}
+                  >
+                    <div className="relative">
+                      <span className="pointer-events-none absolute top-1/2 left-2.5 -translate-y-1/2 text-sm text-muted-foreground">
+                        Rp
+                      </span>
+                      <Input
+                        id={id('price')}
+                        value={groupDigits(row.price)}
+                        onChange={(e) =>
+                          change(row.key, { price: onlyDigits(e.target.value) })
+                        }
+                        inputMode="numeric"
+                        className="pl-9 tabular-nums"
+                      />
+                    </div>
+                  </Field>
+                  <Field id={id('unit')} label="Satuan" error={error.unit}>
+                    <Input
+                      id={id('unit')}
+                      value={row.unit}
+                      onChange={(e) =>
+                        change(row.key, { unit: e.target.value })
+                      }
+                      list="stock-units"
+                    />
+                  </Field>
+                  <Field
                     id={id('barcode')}
-                    value={row.barcode}
-                    onChange={(e) =>
-                      change(row.key, { barcode: e.target.value })
-                    }
-                    placeholder="Otomatis"
-                    className="tabular-nums"
-                  />
-                </Field>
-                <Field id={id('code')} label="Kode">
-                  <Input
-                    id={id('code')}
-                    value={row.code}
-                    onChange={(e) => change(row.key, { code: e.target.value })}
-                    placeholder="Otomatis"
-                  />
-                </Field>
-                <Field id={id('pack-name')} label="Kemasan beli">
-                  <Input
-                    id={id('pack-name')}
-                    value={row.packName}
-                    onChange={(e) =>
-                      change(row.key, { packName: e.target.value })
-                    }
-                    placeholder="mis. box"
-                  />
-                </Field>
-                <Field id={id('pack-size')} label={`Isi (${row.unit || '…'})`}>
-                  <Input
+                    label="Barcode"
+                    className="col-span-2 md:col-span-1"
+                  >
+                    <Input
+                      id={id('barcode')}
+                      value={row.barcode}
+                      onChange={(e) =>
+                        change(row.key, { barcode: e.target.value })
+                      }
+                      placeholder="Otomatis"
+                      className="tabular-nums"
+                    />
+                  </Field>
+                  <Field id={id('code')} label="Kode">
+                    <Input
+                      id={id('code')}
+                      value={row.code}
+                      onChange={(e) =>
+                        change(row.key, { code: e.target.value })
+                      }
+                      placeholder="Otomatis"
+                    />
+                  </Field>
+                  <Field id={id('pack-name')} label="Kemasan beli">
+                    <Input
+                      id={id('pack-name')}
+                      value={row.packName}
+                      onChange={(e) =>
+                        change(row.key, { packName: e.target.value })
+                      }
+                      placeholder="mis. box"
+                    />
+                  </Field>
+                  <Field
                     id={id('pack-size')}
-                    value={row.packSize}
-                    onChange={(e) =>
-                      change(row.key, { packSize: e.target.value })
-                    }
-                    inputMode="decimal"
-                    placeholder="mis. 12"
-                    className="tabular-nums"
-                  />
-                </Field>
-              </div>
-              {error.pack && (
-                <p className="mt-2 text-sm text-destructive">{error.pack}</p>
-              )}
-              <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 border-t pt-3">
-                <span className="flex items-center gap-2">
-                  <Switch
-                    id={id('active')}
-                    checked={row.active}
-                    onCheckedChange={(active) => change(row.key, { active })}
-                  />
-                  <Label htmlFor={id('active')}>Dijual</Label>
-                </span>
-                <span className="ml-auto flex gap-1">
-                  {row.id !== null && (
+                    label={`Isi (${row.unit || '…'})`}
+                  >
+                    <Input
+                      id={id('pack-size')}
+                      value={row.packSize}
+                      onChange={(e) =>
+                        change(row.key, { packSize: e.target.value })
+                      }
+                      inputMode="decimal"
+                      placeholder="mis. 12"
+                      className="tabular-nums"
+                    />
+                  </Field>
+                </div>
+                {error.pack && (
+                  <p className="mt-2 text-sm text-destructive">{error.pack}</p>
+                )}
+                <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 border-t pt-3">
+                  <span className="flex items-center gap-2">
+                    <Switch
+                      id={id('active')}
+                      checked={row.active}
+                      onCheckedChange={(active) => change(row.key, { active })}
+                    />
+                    <Label htmlFor={id('active')}>Dijual</Label>
+                  </span>
+                  <span className="ml-auto flex gap-1">
+                    {row.id !== null && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setHistoryOf(row)}
+                      >
+                        <HistoryIcon />
+                        Riwayat harga
+                      </Button>
+                    )}
                     <Button
                       type="button"
                       variant="ghost"
                       size="sm"
-                      onClick={() => setHistoryOf(row)}
+                      onClick={() => duplicate(row)}
                     >
-                      <HistoryIcon />
-                      Riwayat harga
+                      <CopyIcon />
+                      Duplikat
                     </Button>
-                  )}
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => duplicate(row)}
-                  >
-                    <CopyIcon />
-                    Duplikat
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    disabled={rows.length === 1}
-                    onClick={() => remove(row.key)}
-                    aria-label={`Hapus ${label}`}
-                  >
-                    <Trash2Icon />
-                    Hapus
-                  </Button>
-                </span>
-              </div>
-            </fieldset>
-          )
-        })}
-      </div>
-      <datalist id="stock-units">
-        {['pcs', 'set', 'pasang', 'lusin', 'pak', 'box', 'rim', 'meter'].map(
-          (unit) => (
-            <option key={unit} value={unit} />
-          ),
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      disabled={rows.length === 1}
+                      onClick={() => remove(row.key)}
+                      aria-label={`Hapus ${label}`}
+                    >
+                      <Trash2Icon />
+                      Hapus
+                    </Button>
+                  </span>
+                </div>
+              </fieldset>
+            )
+          })}
+        </div>
+        <datalist id="stock-units">
+          {['pcs', 'set', 'pasang', 'lusin', 'pak', 'box', 'rim', 'meter'].map(
+            (unit) => (
+              <option key={unit} value={unit} />
+            ),
+          )}
+        </datalist>
+
+        <Button
+          type="button"
+          variant="outline"
+          className="mt-3"
+          onClick={() => setRows((current) => [...current, blankRow()])}
+        >
+          <PlusIcon />
+          Tambah SKU
+        </Button>
+
+        {saveError != null && (
+          <p role="alert" className="mt-6 text-sm text-destructive">
+            {errorMessage(saveError)}
+          </p>
         )}
-      </datalist>
+        {checked && invalid && (
+          <p role="alert" className="mt-6 text-sm text-destructive">
+            Masih ada isian yang perlu diperbaiki.
+          </p>
+        )}
 
-      <Button
-        type="button"
-        variant="outline"
-        className="mt-3"
-        onClick={() => setRows((current) => [...current, blankRow()])}
-      >
-        <PlusIcon />
-        Tambah SKU
-      </Button>
-
-      {saveError != null && (
-        <p role="alert" className="mt-6 text-sm text-destructive">
-          {errorMessage(saveError)}
-        </p>
-      )}
-      {checked && invalid && (
-        <p role="alert" className="mt-6 text-sm text-destructive">
-          Masih ada isian yang perlu diperbaiki.
-        </p>
-      )}
-
-      <div className="mt-6 flex flex-wrap gap-2 border-t pt-4">
-        <Button type="submit" disabled={saving}>
-          {saving ? 'Menyimpan…' : 'Simpan produk'}
-        </Button>
-        <Button type="button" variant="outline" asChild>
-          <Link to="/produk">Batal</Link>
-        </Button>
-        {product && (
-          <Button
-            type="button"
-            variant="ghost"
-            className="ml-auto text-destructive hover:text-destructive"
-            onClick={() => setDeleting(true)}
-          >
-            Hapus produk
+        <div className="mt-6 flex flex-wrap gap-2 border-t pt-4">
+          <Button type="submit" disabled={saving}>
+            {saving ? 'Menyimpan…' : 'Simpan produk'}
           </Button>
-        )}
-      </div>
-
-    </form>
+          <Button type="button" variant="outline" asChild>
+            <Link to="/produk">Batal</Link>
+          </Button>
+          {product && (
+            <Button
+              type="button"
+              variant="ghost"
+              className="ml-auto text-destructive hover:text-destructive"
+              onClick={() => setDeleting(true)}
+            >
+              Hapus produk
+            </Button>
+          )}
+        </div>
+      </form>
 
       {/* Outside the form: a dialog's own submit would bubble into it. */}
       {historyOf?.id != null && (

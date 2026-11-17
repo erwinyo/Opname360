@@ -363,7 +363,11 @@ function ProductionForm({ receipt }: { receipt?: ProductionReceiptPublic }) {
           >
             Selesaikan
           </Button>
-          <Button type="submit" variant="outline" disabled={saveDraft.isPending}>
+          <Button
+            type="submit"
+            variant="outline"
+            disabled={saveDraft.isPending}
+          >
             {saveDraft.isPending ? 'Menyimpan…' : 'Simpan draf'}
           </Button>
           <Button type="button" variant="ghost" asChild>
@@ -518,7 +522,10 @@ function ProductionView({ receipt }: { receipt: ProductionReceiptPublic }) {
           pending={reverse.isPending}
           error={reverse.error}
           onReverse={(reason) =>
-            reverse.mutate({ path: { receipt_id: receipt.id }, body: { reason } })
+            reverse.mutate({
+              path: { receipt_id: receipt.id },
+              body: { reason },
+            })
           }
           onClose={() => setReversing(false)}
         />

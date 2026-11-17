@@ -67,7 +67,9 @@ export function ProductionReceiptsPage() {
       )}
       {receipts.data && total === 0 && (
         <p className="mt-4 rounded-xl border border-dashed p-6 text-muted-foreground">
-          {status ? 'Tidak ada dokumen dengan status ini.' : 'Belum ada hasil produksi.'}
+          {status
+            ? 'Tidak ada dokumen dengan status ini.'
+            : 'Belum ada hasil produksi.'}
         </p>
       )}
       {total > 0 && (

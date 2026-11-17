@@ -121,8 +121,7 @@ export function ImportPage() {
       {result && result.problems.length > 0 && (
         <section className="mt-6">
           <h2 className="font-semibold text-destructive">
-            {result.problems.length} masalah ditemukan. Tidak ada yang
-            diimpor.
+            {result.problems.length} masalah ditemukan. Tidak ada yang diimpor.
           </h2>
           <p className="mt-1 text-sm text-muted-foreground">
             Perbaiki di Excel, simpan, lalu pilih file itu lagi.

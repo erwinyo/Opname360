@@ -11,7 +11,15 @@ from openpyxl.styles import Font
 from openpyxl.utils import get_column_letter
 
 from opname360.core.formatting import sku_label
-from opname360.models import DailyStock, StockFlow
+from opname360.models import (
+    DailyStock,
+    HourlySales,
+    SalesFigures,
+    SalesGroupBy,
+    SalesReport,
+    SalesRow,
+    StockFlow,
+)
 
 
 MONTHS = (
@@ -140,5 +148,70 @@ def daily_stock(report: DailyStock) -> bytes:
             Column('Akhir', 10),
             Column('Nilai akhir', 16, MONEY),
         ],
+        rows,
+    )
+
+
+GROUP_TITLES = {
+    SalesGroupBy.day: 'Tanggal',
+    SalesGroupBy.cashier: 'Kasir',
+    SalesGroupBy.payment_method: 'Metode pembayaran',
+    SalesGroupBy.category: 'Kategori',
+}
+FIGURE_COLUMNS = [
+    Column('Struk', 8),
+    Column('Penjualan kotor', 16, MONEY),
+    Column('Diskon', 14, MONEY),
+    Column('Retur', 14, MONEY),
+    Column('Penjualan bersih', 16, MONEY),
+    Column('HPP', 16, MONEY),
+    Column('Laba kotor', 16, MONEY),
+]
+
+
+def _figures(figures: SalesFigures) -> list[object]:
+    def cell(value: Decimal | int | None) -> object:
+        return '' if value is None else rupiah(value)
+
+    return [
+        figures.receipt_count,
+        cell(figures.gross_sales),
+        cell(figures.discounts),
+        cell(figures.refunds),
+        cell(figures.net_sales),
+        cell(figures.cogs),
+        cell(figures.gross_profit),
+    ]
+
+
+def sales(report: SalesReport) -> bytes:
+    def label(row: SalesRow) -> str:
+        if report.group_by == SalesGroupBy.day:
+            return long_date(date.fromisoformat(row.key))
+        return row.label
+
+    rows: list[Row] = [
+        ([label(row), *_figures(row)], False) for row in report.rows
+    ]
+    rows.append((['Total', *_figures(report.total)], True))
+    return workbook(
+        'Penjualan',
+        f'{long_date(report.start)} s.d. {long_date(report.end)}',
+        [Column(GROUP_TITLES[report.group_by], 24), *FIGURE_COLUMNS],
+        rows,
+    )
+
+
+def hourly(report: HourlySales, hours: list[int]) -> bytes:
+    by_hour = {figures.hour: figures for figures in report.hours}
+    rows: list[Row] = [
+        ([f'{hour:02d}.00-{hour + 1:02d}.00', *_figures(by_hour[hour])], False)
+        for hour in hours
+    ]
+    rows.append((['Total', *_figures(report)], True))
+    return workbook(
+        'Laba Kotor per Jam',
+        long_date(report.day),
+        [Column('Jam', 14), *FIGURE_COLUMNS],
         rows,
     )

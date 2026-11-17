@@ -1,4 +1,5 @@
 from collections.abc import Iterator
+from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from itertools import count
 
@@ -284,3 +285,74 @@ def sell(
         RECEIPTS,
         json={'lines': lines, 'payments': payments, 'expected_total': total},
     )
+
+
+def give_back(
+    client: TestClient,
+    receipt: dict,
+    returns: list[tuple[int, float, str]],
+    *,
+    new: tuple[tuple[Sku, float], ...] = (),
+    payments: list[dict] | None = None,
+    refund_method_id: int | None = None,
+):
+    """Bring back (line index, quantity, condition) from `receipt`, and
+    take `new` instead."""
+    body = {
+        'original_receipt_id': receipt['id'],
+        'returns': [
+            {
+                'original_line_id': receipt['lines'][index]['id'],
+                'quantity': quantity,
+                'condition': condition,
+            }
+            for index, quantity, condition in returns
+        ],
+        'lines': cart(*new),
+    }
+    quoted = client.post(f'{RECEIPTS}quote', json=body)
+    if quoted.status_code != 200:
+        return quoted
+    total = quoted.json()['total']
+    if payments is None and total > 0:
+        payments = [{'payment_method_id': method_id(client), 'amount': total}]
+    return client.post(
+        RECEIPTS,
+        json={
+            **body,
+            'payments': payments or [],
+            'refund_method_id': refund_method_id,
+            'expected_total': total,
+        },
+    )
+
+
+PROMOTIONS = '/api/v1/promotions/'
+NOW = datetime.now(UTC)
+
+
+def promote(
+    client: TestClient,
+    target_kind: str,
+    target_ids: list[int | None],
+    *,
+    value: int,
+    discount_kind: str = 'percentage',
+    starts: timedelta = timedelta(hours=-1),
+    ends: timedelta = timedelta(days=1),
+    name: str = 'Promo',
+) -> dict:
+    response = client.post(
+        PROMOTIONS,
+        json={
+            'name': name,
+            'discount_kind': discount_kind,
+            'value': value,
+            'target_kind': target_kind,
+            'target_ids': target_ids,
+            'starts_at': (NOW + starts).isoformat(),
+            'ends_at': (NOW + ends).isoformat(),
+        },
+    )
+    assert response.status_code == 201, response.text
+    return response.json()

@@ -1,6 +1,6 @@
 """Slice 3, rules 7 and 18: Promotions."""
 
-from datetime import UTC, datetime, timedelta
+from datetime import timedelta
 
 import pytest
 
@@ -8,49 +8,21 @@ from fastapi.testclient import TestClient
 from sqlmodel import Session
 
 from .conftest import (
+    NOW,
+    PROMOTIONS,
     RECEIPTS,
     cart,
     make_user,
     new_category,
     new_product,
     open_shift,
+    promote,
     sell,
     sku_row,
     switch_to,
 )
 
 from opname360.models import Role, Sku, User
-
-
-PROMOTIONS = '/api/v1/promotions/'
-NOW = datetime.now(UTC)
-
-
-def promote(
-    client: TestClient,
-    target_kind: str,
-    target_ids: list[int | None],
-    *,
-    value: int,
-    discount_kind: str = 'percentage',
-    starts: timedelta = timedelta(hours=-1),
-    ends: timedelta = timedelta(days=1),
-    name: str = 'Promo',
-) -> dict:
-    response = client.post(
-        PROMOTIONS,
-        json={
-            'name': name,
-            'discount_kind': discount_kind,
-            'value': value,
-            'target_kind': target_kind,
-            'target_ids': target_ids,
-            'starts_at': (NOW + starts).isoformat(),
-            'ends_at': (NOW + ends).isoformat(),
-        },
-    )
-    assert response.status_code == 201, response.text
-    return response.json()
 
 
 @pytest.fixture

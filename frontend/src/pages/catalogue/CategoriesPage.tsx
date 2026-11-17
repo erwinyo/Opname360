@@ -4,11 +4,7 @@ import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { toast } from 'sonner'
 
-import type {
-  CategoryPublic,
-  CostingMethod,
-  SubCategoryPublic,
-} from '@/client'
+import type { CategoryPublic, CostingMethod, SubCategoryPublic } from '@/client'
 import {
   categoriesCreateCategoryMutation,
   categoriesCreateSubCategoryMutation,
@@ -43,8 +39,7 @@ const METHOD_LABELS: Record<CostingMethod, string> = {
   fifo: 'FIFO',
 }
 const METHOD_HINTS: Record<CostingMethod, string> = {
-  moving_average:
-    'HPP dihitung dari rata-rata harga beli semua stok yang ada.',
+  moving_average: 'HPP dihitung dari rata-rata harga beli semua stok yang ada.',
   fifo: 'Barang yang masuk lebih dulu dianggap terjual lebih dulu.',
 }
 
@@ -89,8 +84,8 @@ export function CategoriesPage() {
       )}
       {categories.data?.length === 0 && (
         <p className="mt-6 rounded-xl border border-dashed p-6 text-muted-foreground">
-          Belum ada kategori. Mulai dengan kategori utama toko, misalnya
-          Seragam atau ATK, lalu isi sub-kategorinya.
+          Belum ada kategori. Mulai dengan kategori utama toko, misalnya Seragam
+          atau ATK, lalu isi sub-kategorinya.
         </p>
       )}
 
@@ -274,11 +269,7 @@ function CategoryDialog({
           autoFocus
         />
       </Field>
-      <Field
-        id="costing-method"
-        label="Metode HPP"
-        hint={METHOD_HINTS[method]}
-      >
+      <Field id="costing-method" label="Metode HPP" hint={METHOD_HINTS[method]}>
         <Select
           value={method}
           onValueChange={(value) => setMethod(value as CostingMethod)}

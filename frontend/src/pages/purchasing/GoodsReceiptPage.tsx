@@ -285,8 +285,7 @@ function ReceiptForm({ receipt }: { receipt?: GoodsReceiptPublic }) {
     )
 
   const activeSuppliers = suppliers.data?.filter(
-    (supplier) =>
-      supplier.is_active || String(supplier.id) === supplierId,
+    (supplier) => supplier.is_active || String(supplier.id) === supplierId,
   )
   const failure = saveDraft.error ?? complete.error
 
@@ -361,7 +360,11 @@ function ReceiptForm({ receipt }: { receipt?: GoodsReceiptPublic }) {
               onChange={(event) => setInvoice(event.target.value)}
             />
           </Field>
-          <Field id="note" label="Catatan" className="sm:col-span-2 lg:col-span-3">
+          <Field
+            id="note"
+            label="Catatan"
+            className="sm:col-span-2 lg:col-span-3"
+          >
             <Input
               id="note"
               value={note}
@@ -498,7 +501,11 @@ function ReceiptForm({ receipt }: { receipt?: GoodsReceiptPublic }) {
           >
             Selesaikan
           </Button>
-          <Button type="submit" variant="outline" disabled={saveDraft.isPending}>
+          <Button
+            type="submit"
+            variant="outline"
+            disabled={saveDraft.isPending}
+          >
             {saveDraft.isPending ? 'Menyimpan…' : 'Simpan draf'}
           </Button>
           <Button type="button" variant="ghost" asChild>

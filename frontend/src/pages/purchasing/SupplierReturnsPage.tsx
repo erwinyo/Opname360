@@ -66,7 +66,9 @@ export function SupplierReturnsPage() {
       )}
       {returns.data && total === 0 && (
         <p className="mt-4 rounded-xl border border-dashed p-6 text-muted-foreground">
-          {status ? 'Tidak ada retur dengan status ini.' : 'Belum ada retur pembelian.'}
+          {status
+            ? 'Tidak ada retur dengan status ini.'
+            : 'Belum ada retur pembelian.'}
         </p>
       )}
       {total > 0 && (

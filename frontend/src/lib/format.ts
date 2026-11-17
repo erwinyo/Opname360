@@ -80,3 +80,17 @@ export function toLocalInput(iso: string | Date): string {
   const pad = (n: number) => String(n).padStart(2, '0')
   return `${at.getFullYear()}-${pad(at.getMonth() + 1)}-${pad(at.getDate())}T${pad(at.getHours())}:${pad(at.getMinutes())}`
 }
+
+const longDate = new Intl.DateTimeFormat('id-ID', { dateStyle: 'full' })
+
+/** "2026-11-17" -> "Selasa, 17 November 2026" */
+export function formatLongDate(isoDate: string): string {
+  return longDate.format(new Date(`${isoDate}T00:00:00`))
+}
+
+const clock = new Intl.DateTimeFormat('id-ID', { timeStyle: 'short' })
+
+/** A moment as "16.58" in the browser's time. */
+export function formatTime(at: number | string | Date): string {
+  return clock.format(new Date(at))
+}

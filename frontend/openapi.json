@@ -6516,6 +6516,526 @@
         }
       }
     },
+    "/api/v1/reports/sales": {
+      "get": {
+        "tags": [
+          "reports"
+        ],
+        "summary": "Sales",
+        "operationId": "reports-sales",
+        "parameters": [
+          {
+            "name": "start",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "title": "Start"
+            }
+          },
+          {
+            "name": "end",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "title": "End"
+            }
+          },
+          {
+            "name": "group_by",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/SalesGroupBy",
+              "default": "day"
+            }
+          },
+          {
+            "name": "opname360_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Opname360 Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SalesReport"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/reports/sales/excel": {
+      "get": {
+        "tags": [
+          "reports"
+        ],
+        "summary": "Sales Excel",
+        "operationId": "reports-sales_excel",
+        "parameters": [
+          {
+            "name": "start",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "title": "Start"
+            }
+          },
+          {
+            "name": "end",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "title": "End"
+            }
+          },
+          {
+            "name": "group_by",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/SalesGroupBy",
+              "default": "day"
+            }
+          },
+          {
+            "name": "opname360_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Opname360 Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {}
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/reports/sales/receipts": {
+      "get": {
+        "tags": [
+          "reports"
+        ],
+        "summary": "Sales Receipts",
+        "operationId": "reports-sales_receipts",
+        "parameters": [
+          {
+            "name": "start",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "title": "Start"
+            }
+          },
+          {
+            "name": "end",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "title": "End"
+            }
+          },
+          {
+            "name": "cashier_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Cashier Id"
+            }
+          },
+          {
+            "name": "payment_method_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Payment Method Id"
+            }
+          },
+          {
+            "name": "category_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Category Id"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "title": "Offset"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "opname360_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Opname360 Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SalesReceiptPage"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/reports/hourly": {
+      "get": {
+        "tags": [
+          "reports"
+        ],
+        "summary": "Hourly",
+        "operationId": "reports-hourly",
+        "parameters": [
+          {
+            "name": "day",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "title": "Day"
+            }
+          },
+          {
+            "name": "opname360_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Opname360 Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HourlySales"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/reports/hourly/excel": {
+      "get": {
+        "tags": [
+          "reports"
+        ],
+        "summary": "Hourly Excel",
+        "operationId": "reports-hourly_excel",
+        "parameters": [
+          {
+            "name": "day",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "title": "Day"
+            }
+          },
+          {
+            "name": "opname360_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Opname360 Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {}
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/reports/dashboard": {
+      "get": {
+        "tags": [
+          "reports"
+        ],
+        "summary": "Dashboard",
+        "operationId": "reports-dashboard",
+        "parameters": [
+          {
+            "name": "opname360_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Opname360 Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Dashboard"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/reports/live": {
+      "get": {
+        "tags": [
+          "reports"
+        ],
+        "summary": "Live",
+        "description": "Says `changed` whenever something new is recorded, so an open\ndashboard reloads within seconds (rule 8). Only a number goes out: the\nfigures themselves are fetched, and checked, as usual.",
+        "operationId": "reports-live",
+        "parameters": [
+          {
+            "name": "opname360_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Opname360 Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "text/event-stream": {
+                "itemSchema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "string"
+                    },
+                    "event": {
+                      "type": "string"
+                    },
+                    "id": {
+                      "type": "string"
+                    },
+                    "retry": {
+                      "type": "integer",
+                      "minimum": 0
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/activity-log/": {
       "get": {
         "tags": [
@@ -7309,6 +7829,18 @@
         ],
         "title": "DailyStockSubCategory"
       },
+      "Dashboard": {
+        "properties": {
+          "today": {
+            "$ref": "#/components/schemas/HourlySales"
+          }
+        },
+        "type": "object",
+        "required": [
+          "today"
+        ],
+        "title": "Dashboard"
+      },
       "DiscountKind": {
         "type": "string",
         "enum": [
@@ -7948,6 +8480,182 @@
         },
         "type": "object",
         "title": "HTTPValidationError"
+      },
+      "HourFigures": {
+        "properties": {
+          "receipt_count": {
+            "type": "integer",
+            "title": "Receipt Count"
+          },
+          "gross_sales": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Gross Sales"
+          },
+          "discounts": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Discounts"
+          },
+          "refunds": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Refunds"
+          },
+          "net_sales": {
+            "type": "integer",
+            "title": "Net Sales"
+          },
+          "cogs": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cogs"
+          },
+          "gross_profit": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Gross Profit"
+          },
+          "hour": {
+            "type": "integer",
+            "title": "Hour"
+          }
+        },
+        "type": "object",
+        "required": [
+          "receipt_count",
+          "gross_sales",
+          "discounts",
+          "refunds",
+          "net_sales",
+          "cogs",
+          "gross_profit",
+          "hour"
+        ],
+        "title": "HourFigures"
+      },
+      "HourlySales": {
+        "properties": {
+          "receipt_count": {
+            "type": "integer",
+            "title": "Receipt Count"
+          },
+          "gross_sales": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Gross Sales"
+          },
+          "discounts": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Discounts"
+          },
+          "refunds": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Refunds"
+          },
+          "net_sales": {
+            "type": "integer",
+            "title": "Net Sales"
+          },
+          "cogs": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cogs"
+          },
+          "gross_profit": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Gross Profit"
+          },
+          "day": {
+            "type": "string",
+            "format": "date",
+            "title": "Day"
+          },
+          "hours": {
+            "items": {
+              "$ref": "#/components/schemas/HourFigures"
+            },
+            "type": "array",
+            "title": "Hours"
+          }
+        },
+        "type": "object",
+        "required": [
+          "receipt_count",
+          "gross_sales",
+          "discounts",
+          "refunds",
+          "net_sales",
+          "cogs",
+          "gross_profit",
+          "day",
+          "hours"
+        ],
+        "title": "HourlySales",
+        "description": "One Shop Day: its 24 hours add up to its totals (rule 4)."
       },
       "ImportPreview": {
         "properties": {
@@ -10458,6 +11166,278 @@
           "cashier"
         ],
         "title": "Role"
+      },
+      "SalesFigures": {
+        "properties": {
+          "receipt_count": {
+            "type": "integer",
+            "title": "Receipt Count"
+          },
+          "gross_sales": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Gross Sales"
+          },
+          "discounts": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Discounts"
+          },
+          "refunds": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Refunds"
+          },
+          "net_sales": {
+            "type": "integer",
+            "title": "Net Sales"
+          },
+          "cogs": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cogs"
+          },
+          "gross_profit": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Gross Profit"
+          }
+        },
+        "type": "object",
+        "required": [
+          "receipt_count",
+          "gross_sales",
+          "discounts",
+          "refunds",
+          "net_sales",
+          "cogs",
+          "gross_profit"
+        ],
+        "title": "SalesFigures",
+        "description": "Net Sales and Gross Profit over a stretch of time (rules 1-3).\n\nA figure that doesn't apply to a grouping is None: a Payment Method has\nno discounts, and COGS belongs to goods, not to a Cashier or a method."
+      },
+      "SalesGroupBy": {
+        "type": "string",
+        "enum": [
+          "day",
+          "cashier",
+          "payment_method",
+          "category"
+        ],
+        "title": "SalesGroupBy"
+      },
+      "SalesReceipt": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "number": {
+            "type": "string",
+            "title": "Number"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/ReceiptKind"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "cashier_name": {
+            "type": "string",
+            "title": "Cashier Name"
+          },
+          "amount": {
+            "type": "integer",
+            "title": "Amount"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "number",
+          "kind",
+          "created_at",
+          "cashier_name",
+          "amount"
+        ],
+        "title": "SalesReceipt"
+      },
+      "SalesReceiptPage": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/SalesReceipt"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "total"
+        ],
+        "title": "SalesReceiptPage"
+      },
+      "SalesReport": {
+        "properties": {
+          "start": {
+            "type": "string",
+            "format": "date",
+            "title": "Start"
+          },
+          "end": {
+            "type": "string",
+            "format": "date",
+            "title": "End"
+          },
+          "group_by": {
+            "$ref": "#/components/schemas/SalesGroupBy"
+          },
+          "rows": {
+            "items": {
+              "$ref": "#/components/schemas/SalesRow"
+            },
+            "type": "array",
+            "title": "Rows"
+          },
+          "total": {
+            "$ref": "#/components/schemas/SalesFigures"
+          }
+        },
+        "type": "object",
+        "required": [
+          "start",
+          "end",
+          "group_by",
+          "rows",
+          "total"
+        ],
+        "title": "SalesReport"
+      },
+      "SalesRow": {
+        "properties": {
+          "receipt_count": {
+            "type": "integer",
+            "title": "Receipt Count"
+          },
+          "gross_sales": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Gross Sales"
+          },
+          "discounts": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Discounts"
+          },
+          "refunds": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Refunds"
+          },
+          "net_sales": {
+            "type": "integer",
+            "title": "Net Sales"
+          },
+          "cogs": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cogs"
+          },
+          "gross_profit": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Gross Profit"
+          },
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          }
+        },
+        "type": "object",
+        "required": [
+          "receipt_count",
+          "gross_sales",
+          "discounts",
+          "refunds",
+          "net_sales",
+          "cogs",
+          "gross_profit",
+          "key",
+          "label"
+        ],
+        "title": "SalesRow"
       },
       "ShiftClose": {
         "properties": {

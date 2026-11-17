@@ -61,7 +61,7 @@ test('pos: open a shift, sell, close', async ({ browser }) => {
   const owner = await (await browser.newContext()).newPage()
   await owner.goto('/')
   await signIn(owner, OWNER.username, OWNER.password)
-  await expect(owner.getByRole('heading', { name: /^Halo/ })).toBeVisible()
+  await expect(owner.getByRole('heading', { name: 'Dasbor' })).toBeVisible()
   const [small, medium] = await setUp(owner)
   let sale = ''
 

@@ -33,7 +33,8 @@ import { errorMessage, queryClient } from '@/lib/api'
 const refresh = () =>
   queryClient.invalidateQueries({ queryKey: suppliersListSuppliersQueryKey() })
 
-type OpenDialog = { kind: 'create' } | { kind: 'edit'; supplier: SupplierPublic } | null
+type OpenDialog =
+  { kind: 'create' } | { kind: 'edit'; supplier: SupplierPublic } | null
 
 export function SuppliersPage() {
   const suppliers = useQuery(suppliersListSuppliersOptions())
@@ -100,7 +101,9 @@ export function SuppliersPage() {
                     {supplier.address ?? '–'}
                   </TableCell>
                   <TableCell>
-                    <Badge variant={supplier.is_active ? 'secondary' : 'outline'}>
+                    <Badge
+                      variant={supplier.is_active ? 'secondary' : 'outline'}
+                    >
                       {supplier.is_active ? 'Aktif' : 'Nonaktif'}
                     </Badge>
                   </TableCell>
@@ -177,8 +180,14 @@ export function SupplierDialog({
     onSaved?.(saved)
     onClose()
   }
-  const create = useMutation({ ...suppliersCreateSupplierMutation(), onSuccess })
-  const update = useMutation({ ...suppliersUpdateSupplierMutation(), onSuccess })
+  const create = useMutation({
+    ...suppliersCreateSupplierMutation(),
+    onSuccess,
+  })
+  const update = useMutation({
+    ...suppliersUpdateSupplierMutation(),
+    onSuccess,
+  })
   const submit = () => {
     setChecked(true)
     if (nameError) return

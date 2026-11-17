@@ -54,13 +54,9 @@ test('the Owner manages staff accounts', async ({ page, browser }) => {
   await test.step("an Admin can't open the Owner's screen", async () => {
     await staff.goto('/')
     await signIn(staff, 'sari', 'kata-sandi-1')
-    await expect(
-      staff.getByRole('heading', { name: 'Halo, Sari Dewi' }),
-    ).toBeVisible()
+    await expect(staff.getByRole('heading', { name: 'Dasbor' })).toBeVisible()
     await staff.goto('/pengguna')
-    await expect(
-      staff.getByRole('heading', { name: 'Halo, Sari Dewi' }),
-    ).toBeVisible()
+    await expect(staff.getByRole('heading', { name: 'Dasbor' })).toBeVisible()
     await expect(staff).toHaveURL(/\/$/)
   })
 

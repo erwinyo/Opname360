@@ -130,10 +130,7 @@ export function StockCardPage() {
                       </TableCell>
                       <TableCell>
                         {path ? (
-                          <Link
-                            to={path}
-                            className="font-medium tabular-nums"
-                          >
+                          <Link to={path} className="font-medium tabular-nums">
                             {entry.document_number}
                           </Link>
                         ) : (

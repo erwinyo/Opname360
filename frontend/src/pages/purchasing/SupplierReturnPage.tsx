@@ -175,11 +175,12 @@ function ReturnForm({
     const left = Number(line.quantity) - Number(line.returned_quantity)
     const text = amounts[line.id] ?? ''
     const amount = text.trim() === '' ? 0 : parseQuantity(text)
-    const error = Number.isNaN(amount) || amount < 0
-      ? 'Isi angka.'
-      : amount > left
-        ? `Paling banyak ${quantity(left)} ${line.stock_unit}.`
-        : undefined
+    const error =
+      Number.isNaN(amount) || amount < 0
+        ? 'Isi angka.'
+        : amount > left
+          ? `Paling banyak ${quantity(left)} ${line.stock_unit}.`
+          : undefined
     return { line, left, text, amount, error }
   })
   const chosen = rows.filter((row) => row.amount > 0 && !row.error)
@@ -382,7 +383,11 @@ function ReturnForm({
           >
             Selesaikan
           </Button>
-          <Button type="submit" variant="outline" disabled={saveDraft.isPending}>
+          <Button
+            type="submit"
+            variant="outline"
+            disabled={saveDraft.isPending}
+          >
             {saveDraft.isPending ? 'Menyimpan…' : 'Simpan draf'}
           </Button>
           <Button type="button" variant="ghost" asChild>
@@ -438,7 +443,9 @@ function ReturnView({
     ...supplierReturnsReverseReturnMutation(),
     onSuccess: (reversed) => {
       queryClient.invalidateQueries()
-      toast.success(`Retur ${reversed.number} dibatalkan. Barang kembali ke stok.`)
+      toast.success(
+        `Retur ${reversed.number} dibatalkan. Barang kembali ke stok.`,
+      )
       setReversing(false)
     },
   })

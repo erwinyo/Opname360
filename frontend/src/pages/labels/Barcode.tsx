@@ -19,7 +19,10 @@ export function Barcode({ value }: { value: string }) {
     // Scale with CSS instead of the pixel size JsBarcode sets.
     const width = element.getAttribute('width')
     const height = element.getAttribute('height')
-    element.setAttribute('viewBox', `0 0 ${parseFloat(width ?? '0')} ${parseFloat(height ?? '0')}`)
+    element.setAttribute(
+      'viewBox',
+      `0 0 ${parseFloat(width ?? '0')} ${parseFloat(height ?? '0')}`,
+    )
     element.removeAttribute('width')
     element.removeAttribute('height')
     element.setAttribute('preserveAspectRatio', 'none')

@@ -9,9 +9,10 @@ from fastapi.testclient import TestClient
 from sqlmodel import Session, col, select
 
 from .conftest import (
+    PROMOTIONS,
     RECEIPTS,
     SHIFTS,
-    cart,
+    give_back,
     method_id,
     new_category,
     new_product,
@@ -23,49 +24,6 @@ from .conftest import (
 )
 
 from opname360.models import MovementReason, Receipt, Sku, StockMovement
-
-
-PROMOTIONS = '/api/v1/promotions/'
-
-
-def give_back(
-    client: TestClient,
-    receipt: dict,
-    returns: list[tuple[int, float, str]],
-    *,
-    new: tuple[tuple[Sku, float], ...] = (),
-    payments: list[dict] | None = None,
-    refund_method_id: int | None = None,
-):
-    """Bring back (line index, quantity, condition) from `receipt`, and
-    take `new` instead."""
-    body = {
-        'original_receipt_id': receipt['id'],
-        'returns': [
-            {
-                'original_line_id': receipt['lines'][index]['id'],
-                'quantity': quantity,
-                'condition': condition,
-            }
-            for index, quantity, condition in returns
-        ],
-        'lines': cart(*new),
-    }
-    quoted = client.post(f'{RECEIPTS}quote', json=body)
-    if quoted.status_code != 200:
-        return quoted
-    total = quoted.json()['total']
-    if payments is None and total > 0:
-        payments = [{'payment_method_id': method_id(client), 'amount': total}]
-    return client.post(
-        RECEIPTS,
-        json={
-            **body,
-            'payments': payments or [],
-            'refund_method_id': refund_method_id,
-            'expected_total': total,
-        },
-    )
 
 
 @pytest.fixture

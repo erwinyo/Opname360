@@ -2,8 +2,10 @@ import { useMutation } from '@tanstack/react-query'
 import {
   BoxesIcon,
   CalendarDaysIcon,
+  ChartColumnStackedIcon,
   ClipboardCheckIcon,
   CreditCardIcon,
+  GaugeIcon,
   HandCoinsIcon,
   HistoryIcon,
   HouseIcon,
@@ -13,6 +15,7 @@ import {
   PackagePlusIcon,
   PercentIcon,
   PrinterIcon,
+  ReceiptTextIcon,
   ScanBarcodeIcon,
   ScissorsIcon,
   ShoppingCartIcon,
@@ -51,12 +54,8 @@ const TILL: Role[] = ['owner', 'cashier']
 const NAV: NavGroup[] = [
   {
     items: [
-      {
-        to: '/',
-        label: 'Beranda',
-        icon: HouseIcon,
-        roles: ['owner', 'admin', 'cashier'],
-      },
+      { to: '/', label: 'Dasbor', icon: GaugeIcon, roles: BACK_OFFICE },
+      { to: '/', label: 'Beranda', icon: HouseIcon, roles: ['cashier'] },
       { to: '/kasir', label: 'Kasir', icon: ShoppingCartIcon, roles: TILL },
       {
         to: '/hitung',
@@ -69,6 +68,18 @@ const NAV: NavGroup[] = [
   {
     label: 'Laporan',
     items: [
+      {
+        to: '/laporan/penjualan',
+        label: 'Penjualan',
+        icon: ReceiptTextIcon,
+        roles: BACK_OFFICE,
+      },
+      {
+        to: '/laporan/laba-kotor',
+        label: 'Laba Kotor per Jam',
+        icon: ChartColumnStackedIcon,
+        roles: BACK_OFFICE,
+      },
       {
         to: '/laporan/stok-harian',
         label: 'Stok Harian',

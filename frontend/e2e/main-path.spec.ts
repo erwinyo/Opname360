@@ -30,7 +30,7 @@ test('main path: a new admin sets up a product and receives it', async ({
   await test.step('the admin signs in and builds the catalogue', async () => {
     await admin.goto('/')
     await signIn(admin, 'rina', 'sandi-rina-1')
-    await expect(admin.getByRole('heading', { name: 'Halo, Rina Admin' })).toBeVisible()
+    await expect(admin.getByRole('heading', { name: 'Dasbor' })).toBeVisible()
     // An Admin has no Pengguna menu.
     await expect(
       admin.getByRole('navigation').getByRole('link', { name: 'Pengguna' }),
@@ -80,7 +80,9 @@ test('main path: a new admin sets up a product and receives it', async ({
     await admin.getByLabel('Tambah barang').fill(barcode)
     await admin.getByLabel('Tambah barang').press('Enter')
     await admin.getByLabel('Jumlah Celana Merah SD · 10').fill('12')
-    await admin.getByLabel('Harga beli per pcs Celana Merah SD · 10').fill('40000')
+    await admin
+      .getByLabel('Harga beli per pcs Celana Merah SD · 10')
+      .fill('40000')
     await admin.getByRole('button', { name: 'Selesaikan' }).click()
     await admin
       .getByRole('dialog')

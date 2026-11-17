@@ -60,7 +60,9 @@ async function phoneOf(
   const page = await (await browser.newContext({ viewport: PHONE })).newPage()
   await page.goto('/')
   await signIn(page, username, `sandi-${username}-1`)
-  await expect(page.getByRole('heading', { name: /^Halo/ })).toBeVisible()
+  await expect(
+    page.getByRole('heading', { name: /^(Halo|Dasbor)/ }),
+  ).toBeVisible()
   return page
 }
 
@@ -73,7 +75,7 @@ test('stock opname: count blind, review, approve', async ({ browser }) => {
   const owner = await (await browser.newContext()).newPage()
   await owner.goto('/')
   await signIn(owner, OWNER.username, OWNER.password)
-  await expect(owner.getByRole('heading', { name: /^Halo/ })).toBeVisible()
+  await expect(owner.getByRole('heading', { name: 'Dasbor' })).toBeVisible()
   const [size8, size10] = await setUp(owner)
   let number = ''
 

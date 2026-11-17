@@ -62,9 +62,13 @@ test('import products from Excel, then print their labels', async ({
       page.getByRole('heading', { name: 'Kaos Olahraga' }),
     ).toBeVisible()
     await page.getByRole('link', { name: 'Cetak label', exact: true }).click()
-    await expect(page.getByRole('heading', { name: 'Cetak Label' })).toBeVisible()
+    await expect(
+      page.getByRole('heading', { name: 'Cetak Label' }),
+    ).toBeVisible()
     await page.getByLabel('Jumlah label Kaos Olahraga · M, Biru').fill('3')
-    await expect(page.getByRole('button', { name: 'Cetak 4 label' })).toBeVisible()
+    await expect(
+      page.getByRole('button', { name: 'Cetak 4 label' }),
+    ).toBeVisible()
     // On screen: the preview. In print: the same four labels.
     await expect(page.locator('#root [data-label]')).toHaveCount(4)
     await expect(page.locator('#root [data-label]').first()).toContainText(
@@ -111,9 +115,13 @@ test('import products from Excel, then print their labels', async ({
     await page.goto(`/barang-masuk/${draft.id}`)
     await expect(page.getByRole('heading', { name: /^BM-/ })).toBeVisible()
     await page.getByRole('link', { name: 'Cetak label', exact: true }).click()
-    await expect(page.getByRole('button', { name: 'Cetak 6 label' })).toBeVisible()
+    await expect(
+      page.getByRole('button', { name: 'Cetak 6 label' }),
+    ).toBeVisible()
     await openMenu(page, 'Cetak Label')
-    await expect(page.getByRole('button', { name: 'Cetak 0 label' })).toBeDisabled()
+    await expect(
+      page.getByRole('button', { name: 'Cetak 0 label' }),
+    ).toBeDisabled()
   })
 })
 

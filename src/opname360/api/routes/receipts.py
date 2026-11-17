@@ -1,0 +1,67 @@
+from typing import Annotated
+
+from fastapi import APIRouter, Depends, Path, Query, status
+
+from opname360.api.deps import SellerDep, SessionDep, get_current_user
+from opname360.models import (
+    Cart,
+    Quote,
+    Receipt,
+    ReceiptCreate,
+    ReceiptPublic,
+    TillSku,
+)
+from opname360.services import receipts
+
+
+router = APIRouter(
+    prefix='/receipts',
+    tags=['receipts'],
+    dependencies=[Depends(get_current_user)],
+)
+
+
+def get_receipt_or_404(
+    session: SessionDep, receipt_id: Annotated[int, Path(ge=1)]
+) -> Receipt:
+    return receipts.get_receipt(session, receipt_id)
+
+
+ReceiptDep = Annotated[Receipt, Depends(get_receipt_or_404)]
+
+
+@router.get('/skus')
+def find_skus(
+    session: SessionDep,
+    seller: SellerDep,
+    search: Annotated[str, Query(max_length=100)],
+) -> list[TillSku]:
+    return receipts.find_skus(session, search)
+
+
+@router.post('/quote')
+def quote(session: SessionDep, seller: SellerDep, cart: Cart) -> Quote:
+    """Today's prices and Promotions for a cart, before payment."""
+    return receipts.quote(session, cart)
+
+
+@router.post('/', status_code=status.HTTP_201_CREATED)
+def complete_receipt(
+    session: SessionDep, seller: SellerDep, receipt_in: ReceiptCreate
+) -> ReceiptPublic:
+    receipt = receipts.complete(session, receipt_in, actor=seller)
+    return receipts.receipt_public(session, receipt)
+
+
+@router.get('/{receipt_id}')
+def read_receipt(session: SessionDep, receipt: ReceiptDep) -> ReceiptPublic:
+    return receipts.receipt_public(session, receipt)
+
+
+@router.post('/{receipt_id}/print')
+def print_receipt(
+    session: SessionDep, seller: SellerDep, receipt: ReceiptDep
+) -> ReceiptPublic:
+    """Count a printout; from the second one on it says it is a copy."""
+    receipt = receipts.print_receipt(session, receipt, actor=seller)
+    return receipts.receipt_public(session, receipt)

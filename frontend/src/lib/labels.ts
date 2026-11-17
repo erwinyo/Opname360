@@ -27,6 +27,9 @@ export const REASON_LABELS: Record<MovementReason, string> = {
   cost_adjustment: 'Penyesuaian nilai',
   opname: 'Stok opname',
   opening: 'Stok awal',
+  sale: 'Penjualan',
+  customer_return: 'Retur penjualan',
+  write_off: 'Dihapus (rusak)',
 }
 
 export const OPNAME_STATUS_LABELS: Record<OpnameStatus, string> = {
@@ -62,5 +65,7 @@ export function documentPath(type: string, id: number): string | null {
   if (type === 'production_receipt') return `/hasil-produksi/${id}`
   if (type === 'supplier_return') return `/retur-pembelian/${id}`
   if (type === 'stock_opname') return `/stok-opname/${id}`
+  if (type === 'receipt') return `/struk/${id}`
+  if (type === 'shift') return `/shift/${id}`
   return null
 }

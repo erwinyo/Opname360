@@ -251,3 +251,36 @@ def close_shift(client: TestClient, shift_id: int, counted_cash: int):
     return client.post(
         f'{SHIFTS}{shift_id}/close', json={'counted_cash': counted_cash}
     )
+
+
+RECEIPTS = '/api/v1/receipts/'
+
+
+def method_id(client: TestClient, name: str = 'Tunai') -> int:
+    methods = client.get('/api/v1/payment-methods/').json()
+    return next(method['id'] for method in methods if method['name'] == name)
+
+
+def cart(*items: tuple[Sku, float]) -> list[dict]:
+    return [
+        {'sku_id': sku.id, 'quantity': quantity} for sku, quantity in items
+    ]
+
+
+def sell(
+    client: TestClient,
+    *items: tuple[Sku, float],
+    payments: list[dict] | None = None,
+):
+    """Sell `items` at today's prices, paid in exact cash unless
+    `payments` says otherwise."""
+    lines = cart(*items)
+    total = client.post(f'{RECEIPTS}quote', json={'lines': lines}).json()[
+        'total'
+    ]
+    if payments is None:
+        payments = [{'payment_method_id': method_id(client), 'amount': total}]
+    return client.post(
+        RECEIPTS,
+        json={'lines': lines, 'payments': payments, 'expected_total': total},
+    )

@@ -19,6 +19,7 @@ import { OpenOpnamePage } from '@/pages/opname/OpenOpnamePage'
 import { OpnamePage } from '@/pages/opname/OpnamePage'
 import { OpnamesPage } from '@/pages/opname/OpnamesPage'
 import { CloseShiftPage } from '@/pages/pos/CloseShiftPage'
+import { ReceiptPage } from '@/pages/pos/ReceiptPage'
 import { ShiftPage } from '@/pages/pos/ShiftPage'
 import { TillPage } from '@/pages/pos/TillPage'
 import { ProductionReceiptPage } from '@/pages/production/ProductionReceiptPage'
@@ -63,6 +64,7 @@ export function App() {
         <Route path="hitung" element={<CountingPage />} />
         <Route path="hitung/:opnameId" element={<CountPage />} />
         <Route path="shift/:shiftId" element={<ShiftPage user={user} />} />
+        <Route path="struk/:receiptId" element={<ReceiptPage user={user} />} />
         {user.role !== 'admin' && (
           <>
             <Route path="kasir" element={<TillPage />} />

@@ -1,8 +1,6 @@
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { LockIcon } from 'lucide-react'
 import { useState } from 'react'
 import type { FormEvent } from 'react'
-import { Link } from 'react-router'
 
 import type { ShiftCurrent } from '@/client'
 import {
@@ -16,6 +14,8 @@ import { Button } from '@/components/ui/button'
 import { errorMessage, queryClient } from '@/lib/api'
 import { formatDateTime } from '@/lib/format'
 
+import { SaleScreen } from './SaleScreen'
+
 /** The till: open a Shift first, then sell in it. */
 export function TillPage() {
   const current = useQuery(shiftsReadCurrentOptions())
@@ -26,27 +26,7 @@ export function TillPage() {
   const shift = current.data
   if (!shift) return <OpenShift />
   if (!shift.is_mine) return <SomeoneElsesShift shift={shift} />
-  return <ShiftBar shift={shift} />
-}
-
-export function ShiftBar({ shift }: { shift: ShiftCurrent }) {
-  return (
-    <div className="flex flex-wrap items-center justify-between gap-3">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Kasir</h1>
-        <p className="text-sm text-muted-foreground">
-          Shift {shift.number} · {shift.cashier_name} · sejak{' '}
-          {formatDateTime(shift.opened_at)}
-        </p>
-      </div>
-      <Button asChild variant="outline">
-        <Link to="/kasir/tutup">
-          <LockIcon />
-          Tutup shift
-        </Link>
-      </Button>
-    </div>
-  )
+  return <SaleScreen shift={shift} />
 }
 
 function SomeoneElsesShift({ shift }: { shift: ShiftCurrent }) {

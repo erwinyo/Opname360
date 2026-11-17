@@ -73,6 +73,30 @@ export type BodyProductsRunImport = {
 };
 
 /**
+ * Cart
+ */
+export type Cart = {
+    /**
+     * Lines
+     */
+    lines?: Array<CartLine>;
+};
+
+/**
+ * CartLine
+ */
+export type CartLine = {
+    /**
+     * Sku Id
+     */
+    sku_id: number;
+    /**
+     * Quantity
+     */
+    quantity: number | string;
+};
+
+/**
  * CategoryCreate
  */
 export type CategoryCreate = {
@@ -725,7 +749,7 @@ export type LoginRequest = {
 /**
  * MovementReason
  */
-export type MovementReason = 'goods_receipt' | 'production_receipt' | 'supplier_return' | 'reversal' | 'opname' | 'opening' | 'cost_adjustment';
+export type MovementReason = 'goods_receipt' | 'production_receipt' | 'supplier_return' | 'reversal' | 'sale' | 'customer_return' | 'write_off' | 'opname' | 'opening' | 'cost_adjustment';
 
 /**
  * MyCountEntry
@@ -1102,6 +1126,28 @@ export type PasswordReset = {
 };
 
 /**
+ * PaymentIn
+ */
+export type PaymentIn = {
+    /**
+     * Payment Method Id
+     */
+    payment_method_id: number;
+    /**
+     * Amount
+     */
+    amount: number;
+    /**
+     * Reference
+     */
+    reference?: string | null;
+    /**
+     * Confirmed
+     */
+    confirmed?: boolean;
+};
+
+/**
  * PaymentMethodCreate
  */
 export type PaymentMethodCreate = {
@@ -1153,6 +1199,32 @@ export type PaymentMethodUpdate = {
      * Is Active
      */
     is_active?: boolean | null;
+};
+
+/**
+ * PaymentPublic
+ */
+export type PaymentPublic = {
+    /**
+     * Payment Method Id
+     */
+    payment_method_id: number;
+    /**
+     * Method Name
+     */
+    method_name: string;
+    /**
+     * Is Cash
+     */
+    is_cash: boolean;
+    /**
+     * Amount
+     */
+    amount: number;
+    /**
+     * Reference
+     */
+    reference: string | null;
 };
 
 /**
@@ -1416,9 +1488,261 @@ export type ProductionReceiptSummary = {
 };
 
 /**
+ * Quote
+ */
+export type Quote = {
+    /**
+     * Lines
+     */
+    lines: Array<QuotedLine>;
+    /**
+     * Subtotal
+     */
+    subtotal: number;
+    /**
+     * Discount Total
+     */
+    discount_total: number;
+    /**
+     * Refund Total
+     */
+    refund_total: number;
+    /**
+     * Total
+     */
+    total: number;
+};
+
+/**
+ * QuotedLine
+ */
+export type QuotedLine = {
+    /**
+     * Sku Id
+     */
+    sku_id: number;
+    /**
+     * Product Name
+     */
+    product_name: string;
+    /**
+     * Size
+     */
+    size: string | null;
+    /**
+     * Color
+     */
+    color: string | null;
+    /**
+     * Code
+     */
+    code: string;
+    /**
+     * Stock Unit
+     */
+    stock_unit: string;
+    /**
+     * Quantity
+     */
+    quantity: string;
+    /**
+     * Unit Price
+     */
+    unit_price: number;
+    /**
+     * Promotion Name
+     */
+    promotion_name: string | null;
+    /**
+     * Discount
+     */
+    discount: number;
+    /**
+     * Line Total
+     */
+    line_total: number;
+};
+
+/**
+ * ReceiptCreate
+ */
+export type ReceiptCreate = {
+    /**
+     * Lines
+     */
+    lines?: Array<CartLine>;
+    /**
+     * Payments
+     */
+    payments?: Array<PaymentIn>;
+    /**
+     * Expected Total
+     */
+    expected_total: number;
+};
+
+/**
+ * ReceiptKind
+ */
+export type ReceiptKind = 'sale' | 'return' | 'exchange';
+
+/**
+ * ReceiptLinePublic
+ */
+export type ReceiptLinePublic = {
+    /**
+     * Id
+     */
+    id: number;
+    /**
+     * Sku Id
+     */
+    sku_id: number;
+    /**
+     * Product Name
+     */
+    product_name: string;
+    /**
+     * Size
+     */
+    size: string | null;
+    /**
+     * Color
+     */
+    color: string | null;
+    /**
+     * Code
+     */
+    code: string;
+    /**
+     * Stock Unit
+     */
+    stock_unit: string;
+    /**
+     * Quantity
+     */
+    quantity: string;
+    /**
+     * Unit Price
+     */
+    unit_price: number;
+    /**
+     * Promotion Name
+     */
+    promotion_name: string | null;
+    /**
+     * Discount
+     */
+    discount: number;
+    /**
+     * Line Total
+     */
+    line_total: number;
+    /**
+     * Original Line Id
+     */
+    original_line_id: number | null;
+    condition: ReturnCondition | null;
+};
+
+/**
+ * ReceiptPublic
+ */
+export type ReceiptPublic = {
+    /**
+     * Id
+     */
+    id: number;
+    /**
+     * Number
+     */
+    number: string;
+    kind: ReceiptKind;
+    status: ReceiptStatus;
+    /**
+     * Shift Id
+     */
+    shift_id: number;
+    /**
+     * Shift Number
+     */
+    shift_number: string;
+    /**
+     * Cashier Name
+     */
+    cashier_name: string;
+    /**
+     * Created At
+     */
+    created_at: string;
+    /**
+     * Original Receipt Id
+     */
+    original_receipt_id: number | null;
+    /**
+     * Original Receipt Number
+     */
+    original_receipt_number: string | null;
+    /**
+     * Subtotal
+     */
+    subtotal: number;
+    /**
+     * Discount Total
+     */
+    discount_total: number;
+    /**
+     * Refund Total
+     */
+    refund_total: number;
+    /**
+     * Total
+     */
+    total: number;
+    /**
+     * Change Given
+     */
+    change_given: number;
+    /**
+     * Print Count
+     */
+    print_count: number;
+    /**
+     * Void Reason
+     */
+    void_reason: string | null;
+    /**
+     * Voided By Name
+     */
+    voided_by_name: string | null;
+    /**
+     * Voided At
+     */
+    voided_at: string | null;
+    /**
+     * Lines
+     */
+    lines: Array<ReceiptLinePublic>;
+    /**
+     * Payments
+     */
+    payments: Array<PaymentPublic>;
+};
+
+/**
+ * ReceiptStatus
+ */
+export type ReceiptStatus = 'completed' | 'voided';
+
+/**
  * Resolution
  */
 export type Resolution = 'company_loss' | 'employee_charge';
+
+/**
+ * ReturnCondition
+ */
+export type ReturnCondition = 'resellable' | 'damaged';
 
 /**
  * ReversalCreate
@@ -2308,6 +2632,46 @@ export type SupplierUpdate = {
      * Is Active
      */
     is_active?: boolean | null;
+};
+
+/**
+ * TillSku
+ *
+ * A SKU as the till shows it: no costs.
+ */
+export type TillSku = {
+    /**
+     * Id
+     */
+    id: number;
+    /**
+     * Product Name
+     */
+    product_name: string;
+    /**
+     * Size
+     */
+    size: string | null;
+    /**
+     * Color
+     */
+    color: string | null;
+    /**
+     * Code
+     */
+    code: string;
+    /**
+     * Barcode
+     */
+    barcode: string;
+    /**
+     * Stock Unit
+     */
+    stock_unit: string;
+    /**
+     * Selling Price
+     */
+    selling_price: number;
 };
 
 /**
@@ -4958,6 +5322,148 @@ export type ShiftsReadShiftResponses = {
 };
 
 export type ShiftsReadShiftResponse = ShiftsReadShiftResponses[keyof ShiftsReadShiftResponses];
+
+export type ReceiptsFindSkusData = {
+    body?: never;
+    path?: never;
+    query: {
+        /**
+         * Search
+         */
+        search: string;
+    };
+    url: '/api/v1/receipts/skus';
+};
+
+export type ReceiptsFindSkusErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type ReceiptsFindSkusError = ReceiptsFindSkusErrors[keyof ReceiptsFindSkusErrors];
+
+export type ReceiptsFindSkusResponses = {
+    /**
+     * Response Receipts-Find Skus
+     *
+     * Successful Response
+     */
+    200: Array<TillSku>;
+};
+
+export type ReceiptsFindSkusResponse = ReceiptsFindSkusResponses[keyof ReceiptsFindSkusResponses];
+
+export type ReceiptsQuoteData = {
+    body: Cart;
+    path?: never;
+    query?: never;
+    url: '/api/v1/receipts/quote';
+};
+
+export type ReceiptsQuoteErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type ReceiptsQuoteError = ReceiptsQuoteErrors[keyof ReceiptsQuoteErrors];
+
+export type ReceiptsQuoteResponses = {
+    /**
+     * Successful Response
+     */
+    200: Quote;
+};
+
+export type ReceiptsQuoteResponse = ReceiptsQuoteResponses[keyof ReceiptsQuoteResponses];
+
+export type ReceiptsCompleteReceiptData = {
+    body: ReceiptCreate;
+    path?: never;
+    query?: never;
+    url: '/api/v1/receipts/';
+};
+
+export type ReceiptsCompleteReceiptErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type ReceiptsCompleteReceiptError = ReceiptsCompleteReceiptErrors[keyof ReceiptsCompleteReceiptErrors];
+
+export type ReceiptsCompleteReceiptResponses = {
+    /**
+     * Successful Response
+     */
+    201: ReceiptPublic;
+};
+
+export type ReceiptsCompleteReceiptResponse = ReceiptsCompleteReceiptResponses[keyof ReceiptsCompleteReceiptResponses];
+
+export type ReceiptsReadReceiptData = {
+    body?: never;
+    path: {
+        /**
+         * Receipt Id
+         */
+        receipt_id: number;
+    };
+    query?: never;
+    url: '/api/v1/receipts/{receipt_id}';
+};
+
+export type ReceiptsReadReceiptErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type ReceiptsReadReceiptError = ReceiptsReadReceiptErrors[keyof ReceiptsReadReceiptErrors];
+
+export type ReceiptsReadReceiptResponses = {
+    /**
+     * Successful Response
+     */
+    200: ReceiptPublic;
+};
+
+export type ReceiptsReadReceiptResponse = ReceiptsReadReceiptResponses[keyof ReceiptsReadReceiptResponses];
+
+export type ReceiptsPrintReceiptData = {
+    body?: never;
+    path: {
+        /**
+         * Receipt Id
+         */
+        receipt_id: number;
+    };
+    query?: never;
+    url: '/api/v1/receipts/{receipt_id}/print';
+};
+
+export type ReceiptsPrintReceiptErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type ReceiptsPrintReceiptError = ReceiptsPrintReceiptErrors[keyof ReceiptsPrintReceiptErrors];
+
+export type ReceiptsPrintReceiptResponses = {
+    /**
+     * Successful Response
+     */
+    200: ReceiptPublic;
+};
+
+export type ReceiptsPrintReceiptResponse = ReceiptsPrintReceiptResponses[keyof ReceiptsPrintReceiptResponses];
 
 export type ActivityLogListEntriesData = {
     body?: never;

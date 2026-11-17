@@ -12,6 +12,11 @@ class MovementReason(StrEnum):
     production_receipt = 'production_receipt'
     supplier_return = 'supplier_return'
     reversal = 'reversal'
+    sale = 'sale'
+    # Back from a customer, Resellable or Damaged.
+    customer_return = 'customer_return'
+    # A Damaged Return leaving stock again at once.
+    write_off = 'write_off'
     # A Variance corrected by an approved Stock Opname.
     opname = 'opname'
     # Opening stock from the Opening Opname.

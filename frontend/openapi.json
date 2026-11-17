@@ -5393,6 +5393,307 @@
         }
       }
     },
+    "/api/v1/receipts/skus": {
+      "get": {
+        "tags": [
+          "receipts"
+        ],
+        "summary": "Find Skus",
+        "operationId": "receipts-find_skus",
+        "parameters": [
+          {
+            "name": "search",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 100,
+              "title": "Search"
+            }
+          },
+          {
+            "name": "opname360_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Opname360 Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TillSku"
+                  },
+                  "title": "Response Receipts-Find Skus"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/receipts/quote": {
+      "post": {
+        "tags": [
+          "receipts"
+        ],
+        "summary": "Quote",
+        "description": "Today's prices and Promotions for a cart, before payment.",
+        "operationId": "receipts-quote",
+        "parameters": [
+          {
+            "name": "opname360_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Opname360 Session"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Cart"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Quote"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/receipts/": {
+      "post": {
+        "tags": [
+          "receipts"
+        ],
+        "summary": "Complete Receipt",
+        "operationId": "receipts-complete_receipt",
+        "parameters": [
+          {
+            "name": "opname360_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Opname360 Session"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReceiptCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReceiptPublic"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/receipts/{receipt_id}": {
+      "get": {
+        "tags": [
+          "receipts"
+        ],
+        "summary": "Read Receipt",
+        "operationId": "receipts-read_receipt",
+        "parameters": [
+          {
+            "name": "receipt_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "title": "Receipt Id"
+            }
+          },
+          {
+            "name": "opname360_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Opname360 Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReceiptPublic"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/receipts/{receipt_id}/print": {
+      "post": {
+        "tags": [
+          "receipts"
+        ],
+        "summary": "Print Receipt",
+        "description": "Count a printout; from the second one on it says it is a copy.",
+        "operationId": "receipts-print_receipt",
+        "parameters": [
+          {
+            "name": "receipt_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "title": "Receipt Id"
+            }
+          },
+          {
+            "name": "opname360_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Opname360 Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReceiptPublic"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/activity-log/": {
       "get": {
         "tags": [
@@ -5597,6 +5898,47 @@
           "file"
         ],
         "title": "Body_products-run_import"
+      },
+      "Cart": {
+        "properties": {
+          "lines": {
+            "items": {
+              "$ref": "#/components/schemas/CartLine"
+            },
+            "type": "array",
+            "maxItems": 500,
+            "title": "Lines",
+            "default": []
+          }
+        },
+        "type": "object",
+        "title": "Cart"
+      },
+      "CartLine": {
+        "properties": {
+          "sku_id": {
+            "type": "integer",
+            "title": "Sku Id"
+          },
+          "quantity": {
+            "anyOf": [
+              {
+                "type": "number",
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "title": "Quantity"
+          }
+        },
+        "type": "object",
+        "required": [
+          "sku_id",
+          "quantity"
+        ],
+        "title": "CartLine"
       },
       "CategoryCreate": {
         "properties": {
@@ -6752,6 +7094,9 @@
           "production_receipt",
           "supplier_return",
           "reversal",
+          "sale",
+          "customer_return",
+          "write_off",
           "opname",
           "opening",
           "cost_adjustment"
@@ -7510,6 +7855,42 @@
         ],
         "title": "PasswordReset"
       },
+      "PaymentIn": {
+        "properties": {
+          "payment_method_id": {
+            "type": "integer",
+            "title": "Payment Method Id"
+          },
+          "amount": {
+            "type": "integer",
+            "exclusiveMinimum": 0.0,
+            "title": "Amount"
+          },
+          "reference": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reference"
+          },
+          "confirmed": {
+            "type": "boolean",
+            "title": "Confirmed",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "payment_method_id",
+          "amount"
+        ],
+        "title": "PaymentIn"
+      },
       "PaymentMethodCreate": {
         "properties": {
           "name": {
@@ -7594,6 +7975,46 @@
         },
         "type": "object",
         "title": "PaymentMethodUpdate"
+      },
+      "PaymentPublic": {
+        "properties": {
+          "payment_method_id": {
+            "type": "integer",
+            "title": "Payment Method Id"
+          },
+          "method_name": {
+            "type": "string",
+            "title": "Method Name"
+          },
+          "is_cash": {
+            "type": "boolean",
+            "title": "Is Cash"
+          },
+          "amount": {
+            "type": "integer",
+            "title": "Amount"
+          },
+          "reference": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reference"
+          }
+        },
+        "type": "object",
+        "required": [
+          "payment_method_id",
+          "method_name",
+          "is_cash",
+          "amount",
+          "reference"
+        ],
+        "title": "PaymentPublic"
       },
       "PaymentStatus": {
         "type": "string",
@@ -8051,6 +8472,440 @@
         ],
         "title": "ProductionReceiptSummary"
       },
+      "Quote": {
+        "properties": {
+          "lines": {
+            "items": {
+              "$ref": "#/components/schemas/QuotedLine"
+            },
+            "type": "array",
+            "title": "Lines"
+          },
+          "subtotal": {
+            "type": "integer",
+            "title": "Subtotal"
+          },
+          "discount_total": {
+            "type": "integer",
+            "title": "Discount Total"
+          },
+          "refund_total": {
+            "type": "integer",
+            "title": "Refund Total"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          }
+        },
+        "type": "object",
+        "required": [
+          "lines",
+          "subtotal",
+          "discount_total",
+          "refund_total",
+          "total"
+        ],
+        "title": "Quote"
+      },
+      "QuotedLine": {
+        "properties": {
+          "sku_id": {
+            "type": "integer",
+            "title": "Sku Id"
+          },
+          "product_name": {
+            "type": "string",
+            "title": "Product Name"
+          },
+          "size": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Size"
+          },
+          "color": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Color"
+          },
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "stock_unit": {
+            "type": "string",
+            "title": "Stock Unit"
+          },
+          "quantity": {
+            "type": "string",
+            "title": "Quantity"
+          },
+          "unit_price": {
+            "type": "integer",
+            "title": "Unit Price"
+          },
+          "promotion_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Promotion Name"
+          },
+          "discount": {
+            "type": "integer",
+            "title": "Discount"
+          },
+          "line_total": {
+            "type": "integer",
+            "title": "Line Total"
+          }
+        },
+        "type": "object",
+        "required": [
+          "sku_id",
+          "product_name",
+          "size",
+          "color",
+          "code",
+          "stock_unit",
+          "quantity",
+          "unit_price",
+          "promotion_name",
+          "discount",
+          "line_total"
+        ],
+        "title": "QuotedLine"
+      },
+      "ReceiptCreate": {
+        "properties": {
+          "lines": {
+            "items": {
+              "$ref": "#/components/schemas/CartLine"
+            },
+            "type": "array",
+            "maxItems": 500,
+            "title": "Lines",
+            "default": []
+          },
+          "payments": {
+            "items": {
+              "$ref": "#/components/schemas/PaymentIn"
+            },
+            "type": "array",
+            "maxItems": 10,
+            "title": "Payments",
+            "default": []
+          },
+          "expected_total": {
+            "type": "integer",
+            "title": "Expected Total"
+          }
+        },
+        "type": "object",
+        "required": [
+          "expected_total"
+        ],
+        "title": "ReceiptCreate"
+      },
+      "ReceiptKind": {
+        "type": "string",
+        "enum": [
+          "sale",
+          "return",
+          "exchange"
+        ],
+        "title": "ReceiptKind"
+      },
+      "ReceiptLinePublic": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "sku_id": {
+            "type": "integer",
+            "title": "Sku Id"
+          },
+          "product_name": {
+            "type": "string",
+            "title": "Product Name"
+          },
+          "size": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Size"
+          },
+          "color": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Color"
+          },
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "stock_unit": {
+            "type": "string",
+            "title": "Stock Unit"
+          },
+          "quantity": {
+            "type": "string",
+            "title": "Quantity"
+          },
+          "unit_price": {
+            "type": "integer",
+            "title": "Unit Price"
+          },
+          "promotion_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Promotion Name"
+          },
+          "discount": {
+            "type": "integer",
+            "title": "Discount"
+          },
+          "line_total": {
+            "type": "integer",
+            "title": "Line Total"
+          },
+          "original_line_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Original Line Id"
+          },
+          "condition": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ReturnCondition"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "sku_id",
+          "product_name",
+          "size",
+          "color",
+          "code",
+          "stock_unit",
+          "quantity",
+          "unit_price",
+          "promotion_name",
+          "discount",
+          "line_total",
+          "original_line_id",
+          "condition"
+        ],
+        "title": "ReceiptLinePublic"
+      },
+      "ReceiptPublic": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "number": {
+            "type": "string",
+            "title": "Number"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/ReceiptKind"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ReceiptStatus"
+          },
+          "shift_id": {
+            "type": "integer",
+            "title": "Shift Id"
+          },
+          "shift_number": {
+            "type": "string",
+            "title": "Shift Number"
+          },
+          "cashier_name": {
+            "type": "string",
+            "title": "Cashier Name"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "original_receipt_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Original Receipt Id"
+          },
+          "original_receipt_number": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Original Receipt Number"
+          },
+          "subtotal": {
+            "type": "integer",
+            "title": "Subtotal"
+          },
+          "discount_total": {
+            "type": "integer",
+            "title": "Discount Total"
+          },
+          "refund_total": {
+            "type": "integer",
+            "title": "Refund Total"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "change_given": {
+            "type": "integer",
+            "title": "Change Given"
+          },
+          "print_count": {
+            "type": "integer",
+            "title": "Print Count"
+          },
+          "void_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Void Reason"
+          },
+          "voided_by_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Voided By Name"
+          },
+          "voided_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Voided At"
+          },
+          "lines": {
+            "items": {
+              "$ref": "#/components/schemas/ReceiptLinePublic"
+            },
+            "type": "array",
+            "title": "Lines"
+          },
+          "payments": {
+            "items": {
+              "$ref": "#/components/schemas/PaymentPublic"
+            },
+            "type": "array",
+            "title": "Payments"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "number",
+          "kind",
+          "status",
+          "shift_id",
+          "shift_number",
+          "cashier_name",
+          "created_at",
+          "original_receipt_id",
+          "original_receipt_number",
+          "subtotal",
+          "discount_total",
+          "refund_total",
+          "total",
+          "change_given",
+          "print_count",
+          "void_reason",
+          "voided_by_name",
+          "voided_at",
+          "lines",
+          "payments"
+        ],
+        "title": "ReceiptPublic"
+      },
+      "ReceiptStatus": {
+        "type": "string",
+        "enum": [
+          "completed",
+          "voided"
+        ],
+        "title": "ReceiptStatus"
+      },
       "Resolution": {
         "type": "string",
         "enum": [
@@ -8058,6 +8913,14 @@
           "employee_charge"
         ],
         "title": "Resolution"
+      },
+      "ReturnCondition": {
+        "type": "string",
+        "enum": [
+          "resellable",
+          "damaged"
+        ],
+        "title": "ReturnCondition"
       },
       "ReversalCreate": {
         "properties": {
@@ -9664,6 +10527,69 @@
         },
         "type": "object",
         "title": "SupplierUpdate"
+      },
+      "TillSku": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "product_name": {
+            "type": "string",
+            "title": "Product Name"
+          },
+          "size": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Size"
+          },
+          "color": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Color"
+          },
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "barcode": {
+            "type": "string",
+            "title": "Barcode"
+          },
+          "stock_unit": {
+            "type": "string",
+            "title": "Stock Unit"
+          },
+          "selling_price": {
+            "type": "integer",
+            "title": "Selling Price"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "product_name",
+          "size",
+          "color",
+          "code",
+          "barcode",
+          "stock_unit",
+          "selling_price"
+        ],
+        "title": "TillSku",
+        "description": "A SKU as the till shows it: no costs."
       },
       "UnknownBarcodePublic": {
         "properties": {

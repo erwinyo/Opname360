@@ -25,11 +25,13 @@ export function CloseShiftPage() {
   const close = useMutation({
     ...shiftsCloseShiftMutation(),
     onSuccess: (shift) => {
-      queryClient.setQueryData(shiftsReadCurrentQueryKey(), null)
       navigate(`/shift/${shift.id}`)
+      queryClient.setQueryData(shiftsReadCurrentQueryKey(), null)
     },
   })
 
+  // Closed: on the way to the summary, not back to Kasir.
+  if (close.isSuccess) return null
   if (current.isPending) return <p className="text-muted-foreground">Memuat…</p>
   const shift = current.data
   if (!shift?.is_mine) return <Navigate to="/kasir" replace />

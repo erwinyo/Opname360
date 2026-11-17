@@ -6,6 +6,10 @@ from opname360.core.errors import ConflictError, ForbiddenError, NotFoundError
 from opname360.core.formatting import rupiah
 from opname360.models import (
     Location,
+    Payment,
+    PaymentMethod,
+    Receipt,
+    ReceiptStatus,
     Role,
     Shift,
     ShiftClose,
@@ -154,10 +158,23 @@ def close_shift(
 
 
 def expected_cash(session: Session, shift: Shift) -> int:
-    """Float plus cash taken minus cash given back."""
+    """Float plus cash taken minus cash given back (rule 2). A voided
+    Receipt took nothing."""
     if shift.expected_cash is not None:
         return shift.expected_cash
-    return shift.opening_float
+    cash = session.exec(
+        select(func.coalesce(func.sum(Payment.amount), 0))
+        .join(Receipt, col(Payment.receipt_id) == Receipt.id)
+        .join(
+            PaymentMethod, col(Payment.payment_method_id) == PaymentMethod.id
+        )
+        .where(
+            Receipt.shift_id == shift.id,
+            Receipt.status == ReceiptStatus.completed,
+            col(PaymentMethod.is_cash).is_(True),
+        )
+    ).one()
+    return shift.opening_float + int(cash)
 
 
 def needs_resolution(shift: Shift) -> bool:

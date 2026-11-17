@@ -1,5 +1,7 @@
 # Slice 4: Reports
 
+**Status: built.** Every rule below has an API test in `tests/test_daily_stock.py`, `test_sales_reports.py`, `test_product_reports.py` and `test_variance_reports.py`, and the main path has a browser test (`frontend/e2e/reports.spec.ts`), which also opens an opname from Class A and downloads an Excel file.
+
 **When it's done:** the Owner opens a phone anywhere and sees today's sales and gross profit hour by hour as they happen, what's in stock, what sells, and where stock went missing.
 
 Needs slices 1 to 3. This slice adds no new business records: every figure is worked out from Stock Movements, Receipts and Stock Opnames. Charts follow the `dataviz` skill.
@@ -47,6 +49,23 @@ One screen per report above, all usable on a phone. Each has a period or date pi
 3. **What sells:** Fast Moving, Kontribusi Omzet, and opening a Partial Opname from either.
 4. **Opname results and alerts:** Selisih Opname, the dashboard's attention list.
 5. **Browser test:** the Owner has the dashboard open → a Cashier completes a sale → the hourly chart and totals change without a reload.
+
+## Decided while building
+
+- **Where sales figures come from:** completed Receipts, at the time each was made. COGS is each line's quantity times the unit COGS stored on it (to 4 decimals, so the hours add up to the day exactly). A return takes back the cost it was sold at, Resellable or Damaged; writing off a Damaged Return is a stock loss, not COGS (slice 5 books it to Barang Rusak).
+- **Negative Stock cost adjustments** (costing rule 6), and their Reversals, are COGS in the hour they are booked, as the Ledger will book them. A voided Receipt's adjustments count for nothing.
+- **Groupings:** a Cashier's or a Payment Method's row stops at Net Sales; COGS belongs to goods. A Payment Method shows what it took, net of change and refunds. In Penjualan by Category, a Receipt with lines in two Categories counts in both, with only that Category's lines as its amount.
+- **Laporan Stok Harian** lists every SKU that had moved by the end of the day, including those back at zero, for the shop's first Location. Subtotals add quantities as they are, whatever the unit.
+- **Hours shown:** the chart and the hourly tables show the shop's opening hours plus any other hour with sales. The API always gives all 24.
+- **The Dasbor is the home page** of the Owner and the Admin (the menu says Dasbor instead of Beranda). Cashiers keep their greeting.
+- **Live updates:** an open dashboard keeps a server-sent event stream open. The server looks at the Activity Log every 2 seconds and only says "something changed"; the dashboard then reloads its figures through the normal, role-checked endpoint. A sale shows on the Owner's phone in about 2 seconds.
+- **The hourly chart** is a stacked bar per hour: HPP below, laba kotor above, so the bar is as tall as Net Sales. A negative part hangs below the line. Blue and orange from the dataviz skill's reference palette, validated on the white card. Every bar has a tooltip and keyboard focus, and the dashboard can switch the chart to a table.
+- **Fast Moving** shows the top 50, with each SKU's System Quantity now. **Kontribusi Omzet** counts active SKUs that sold nothing as C; a SKU whose returns outweigh its sales is C too. Both default to the last 30 days.
+- **Opname from a report** hands its SKUs to Buka Opname, with a note saying where they came from; the Admin still chooses the Checkers.
+- **Selisih Opname** takes Stock Opnames approved in the period and not reversed; the Opening Opname is not a Variance. Values are what approval actually moved. A Surplus has no reason or resolution, so it is its own row, "Selisih lebih".
+- **Things needing attention:** a Shortage gets its Variance Resolution when its opname is approved, so "Shortages waiting" shows as Stock Opnames waiting for approval. Each item links to its list, already filtered.
+- **Excel files** are made on the server by the same functions as the screens, money rounded to whole rupiah the way the screens round.
+- **Not yet in COGS:** the difference a Supplier Return books to Harga Pokok Penjualan in the Ledger plan. Slice 5 must add it here or post it elsewhere, so that its rule 7 (same gross profit as these reports) holds.
 
 ## Not in this slice
 

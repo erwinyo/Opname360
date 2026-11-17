@@ -1,6 +1,6 @@
 # Build plan
 
-Status: **agreed on 2026-11-15. Slices 1 to 3 are built** (branches `slice-1-foundation`, `slice-2-stock-opname` and `slice-3-pos`); slice 4 is next.
+Status: **agreed on 2026-11-15. Slices 1 to 4 are built** (branches `slice-1-foundation`, `slice-2-stock-opname`, `slice-3-pos` and `slice-4-reports`); the shop can go live (see Go-live), and slice 5 is next.
 
 Vocabulary is in [GLOSSARY.md](../GLOSSARY.md), decisions in [adr/](adr/), open client questions in [client-questions.md](client-questions.md).
 

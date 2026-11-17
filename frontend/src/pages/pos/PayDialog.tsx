@@ -10,6 +10,7 @@ import { FormDialog } from '@/components/FormDialog'
 import { MoneyInput } from '@/components/MoneyInput'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { queryClient } from '@/lib/api'
 import { rupiah } from '@/lib/format'
 import { cn } from '@/lib/utils'
 
@@ -41,6 +42,8 @@ export function PayDialog({
   const complete = useMutation({
     ...receiptsCompleteReceiptMutation(),
     onSuccess: onPaid,
+    // A price or Promotion may have changed: show the cart's new total.
+    onError: () => queryClient.invalidateQueries({ queryKey: ['quote'] }),
   })
 
   const list = methods.data ?? []

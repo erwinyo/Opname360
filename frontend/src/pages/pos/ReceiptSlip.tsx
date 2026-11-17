@@ -71,14 +71,23 @@ export function ReceiptSlip({
         </div>
       ))}
       <Rule />
-      {receipt.discount_total > 0 && (
+      {receipt.refund_total > 0 ? (
         <>
-          <SlipRow label="Subtotal" value={rupiah(receipt.subtotal)} />
-          <SlipRow label="Diskon" value={rupiah(-receipt.discount_total)} />
+          {receipt.subtotal > 0 && (
+            <SlipRow
+              label="Belanja"
+              value={rupiah(receipt.subtotal - receipt.discount_total)}
+            />
+          )}
+          <SlipRow label="Retur" value={rupiah(-receipt.refund_total)} />
         </>
-      )}
-      {receipt.refund_total > 0 && (
-        <SlipRow label="Retur" value={rupiah(-receipt.refund_total)} />
+      ) : (
+        receipt.discount_total > 0 && (
+          <>
+            <SlipRow label="Subtotal" value={rupiah(receipt.subtotal)} />
+            <SlipRow label="Diskon" value={rupiah(-receipt.discount_total)} />
+          </>
+        )
       )}
       <SlipRow
         label={receipt.total < 0 ? 'DIKEMBALIKAN' : 'TOTAL'}

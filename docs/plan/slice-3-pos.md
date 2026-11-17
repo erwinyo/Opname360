@@ -1,5 +1,7 @@
 # Slice 3: POS
 
+**Status: built.** Every rule below has an API test in `tests/test_shifts.py`, `test_selling.py`, `test_promotions.py`, `test_returns.py` and `test_void_and_close.py`, and the main path has a browser test (`frontend/e2e/pos.spec.ts`).
+
 **When it's done:** a Cashier sells by scanning, takes payment and prints a Receipt; returns and exchanges go through the original Receipt; each Shift's cash is counted and reconciled. Smartlink can be switched off ([ADR 0005](../adr/0005-own-pos-replaces-smartlink.md)).
 
 Needs slices 1 and 2. Shared patterns are in [plan.md](../plan.md).
@@ -75,6 +77,25 @@ Each one gets a test.
 4. **Returns and Exchanges.**
 5. **Void and closing:** Transaksi Shift, closing summary, Cash Variance resolution.
 6. **Browser test:** open a Shift → sell two SKUs, one under a Promotion → exchange one for another size → close the Shift with a shortage → the Owner resolves it.
+
+## Decided while building
+
+- **Numbers:** Shifts `SH-2611-0001`. Receipts by kind: `PJ` sale, `RJ` return, `TT` exchange. A Void is a Reversal with its own `BTL` number, like other documents.
+- **The shop's timezone** stays a server setting (`TIMEZONE`, Asia/Jakarta), not on Pengaturan Toko: document numbers and Shop Days depend on it. Opening hours start at 05:00–22:00 ([question 9](../client-questions.md)).
+- **Who uses an open Shift:** its Cashier, or the Owner, who can also close it. Another Cashier waits until it is closed.
+- **Blind count:** the till never shows cash totals; the Cashier sees the summary only after closing. The Owner and Admin see the expected cash live.
+- **Payments** are stored net of change: change comes off the cash payment. A non-cash method can't be paid more than the total. Each non-cash payment has an optional reference and a "sudah masuk" tick.
+- **The total the customer saw is checked at payment.** If a price or Promotion changed in between, the sale stops and the cart shows the new total.
+- **Promotions** are a whole percentage or rupiah off each unit, with one kind of target each (SKUs, Products, Sub-categories or Categories). Ending one that hasn't started cancels it.
+- **Refunds** are the line's total after discount, shared over its units; rounding settles on the last unit, so the refunds of a line add up to exactly what was paid.
+- **Money back:** a return is refunded in cash unless the Cashier picks another method; an exchange always pays the difference back in cash.
+- **What can come back:** lines sold on a sale or an exchange. A return Receipt itself can't be returned.
+- **Void order:** a Receipt with returns can be voided only after those returns are voided.
+- **Cash methods:** whether a method is cash is fixed when it is created, and the last active cash method can't be switched off.
+- **A short drawer charged to an employee** charges the whole shortage; the Owner picks the employee, the Shift's Cashier by default.
+- **Reprints** are counted by the server: every printout after the first says SALINAN, and reprints go to the Activity Log.
+- **Fast scanning:** the scan field clears at once and every scan is added, even when the scanner is faster than the server.
+- **Printing** uses the browser's print on 80 mm paper; Chrome's kiosk printing skips the dialog. Not yet tried on a real receipt printer.
 
 ## Not in this slice
 

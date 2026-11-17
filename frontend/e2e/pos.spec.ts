@@ -15,10 +15,10 @@ type Sku = { id: number; barcode: string; size: string }
 async function setUp(owner: Page) {
   const request = owner.request
   await api(request, 'users/', {
-    username: 'rina',
-    full_name: 'Rina Kasir',
+    username: 'sinta',
+    full_name: 'Sinta Kasir',
     role: 'cashier',
-    password: 'sandi-rina-1',
+    password: 'sandi-sinta-1',
   })
   const category = await api(request, 'categories/', { name: 'Seragam POS' })
   const withSub = await api(
@@ -69,7 +69,7 @@ test('pos: open a shift, sell, close', async ({ browser }) => {
     await browser.newContext({ viewport: { width: 1280, height: 800 } })
   ).newPage()
   await till.goto('/')
-  await signIn(till, 'rina', 'sandi-rina-1')
+  await signIn(till, 'sinta', 'sandi-sinta-1')
   await expect(till.getByRole('heading', { name: /^Halo/ })).toBeVisible()
 
   await test.step('the owner puts size S on promotion', async () => {
@@ -157,14 +157,14 @@ test('pos: open a shift, sell, close', async ({ browser }) => {
     await owner.getByRole('link', { name: /^SH-/ }).first().click()
     await owner.getByLabel('Ganti rugi karyawan').check()
     await expect(owner.getByLabel('Karyawan', { exact: true })).toHaveText(
-      'Rina Kasir',
+      'Sinta Kasir',
     )
     await shot(owner, 'pos-08-resolve')
     await owner.getByRole('button', { name: 'Simpan keputusan' }).click()
-    await expect(owner.getByText('Ganti rugi Rina Kasir')).toBeVisible()
+    await expect(owner.getByText('Ganti rugi Sinta Kasir')).toBeVisible()
     await openMenu(owner, 'Ganti Rugi Karyawan')
     await expect(
-      owner.getByRole('button', { name: /Rina Kasir/ }),
+      owner.getByRole('button', { name: /Sinta Kasir/ }),
     ).toContainText('Rp 5.000')
   })
 })

@@ -126,7 +126,7 @@ def upgrade() -> None:
     # ### end Alembic commands ###
     op.execute(
         'INSERT INTO shop_settings (id, name, opens_at, closes_at, '
-        "return_window_days) VALUES (1, 'Toko', '08:00', '21:00', 7)"
+        "return_window_days) VALUES (1, 'Toko', '05:00', '22:00', 7)"
     )
     op.execute(
         'INSERT INTO payment_method (name, is_cash, is_active) VALUES '

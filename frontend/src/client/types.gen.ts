@@ -5,6 +5,107 @@ export type ClientOptions = {
 }
 
 /**
+ * AbcClass
+ */
+export type AbcClass = 'A' | 'B' | 'C'
+
+/**
+ * AbcClassTotal
+ */
+export type AbcClassTotal = {
+  abc_class: AbcClass
+  /**
+   * Sku Count
+   */
+  sku_count: number
+  /**
+   * Net Sales
+   */
+  net_sales: number
+  /**
+   * Share
+   */
+  share: string
+}
+
+/**
+ * AbcReport
+ */
+export type AbcReport = {
+  /**
+   * Start
+   */
+  start: string
+  /**
+   * End
+   */
+  end: string
+  /**
+   * Net Sales
+   */
+  net_sales: number
+  /**
+   * Classes
+   */
+  classes: Array<AbcClassTotal>
+  /**
+   * Rows
+   */
+  rows: Array<AbcRow>
+}
+
+/**
+ * AbcRow
+ */
+export type AbcRow = {
+  /**
+   * Sku Id
+   */
+  sku_id: number
+  /**
+   * Product Name
+   */
+  product_name: string
+  /**
+   * Size
+   */
+  size: string | null
+  /**
+   * Color
+   */
+  color: string | null
+  /**
+   * Code
+   */
+  code: string
+  /**
+   * Stock Unit
+   */
+  stock_unit: string
+  /**
+   * Category Name
+   */
+  category_name: string
+  /**
+   * Units Sold
+   */
+  units_sold: string
+  /**
+   * Net Sales
+   */
+  net_sales: number
+  /**
+   * Share
+   */
+  share: string
+  /**
+   * Running Share
+   */
+  running_share: string
+  abc_class: AbcClass
+}
+
+/**
  * ActivityLogEntry
  */
 export type ActivityLogEntry = {
@@ -549,6 +650,70 @@ export type EmployeeChargeTotal = {
    * Outstanding Count
    */
   outstanding_count: number
+}
+
+/**
+ * FastMoving
+ */
+export type FastMoving = {
+  /**
+   * Start
+   */
+  start: string
+  /**
+   * End
+   */
+  end: string
+  /**
+   * Rows
+   */
+  rows: Array<FastMovingRow>
+}
+
+/**
+ * FastMovingRow
+ */
+export type FastMovingRow = {
+  /**
+   * Sku Id
+   */
+  sku_id: number
+  /**
+   * Product Name
+   */
+  product_name: string
+  /**
+   * Size
+   */
+  size: string | null
+  /**
+   * Color
+   */
+  color: string | null
+  /**
+   * Code
+   */
+  code: string
+  /**
+   * Stock Unit
+   */
+  stock_unit: string
+  /**
+   * Category Name
+   */
+  category_name: string
+  /**
+   * Units Sold
+   */
+  units_sold: string
+  /**
+   * Net Sales
+   */
+  net_sales: number
+  /**
+   * Stock
+   */
+  stock: string
 }
 
 /**
@@ -6908,6 +7073,182 @@ export type ReportsHourlyExcelError =
   ReportsHourlyExcelErrors[keyof ReportsHourlyExcelErrors]
 
 export type ReportsHourlyExcelResponses = {
+  /**
+   * Successful Response
+   */
+  200: unknown
+}
+
+export type ReportsFastMovingData = {
+  body?: never
+  path?: never
+  query: {
+    /**
+     * Start
+     */
+    start: string
+    /**
+     * End
+     */
+    end: string
+    /**
+     * Category Id
+     */
+    category_id?: number | null
+    /**
+     * Sub Category Id
+     */
+    sub_category_id?: number | null
+    /**
+     * Limit
+     */
+    limit?: number
+  }
+  url: '/api/v1/reports/fast-moving'
+}
+
+export type ReportsFastMovingErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError
+}
+
+export type ReportsFastMovingError =
+  ReportsFastMovingErrors[keyof ReportsFastMovingErrors]
+
+export type ReportsFastMovingResponses = {
+  /**
+   * Successful Response
+   */
+  200: FastMoving
+}
+
+export type ReportsFastMovingResponse =
+  ReportsFastMovingResponses[keyof ReportsFastMovingResponses]
+
+export type ReportsFastMovingExcelData = {
+  body?: never
+  path?: never
+  query: {
+    /**
+     * Start
+     */
+    start: string
+    /**
+     * End
+     */
+    end: string
+    /**
+     * Category Id
+     */
+    category_id?: number | null
+    /**
+     * Sub Category Id
+     */
+    sub_category_id?: number | null
+    /**
+     * Limit
+     */
+    limit?: number
+  }
+  url: '/api/v1/reports/fast-moving/excel'
+}
+
+export type ReportsFastMovingExcelErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError
+}
+
+export type ReportsFastMovingExcelError =
+  ReportsFastMovingExcelErrors[keyof ReportsFastMovingExcelErrors]
+
+export type ReportsFastMovingExcelResponses = {
+  /**
+   * Successful Response
+   */
+  200: unknown
+}
+
+export type ReportsAbcData = {
+  body?: never
+  path?: never
+  query: {
+    /**
+     * Start
+     */
+    start: string
+    /**
+     * End
+     */
+    end: string
+    /**
+     * Category Id
+     */
+    category_id?: number | null
+    /**
+     * Sub Category Id
+     */
+    sub_category_id?: number | null
+  }
+  url: '/api/v1/reports/abc'
+}
+
+export type ReportsAbcErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError
+}
+
+export type ReportsAbcError = ReportsAbcErrors[keyof ReportsAbcErrors]
+
+export type ReportsAbcResponses = {
+  /**
+   * Successful Response
+   */
+  200: AbcReport
+}
+
+export type ReportsAbcResponse = ReportsAbcResponses[keyof ReportsAbcResponses]
+
+export type ReportsAbcExcelData = {
+  body?: never
+  path?: never
+  query: {
+    /**
+     * Start
+     */
+    start: string
+    /**
+     * End
+     */
+    end: string
+    /**
+     * Category Id
+     */
+    category_id?: number | null
+    /**
+     * Sub Category Id
+     */
+    sub_category_id?: number | null
+  }
+  url: '/api/v1/reports/abc/excel'
+}
+
+export type ReportsAbcExcelErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError
+}
+
+export type ReportsAbcExcelError =
+  ReportsAbcExcelErrors[keyof ReportsAbcExcelErrors]
+
+export type ReportsAbcExcelResponses = {
   /**
    * Successful Response
    */

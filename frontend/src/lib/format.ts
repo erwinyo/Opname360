@@ -94,3 +94,8 @@ const clock = new Intl.DateTimeFormat('id-ID', { timeStyle: 'short' })
 export function formatTime(at: number | string | Date): string {
   return clock.format(new Date(at))
 }
+
+/** A fraction as the API sends it ("0.1234") -> "12,3%". */
+export function percent(fraction: string | number): string {
+  return `${new Intl.NumberFormat('id-ID', { maximumFractionDigits: 1 }).format(Number(fraction) * 100)}%`
+}

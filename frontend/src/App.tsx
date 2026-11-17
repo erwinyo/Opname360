@@ -32,7 +32,9 @@ import { GoodsReceiptsPage } from '@/pages/purchasing/GoodsReceiptsPage'
 import { SupplierReturnPage } from '@/pages/purchasing/SupplierReturnPage'
 import { SupplierReturnsPage } from '@/pages/purchasing/SupplierReturnsPage'
 import { SuppliersPage } from '@/pages/purchasing/SuppliersPage'
+import { AbcPage } from '@/pages/reports/AbcPage'
 import { DailyStockPage } from '@/pages/reports/DailyStockPage'
+import { FastMovingPage } from '@/pages/reports/FastMovingPage'
 import { HourlyPage } from '@/pages/reports/HourlyPage'
 import { SalesPage } from '@/pages/reports/SalesPage'
 import { SalesReceiptsPage } from '@/pages/reports/SalesReceiptsPage'
@@ -136,6 +138,8 @@ export function App() {
               element={<SalesReceiptsPage />}
             />
             <Route path="laporan/laba-kotor" element={<HourlyPage />} />
+            <Route path="laporan/fast-moving" element={<FastMovingPage />} />
+            <Route path="laporan/kontribusi-omzet" element={<AbcPage />} />
           </>
         )}
         {user.role === 'owner' && (

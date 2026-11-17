@@ -12,7 +12,9 @@ from openpyxl.utils import get_column_letter
 
 from opname360.core.formatting import sku_label
 from opname360.models import (
+    AbcReport,
     DailyStock,
+    FastMoving,
     HourlySales,
     SalesFigures,
     SalesGroupBy,
@@ -196,7 +198,7 @@ def sales(report: SalesReport) -> bytes:
     rows.append((['Total', *_figures(report.total)], True))
     return workbook(
         'Penjualan',
-        f'{long_date(report.start)} s.d. {long_date(report.end)}',
+        _period(report.start, report.end),
         [Column(GROUP_TITLES[report.group_by], 24), *FIGURE_COLUMNS],
         rows,
     )
@@ -213,5 +215,91 @@ def hourly(report: HourlySales, hours: list[int]) -> bytes:
         'Laba Kotor per Jam',
         long_date(report.day),
         [Column('Jam', 14), *FIGURE_COLUMNS],
+        rows,
+    )
+
+
+def _period(start: date, end: date) -> str:
+    return f'{long_date(start)} s.d. {long_date(end)}'
+
+
+def fast_moving(report: FastMoving) -> bytes:
+    rows: list[Row] = [
+        (
+            [
+                rank,
+                sku_label(row.product_name, row.size, row.color),
+                row.code,
+                row.category_name,
+                row.units_sold,
+                rupiah(row.net_sales),
+                row.stock,
+            ],
+            False,
+        )
+        for rank, row in enumerate(report.rows, start=1)
+    ]
+    return workbook(
+        'Fast Moving',
+        _period(report.start, report.end),
+        [
+            Column('Peringkat', 10),
+            Column('Barang', 36),
+            Column('Kode', 16),
+            Column('Kategori', 18),
+            Column('Terjual', 10),
+            Column('Penjualan bersih', 16, MONEY),
+            Column('Stok', 10),
+        ],
+        rows,
+    )
+
+
+def abc(report: AbcReport) -> bytes:
+    rows: list[Row] = [
+        (
+            [
+                row.abc_class.value,
+                sku_label(row.product_name, row.size, row.color),
+                row.code,
+                row.category_name,
+                rupiah(row.net_sales),
+                row.share,
+                row.running_share,
+            ],
+            False,
+        )
+        for row in report.rows
+    ]
+    for total in report.classes:
+        rows.append(
+            (
+                [
+                    f'Kelas {total.abc_class.value}',
+                    f'{total.sku_count} SKU',
+                    '',
+                    '',
+                    rupiah(total.net_sales),
+                    total.share,
+                    '',
+                ],
+                True,
+            )
+        )
+    rows.append(
+        (['Total', '', '', '', rupiah(report.net_sales), '', ''], True)
+    )
+    return workbook(
+        'Kontribusi Omzet',
+        _period(report.start, report.end),
+        [
+            Column('Kelas', 8),
+            Column('Barang', 36),
+            Column('Kode', 16),
+            Column('Kategori', 18),
+            Column('Penjualan bersih', 16, MONEY),
+            Column('Porsi', 10, PERCENT),
+            Column('Kumulatif', 10, PERCENT),
+        ],
         rows,
     )

@@ -161,3 +161,75 @@ class SalesReceipt(SQLModel):
 class SalesReceiptPage(SQLModel):
     items: list[SalesReceipt]
     total: int
+
+
+# Fast Moving and Kontribusi Omzet
+
+
+class ProductSalesFilter(SQLModel):
+    start: date
+    end: date
+    category_id: int | None = None
+    sub_category_id: int | None = None
+
+    @model_validator(mode='after')
+    def a_real_period(self) -> Self:
+        if self.end < self.start:
+            raise ValueError('Tanggal akhir sebelum tanggal awal.')
+        return self
+
+
+class FastMovingFilter(ProductSalesFilter):
+    limit: int = Field(default=50, ge=1, le=500)
+
+
+class SkuSales(SQLModel):
+    sku_id: int
+    product_name: str
+    size: str | None
+    color: str | None
+    code: str
+    stock_unit: str
+    category_name: str
+    # Sold minus returned over the period.
+    units_sold: Decimal
+    net_sales: int
+
+
+class FastMovingRow(SkuSales):
+    # The System Quantity now.
+    stock: Decimal
+
+
+class FastMoving(SQLModel):
+    start: date
+    end: date
+    rows: list[FastMovingRow]
+
+
+class AbcClass(StrEnum):
+    a = 'A'
+    b = 'B'
+    c = 'C'
+
+
+class AbcRow(SkuSales):
+    # Fractions of the period's Net Sales: 0.1234 is 12,34%.
+    share: Decimal
+    running_share: Decimal
+    abc_class: AbcClass
+
+
+class AbcClassTotal(SQLModel):
+    abc_class: AbcClass
+    sku_count: int
+    net_sales: int
+    share: Decimal
+
+
+class AbcReport(SQLModel):
+    start: date
+    end: date
+    net_sales: int
+    classes: list[AbcClassTotal]
+    rows: list[AbcRow]

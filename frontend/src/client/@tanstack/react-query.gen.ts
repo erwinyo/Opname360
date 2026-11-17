@@ -84,9 +84,13 @@ import {
   receiptsReadReceipt,
   receiptsReceiptForReturn,
   receiptsVoidReceipt,
+  reportsAbc,
+  reportsAbcExcel,
   reportsDailyStock,
   reportsDailyStockExcel,
   reportsDashboard,
+  reportsFastMoving,
+  reportsFastMovingExcel,
   reportsHourly,
   reportsHourlyExcel,
   reportsSales,
@@ -336,6 +340,11 @@ import type {
   ReceiptsVoidReceiptData,
   ReceiptsVoidReceiptError,
   ReceiptsVoidReceiptResponse,
+  ReportsAbcData,
+  ReportsAbcError,
+  ReportsAbcExcelData,
+  ReportsAbcExcelError,
+  ReportsAbcResponse,
   ReportsDailyStockData,
   ReportsDailyStockError,
   ReportsDailyStockExcelData,
@@ -344,6 +353,11 @@ import type {
   ReportsDashboardData,
   ReportsDashboardError,
   ReportsDashboardResponse,
+  ReportsFastMovingData,
+  ReportsFastMovingError,
+  ReportsFastMovingExcelData,
+  ReportsFastMovingExcelError,
+  ReportsFastMovingResponse,
   ReportsHourlyData,
   ReportsHourlyError,
   ReportsHourlyExcelData,
@@ -4162,6 +4176,319 @@ export const reportsHourlyExcelOptions = (
     },
     queryKey: reportsHourlyExcelQueryKey(options),
   })
+
+export const reportsFastMovingQueryKey = (
+  options: Options<ReportsFastMovingData>,
+) => createQueryKey('reportsFastMoving', options)
+
+/**
+ * Fast Moving
+ */
+export const reportsFastMovingOptions = (
+  options: Options<ReportsFastMovingData>,
+) =>
+  queryOptions<
+    ReportsFastMovingResponse,
+    ReportsFastMovingError,
+    ReportsFastMovingResponse,
+    ReturnType<typeof reportsFastMovingQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await reportsFastMoving({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      })
+      return data
+    },
+    queryKey: reportsFastMovingQueryKey(options),
+  })
+
+export const reportsFastMovingInfiniteQueryKey = (
+  options: Options<ReportsFastMovingData>,
+): QueryKey<Options<ReportsFastMovingData>> =>
+  createQueryKey('reportsFastMoving', options, true)
+
+/**
+ * Fast Moving
+ */
+export const reportsFastMovingInfiniteOptions = (
+  options: Options<ReportsFastMovingData>,
+) => {
+  const opts = infiniteQueryOptions<
+    ReportsFastMovingResponse,
+    ReportsFastMovingError,
+    InfiniteData<ReportsFastMovingResponse>,
+    QueryKey<Options<ReportsFastMovingData>>,
+    | string
+    | Pick<
+        QueryKey<Options<ReportsFastMovingData>>[0],
+        'body' | 'headers' | 'path' | 'query'
+      >
+  >(
+    // @ts-ignore
+    {
+      queryFn: async ({ pageParam, queryKey, signal }) => {
+        // @ts-ignore
+        const page: Pick<
+          QueryKey<Options<ReportsFastMovingData>>[0],
+          'body' | 'headers' | 'path' | 'query'
+        > =
+          typeof pageParam === 'object'
+            ? pageParam
+            : {
+                query: {
+                  start: pageParam,
+                },
+              }
+        const params = createInfiniteParams(queryKey, page)
+        const { data } = await reportsFastMoving({
+          ...options,
+          ...params,
+          signal,
+          throwOnError: true,
+        })
+        return data
+      },
+      queryKey: reportsFastMovingInfiniteQueryKey(options),
+    },
+  )
+  return opts as Omit<typeof opts, 'initialData'>
+}
+
+export const reportsFastMovingExcelQueryKey = (
+  options: Options<ReportsFastMovingExcelData>,
+) => createQueryKey('reportsFastMovingExcel', options)
+
+/**
+ * Fast Moving Excel
+ */
+export const reportsFastMovingExcelOptions = (
+  options: Options<ReportsFastMovingExcelData>,
+) =>
+  queryOptions<
+    unknown,
+    ReportsFastMovingExcelError,
+    unknown,
+    ReturnType<typeof reportsFastMovingExcelQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await reportsFastMovingExcel({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      })
+      return data
+    },
+    queryKey: reportsFastMovingExcelQueryKey(options),
+  })
+
+export const reportsFastMovingExcelInfiniteQueryKey = (
+  options: Options<ReportsFastMovingExcelData>,
+): QueryKey<Options<ReportsFastMovingExcelData>> =>
+  createQueryKey('reportsFastMovingExcel', options, true)
+
+/**
+ * Fast Moving Excel
+ */
+export const reportsFastMovingExcelInfiniteOptions = (
+  options: Options<ReportsFastMovingExcelData>,
+) => {
+  const opts = infiniteQueryOptions<
+    unknown,
+    ReportsFastMovingExcelError,
+    InfiniteData<unknown>,
+    QueryKey<Options<ReportsFastMovingExcelData>>,
+    | string
+    | Pick<
+        QueryKey<Options<ReportsFastMovingExcelData>>[0],
+        'body' | 'headers' | 'path' | 'query'
+      >
+  >(
+    // @ts-ignore
+    {
+      queryFn: async ({ pageParam, queryKey, signal }) => {
+        // @ts-ignore
+        const page: Pick<
+          QueryKey<Options<ReportsFastMovingExcelData>>[0],
+          'body' | 'headers' | 'path' | 'query'
+        > =
+          typeof pageParam === 'object'
+            ? pageParam
+            : {
+                query: {
+                  start: pageParam,
+                },
+              }
+        const params = createInfiniteParams(queryKey, page)
+        const { data } = await reportsFastMovingExcel({
+          ...options,
+          ...params,
+          signal,
+          throwOnError: true,
+        })
+        return data
+      },
+      queryKey: reportsFastMovingExcelInfiniteQueryKey(options),
+    },
+  )
+  return opts as Omit<typeof opts, 'initialData'>
+}
+
+export const reportsAbcQueryKey = (options: Options<ReportsAbcData>) =>
+  createQueryKey('reportsAbc', options)
+
+/**
+ * Abc
+ */
+export const reportsAbcOptions = (options: Options<ReportsAbcData>) =>
+  queryOptions<
+    ReportsAbcResponse,
+    ReportsAbcError,
+    ReportsAbcResponse,
+    ReturnType<typeof reportsAbcQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await reportsAbc({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      })
+      return data
+    },
+    queryKey: reportsAbcQueryKey(options),
+  })
+
+export const reportsAbcInfiniteQueryKey = (
+  options: Options<ReportsAbcData>,
+): QueryKey<Options<ReportsAbcData>> =>
+  createQueryKey('reportsAbc', options, true)
+
+/**
+ * Abc
+ */
+export const reportsAbcInfiniteOptions = (options: Options<ReportsAbcData>) => {
+  const opts = infiniteQueryOptions<
+    ReportsAbcResponse,
+    ReportsAbcError,
+    InfiniteData<ReportsAbcResponse>,
+    QueryKey<Options<ReportsAbcData>>,
+    | string
+    | Pick<
+        QueryKey<Options<ReportsAbcData>>[0],
+        'body' | 'headers' | 'path' | 'query'
+      >
+  >(
+    // @ts-ignore
+    {
+      queryFn: async ({ pageParam, queryKey, signal }) => {
+        // @ts-ignore
+        const page: Pick<
+          QueryKey<Options<ReportsAbcData>>[0],
+          'body' | 'headers' | 'path' | 'query'
+        > =
+          typeof pageParam === 'object'
+            ? pageParam
+            : {
+                query: {
+                  start: pageParam,
+                },
+              }
+        const params = createInfiniteParams(queryKey, page)
+        const { data } = await reportsAbc({
+          ...options,
+          ...params,
+          signal,
+          throwOnError: true,
+        })
+        return data
+      },
+      queryKey: reportsAbcInfiniteQueryKey(options),
+    },
+  )
+  return opts as Omit<typeof opts, 'initialData'>
+}
+
+export const reportsAbcExcelQueryKey = (
+  options: Options<ReportsAbcExcelData>,
+) => createQueryKey('reportsAbcExcel', options)
+
+/**
+ * Abc Excel
+ */
+export const reportsAbcExcelOptions = (options: Options<ReportsAbcExcelData>) =>
+  queryOptions<
+    unknown,
+    ReportsAbcExcelError,
+    unknown,
+    ReturnType<typeof reportsAbcExcelQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await reportsAbcExcel({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      })
+      return data
+    },
+    queryKey: reportsAbcExcelQueryKey(options),
+  })
+
+export const reportsAbcExcelInfiniteQueryKey = (
+  options: Options<ReportsAbcExcelData>,
+): QueryKey<Options<ReportsAbcExcelData>> =>
+  createQueryKey('reportsAbcExcel', options, true)
+
+/**
+ * Abc Excel
+ */
+export const reportsAbcExcelInfiniteOptions = (
+  options: Options<ReportsAbcExcelData>,
+) => {
+  const opts = infiniteQueryOptions<
+    unknown,
+    ReportsAbcExcelError,
+    InfiniteData<unknown>,
+    QueryKey<Options<ReportsAbcExcelData>>,
+    | string
+    | Pick<
+        QueryKey<Options<ReportsAbcExcelData>>[0],
+        'body' | 'headers' | 'path' | 'query'
+      >
+  >(
+    // @ts-ignore
+    {
+      queryFn: async ({ pageParam, queryKey, signal }) => {
+        // @ts-ignore
+        const page: Pick<
+          QueryKey<Options<ReportsAbcExcelData>>[0],
+          'body' | 'headers' | 'path' | 'query'
+        > =
+          typeof pageParam === 'object'
+            ? pageParam
+            : {
+                query: {
+                  start: pageParam,
+                },
+              }
+        const params = createInfiniteParams(queryKey, page)
+        const { data } = await reportsAbcExcel({
+          ...options,
+          ...params,
+          signal,
+          throwOnError: true,
+        })
+        return data
+      },
+      queryKey: reportsAbcExcelInfiniteQueryKey(options),
+    },
+  )
+  return opts as Omit<typeof opts, 'initialData'>
+}
 
 export const reportsDashboardQueryKey = (
   options?: Options<ReportsDashboardData>,

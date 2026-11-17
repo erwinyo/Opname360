@@ -139,14 +139,22 @@ from opname360.models.receipt import (
     TillSku,
 )
 from opname360.models.report import (
+    AbcClass,
+    AbcClassTotal,
+    AbcReport,
+    AbcRow,
     DailyStock,
     DailyStockCategory,
     DailyStockFilter,
     DailyStockRow,
     DailyStockSubCategory,
     Dashboard,
+    FastMoving,
+    FastMovingFilter,
+    FastMovingRow,
     HourFigures,
     HourlySales,
+    ProductSalesFilter,
     SalesFigures,
     SalesFilter,
     SalesGroupBy,
@@ -155,6 +163,7 @@ from opname360.models.report import (
     SalesReceiptPage,
     SalesReport,
     SalesRow,
+    SkuSales,
     StockFlow,
 )
 from opname360.models.shift import (
@@ -218,6 +227,10 @@ from opname360.models.user import (
 
 
 __all__ = [
+    'AbcClass',
+    'AbcClassTotal',
+    'AbcReport',
+    'AbcRow',
     'ActivityLog',
     'ActivityLogEntry',
     'ActivityLogFilter',
@@ -250,6 +263,9 @@ __all__ = [
     'EmployeeChargePage',
     'EmployeeChargePublic',
     'EmployeeChargeTotal',
+    'FastMoving',
+    'FastMovingFilter',
+    'FastMovingRow',
     'GoodsReceipt',
     'GoodsReceiptFilter',
     'GoodsReceiptLine',
@@ -297,6 +313,7 @@ __all__ = [
     'ProductFilter',
     'ProductPage',
     'ProductPublic',
+    'ProductSalesFilter',
     'ProductSave',
     'ProductionReceipt',
     'ProductionReceiptFilter',
@@ -361,6 +378,7 @@ __all__ = [
     'SkuPriceChange',
     'SkuPriceChangePublic',
     'SkuPublic',
+    'SkuSales',
     'SkuSave',
     'StaffOption',
     'StockBalance',

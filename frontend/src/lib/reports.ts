@@ -60,3 +60,11 @@ export function compact(amount: number): string {
 export function hourRange(hour: number): string {
   return `${hourLabel(hour)}–${hourLabel(hour + 1)}`
 }
+
+/** The date `days` before today, as "2026-10-19" for a date input. */
+export function daysAgo(days: number): string {
+  const at = new Date()
+  at.setDate(at.getDate() - days)
+  const pad = (n: number) => String(n).padStart(2, '0')
+  return `${at.getFullYear()}-${pad(at.getMonth() + 1)}-${pad(at.getDate())}`
+}

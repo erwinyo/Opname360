@@ -9,10 +9,14 @@ from fastapi.sse import EventSourceResponse, ServerSentEvent
 
 from opname360.api.deps import SessionDep, require_admin
 from opname360.models import (
+    AbcReport,
     DailyStock,
     DailyStockFilter,
     Dashboard,
+    FastMoving,
+    FastMovingFilter,
     HourlySales,
+    ProductSalesFilter,
     SalesFilter,
     SalesReceiptFilter,
     SalesReceiptPage,
@@ -95,6 +99,42 @@ def hourly_excel(
     hours = reports.shown_hours(session, report)
     return excel_file(
         excel.hourly(report, hours), f'laba-kotor-per-jam-{day}.xlsx'
+    )
+
+
+@router.get('/fast-moving')
+def fast_moving(
+    session: SessionDep, filters: Annotated[FastMovingFilter, Query()]
+) -> FastMoving:
+    return reports.fast_moving(session, filters)
+
+
+@router.get('/fast-moving/excel', response_class=Response, responses=EXCEL)
+def fast_moving_excel(
+    session: SessionDep, filters: Annotated[FastMovingFilter, Query()]
+) -> Response:
+    report = reports.fast_moving(session, filters)
+    return excel_file(
+        excel.fast_moving(report),
+        f'fast-moving-{filters.start}-{filters.end}.xlsx',
+    )
+
+
+@router.get('/abc')
+def abc(
+    session: SessionDep, filters: Annotated[ProductSalesFilter, Query()]
+) -> AbcReport:
+    return reports.abc_report(session, filters)
+
+
+@router.get('/abc/excel', response_class=Response, responses=EXCEL)
+def abc_excel(
+    session: SessionDep, filters: Annotated[ProductSalesFilter, Query()]
+) -> Response:
+    report = reports.abc_report(session, filters)
+    return excel_file(
+        excel.abc(report),
+        f'kontribusi-omzet-{filters.start}-{filters.end}.xlsx',
     )
 
 

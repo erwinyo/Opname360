@@ -229,6 +229,12 @@ import type {
   ReceiptsVoidReceiptData,
   ReceiptsVoidReceiptErrors,
   ReceiptsVoidReceiptResponses,
+  ReportsAbcData,
+  ReportsAbcErrors,
+  ReportsAbcExcelData,
+  ReportsAbcExcelErrors,
+  ReportsAbcExcelResponses,
+  ReportsAbcResponses,
   ReportsDailyStockData,
   ReportsDailyStockErrors,
   ReportsDailyStockExcelData,
@@ -238,6 +244,12 @@ import type {
   ReportsDashboardData,
   ReportsDashboardErrors,
   ReportsDashboardResponses,
+  ReportsFastMovingData,
+  ReportsFastMovingErrors,
+  ReportsFastMovingExcelData,
+  ReportsFastMovingExcelErrors,
+  ReportsFastMovingExcelResponses,
+  ReportsFastMovingResponses,
   ReportsHourlyData,
   ReportsHourlyErrors,
   ReportsHourlyExcelData,
@@ -2339,6 +2351,66 @@ export const reportsHourlyExcel = <ThrowOnError extends boolean = false>(
     ReportsHourlyExcelErrors,
     ThrowOnError
   >({ url: '/api/v1/reports/hourly/excel', ...options })
+
+/**
+ * Fast Moving
+ */
+export const reportsFastMoving = <ThrowOnError extends boolean = false>(
+  options: Options<ReportsFastMovingData, ThrowOnError>,
+): RequestResult<
+  ReportsFastMovingResponses,
+  ReportsFastMovingErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    ReportsFastMovingResponses,
+    ReportsFastMovingErrors,
+    ThrowOnError
+  >({ url: '/api/v1/reports/fast-moving', ...options })
+
+/**
+ * Fast Moving Excel
+ */
+export const reportsFastMovingExcel = <ThrowOnError extends boolean = false>(
+  options: Options<ReportsFastMovingExcelData, ThrowOnError>,
+): RequestResult<
+  ReportsFastMovingExcelResponses,
+  ReportsFastMovingExcelErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    ReportsFastMovingExcelResponses,
+    ReportsFastMovingExcelErrors,
+    ThrowOnError
+  >({ url: '/api/v1/reports/fast-moving/excel', ...options })
+
+/**
+ * Abc
+ */
+export const reportsAbc = <ThrowOnError extends boolean = false>(
+  options: Options<ReportsAbcData, ThrowOnError>,
+): RequestResult<ReportsAbcResponses, ReportsAbcErrors, ThrowOnError> =>
+  (options.client ?? client).get<
+    ReportsAbcResponses,
+    ReportsAbcErrors,
+    ThrowOnError
+  >({ url: '/api/v1/reports/abc', ...options })
+
+/**
+ * Abc Excel
+ */
+export const reportsAbcExcel = <ThrowOnError extends boolean = false>(
+  options: Options<ReportsAbcExcelData, ThrowOnError>,
+): RequestResult<
+  ReportsAbcExcelResponses,
+  ReportsAbcExcelErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    ReportsAbcExcelResponses,
+    ReportsAbcExcelErrors,
+    ThrowOnError
+  >({ url: '/api/v1/reports/abc/excel', ...options })
 
 /**
  * Dashboard

@@ -11,10 +11,14 @@ from zoneinfo import ZoneInfo
 
 from sqlalchemy import Date, and_, cast, not_
 from sqlalchemy.dialects.postgresql import distinct_on
-from sqlmodel import Session, case, col, func, select
+from sqlmodel import Session, case, col, func, or_, select
 
 from opname360.core.config import settings
 from opname360.models import (
+    AbcClass,
+    AbcClassTotal,
+    AbcReport,
+    AbcRow,
     ActivityLog,
     Category,
     DailyStock,
@@ -23,12 +27,16 @@ from opname360.models import (
     DailyStockRow,
     DailyStockSubCategory,
     Dashboard,
+    FastMoving,
+    FastMovingFilter,
+    FastMovingRow,
     HourFigures,
     HourlySales,
     Location,
     Payment,
     PaymentMethod,
     Product,
+    ProductSalesFilter,
     Receipt,
     ReceiptLine,
     ReceiptStatus,
@@ -41,6 +49,7 @@ from opname360.models import (
     SalesReport,
     SalesRow,
     Sku,
+    StockBalance,
     StockFlow,
     StockMovement,
     SubCategory,
@@ -559,3 +568,157 @@ def dashboard(session: Session) -> Dashboard:
 def latest_activity(session: Session) -> int:
     """Grows with everything recorded: the live dashboard's signal."""
     return session.exec(select(func.max(ActivityLog.id))).one() or 0
+
+
+# Fast Moving and Kontribusi Omzet
+
+A_LINE = Decimal('0.80')
+B_LINE = Decimal('0.95')
+SHARE = Decimal('0.0001')
+
+
+def _sku_sales(
+    session: Session, filters: ProductSalesFilter, *, every_sku: bool
+) -> list[tuple[Any, ...]]:
+    """Per SKU: units sold minus returned and Net Sales over the period,
+    with its System Quantity now. With `every_sku`, active SKUs that sold
+    nothing are there too."""
+    start, end = day_bounds(filters.start, filters.end)
+    sold = (
+        select(
+            col(ReceiptLine.sku_id).label('sku_id'),
+            func.sum(ReceiptLine.quantity).label('units'),
+            func.sum(ReceiptLine.line_total).label('net'),
+        )
+        .join(Receipt, col(ReceiptLine.receipt_id) == Receipt.id)
+        .where(
+            Receipt.status == ReceiptStatus.completed,
+            col(Receipt.created_at) >= start,
+            col(Receipt.created_at) < end,
+        )
+        .group_by(col(ReceiptLine.sku_id))
+        .subquery()
+    )
+    location_id = stock.resolve_location(session, None)
+    units = func.coalesce(sold.c.units, 0)
+    net = func.coalesce(sold.c.net, 0)
+    columns: list[Any] = [
+        Sku,
+        Product.name,
+        Category.name,
+        units,
+        net,
+        func.coalesce(StockBalance.quantity, 0),
+    ]
+    conditions: list[Any] = []
+    if filters.category_id is not None:
+        conditions.append(SubCategory.category_id == filters.category_id)
+    if filters.sub_category_id is not None:
+        conditions.append(Product.sub_category_id == filters.sub_category_id)
+    if every_sku:
+        conditions.append(or_(col(Sku.is_active), sold.c.sku_id.is_not(None)))
+    query: Any = (
+        select(*columns)
+        .select_from(Sku)
+        .join(Product, col(Sku.product_id) == Product.id)
+        .join(SubCategory, col(Product.sub_category_id) == SubCategory.id)
+        .join(Category, col(SubCategory.category_id) == Category.id)
+        .join(sold, sold.c.sku_id == Sku.id, isouter=every_sku)
+        .join(
+            StockBalance,
+            and_(
+                col(StockBalance.sku_id) == Sku.id,
+                col(StockBalance.location_id) == location_id,
+            ),
+            isouter=True,
+        )
+        .where(*conditions)
+    )
+    if every_sku:
+        query = query.order_by(net.desc(), col(Product.name), col(Sku.id))
+    else:
+        query = query.where(units > 0).order_by(
+            units.desc(), net.desc(), col(Product.name), col(Sku.id)
+        )
+    return list(session.exec(query).all())
+
+
+def _sku_fields(
+    sku: Sku, product_name: str, category_name: str, units: Decimal, net: int
+) -> dict[str, Any]:
+    return {
+        'sku_id': sku.id,
+        'product_name': product_name,
+        'size': sku.size,
+        'color': sku.color,
+        'code': sku.code,
+        'stock_unit': sku.stock_unit,
+        'category_name': category_name,
+        'units_sold': units,
+        'net_sales': net,
+    }
+
+
+def fast_moving(session: Session, filters: FastMovingFilter) -> FastMoving:
+    """SKUs by units sold minus units returned (rule 9)."""
+    rows = _sku_sales(session, filters, every_sku=False)[: filters.limit]
+    return FastMoving(
+        start=filters.start,
+        end=filters.end,
+        rows=[
+            FastMovingRow(**_sku_fields(*row[:5]), stock=row[5])
+            for row in rows
+        ],
+    )
+
+
+def abc_report(session: Session, filters: ProductSalesFilter) -> AbcReport:
+    """ABC Class by Net Sales (rule 10): A until the running share reaches
+    80% (the SKU that crosses the line is still A), B until 95%, C the rest,
+    including SKUs that sold nothing."""
+    rows = _sku_sales(session, filters, every_sku=True)
+    total = sum((row[4] for row in rows), 0)
+    running = ZERO
+    out: list[AbcRow] = []
+    for row in rows:
+        net = row[4]
+        before = running
+        share = Decimal(net) / total if total > 0 else ZERO
+        running += share
+        if net <= 0 or total <= 0:
+            abc_class = AbcClass.c
+        elif before < A_LINE:
+            abc_class = AbcClass.a
+        elif before < B_LINE:
+            abc_class = AbcClass.b
+        else:
+            abc_class = AbcClass.c
+        out.append(
+            AbcRow(
+                **_sku_fields(*row[:5]),
+                share=share.quantize(SHARE),
+                running_share=running.quantize(SHARE),
+                abc_class=abc_class,
+            )
+        )
+    classes = []
+    for abc_class in AbcClass:
+        members = [row for row in out if row.abc_class == abc_class]
+        net = sum(row.net_sales for row in members)
+        classes.append(
+            AbcClassTotal(
+                abc_class=abc_class,
+                sku_count=len(members),
+                net_sales=net,
+                share=(Decimal(net) / total).quantize(SHARE)
+                if total > 0
+                else ZERO,
+            )
+        )
+    return AbcReport(
+        start=filters.start,
+        end=filters.end,
+        net_sales=total,
+        classes=classes,
+        rows=out,
+    )

@@ -6922,6 +6922,426 @@
         }
       }
     },
+    "/api/v1/reports/fast-moving": {
+      "get": {
+        "tags": [
+          "reports"
+        ],
+        "summary": "Fast Moving",
+        "operationId": "reports-fast_moving",
+        "parameters": [
+          {
+            "name": "start",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "title": "Start"
+            }
+          },
+          {
+            "name": "end",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "title": "End"
+            }
+          },
+          {
+            "name": "category_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Category Id"
+            }
+          },
+          {
+            "name": "sub_category_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Sub Category Id"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 500,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "opname360_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Opname360 Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FastMoving"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/reports/fast-moving/excel": {
+      "get": {
+        "tags": [
+          "reports"
+        ],
+        "summary": "Fast Moving Excel",
+        "operationId": "reports-fast_moving_excel",
+        "parameters": [
+          {
+            "name": "start",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "title": "Start"
+            }
+          },
+          {
+            "name": "end",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "title": "End"
+            }
+          },
+          {
+            "name": "category_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Category Id"
+            }
+          },
+          {
+            "name": "sub_category_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Sub Category Id"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 500,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "opname360_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Opname360 Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {}
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/reports/abc": {
+      "get": {
+        "tags": [
+          "reports"
+        ],
+        "summary": "Abc",
+        "operationId": "reports-abc",
+        "parameters": [
+          {
+            "name": "start",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "title": "Start"
+            }
+          },
+          {
+            "name": "end",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "title": "End"
+            }
+          },
+          {
+            "name": "category_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Category Id"
+            }
+          },
+          {
+            "name": "sub_category_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Sub Category Id"
+            }
+          },
+          {
+            "name": "opname360_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Opname360 Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AbcReport"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/reports/abc/excel": {
+      "get": {
+        "tags": [
+          "reports"
+        ],
+        "summary": "Abc Excel",
+        "operationId": "reports-abc_excel",
+        "parameters": [
+          {
+            "name": "start",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "title": "Start"
+            }
+          },
+          {
+            "name": "end",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "title": "End"
+            }
+          },
+          {
+            "name": "category_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Category Id"
+            }
+          },
+          {
+            "name": "sub_category_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Sub Category Id"
+            }
+          },
+          {
+            "name": "opname360_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Opname360 Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {}
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/reports/dashboard": {
       "get": {
         "tags": [
@@ -7127,6 +7547,164 @@
   },
   "components": {
     "schemas": {
+      "AbcClass": {
+        "type": "string",
+        "enum": [
+          "A",
+          "B",
+          "C"
+        ],
+        "title": "AbcClass"
+      },
+      "AbcClassTotal": {
+        "properties": {
+          "abc_class": {
+            "$ref": "#/components/schemas/AbcClass"
+          },
+          "sku_count": {
+            "type": "integer",
+            "title": "Sku Count"
+          },
+          "net_sales": {
+            "type": "integer",
+            "title": "Net Sales"
+          },
+          "share": {
+            "type": "string",
+            "title": "Share"
+          }
+        },
+        "type": "object",
+        "required": [
+          "abc_class",
+          "sku_count",
+          "net_sales",
+          "share"
+        ],
+        "title": "AbcClassTotal"
+      },
+      "AbcReport": {
+        "properties": {
+          "start": {
+            "type": "string",
+            "format": "date",
+            "title": "Start"
+          },
+          "end": {
+            "type": "string",
+            "format": "date",
+            "title": "End"
+          },
+          "net_sales": {
+            "type": "integer",
+            "title": "Net Sales"
+          },
+          "classes": {
+            "items": {
+              "$ref": "#/components/schemas/AbcClassTotal"
+            },
+            "type": "array",
+            "title": "Classes"
+          },
+          "rows": {
+            "items": {
+              "$ref": "#/components/schemas/AbcRow"
+            },
+            "type": "array",
+            "title": "Rows"
+          }
+        },
+        "type": "object",
+        "required": [
+          "start",
+          "end",
+          "net_sales",
+          "classes",
+          "rows"
+        ],
+        "title": "AbcReport"
+      },
+      "AbcRow": {
+        "properties": {
+          "sku_id": {
+            "type": "integer",
+            "title": "Sku Id"
+          },
+          "product_name": {
+            "type": "string",
+            "title": "Product Name"
+          },
+          "size": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Size"
+          },
+          "color": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Color"
+          },
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "stock_unit": {
+            "type": "string",
+            "title": "Stock Unit"
+          },
+          "category_name": {
+            "type": "string",
+            "title": "Category Name"
+          },
+          "units_sold": {
+            "type": "string",
+            "title": "Units Sold"
+          },
+          "net_sales": {
+            "type": "integer",
+            "title": "Net Sales"
+          },
+          "share": {
+            "type": "string",
+            "title": "Share"
+          },
+          "running_share": {
+            "type": "string",
+            "title": "Running Share"
+          },
+          "abc_class": {
+            "$ref": "#/components/schemas/AbcClass"
+          }
+        },
+        "type": "object",
+        "required": [
+          "sku_id",
+          "product_name",
+          "size",
+          "color",
+          "code",
+          "stock_unit",
+          "category_name",
+          "units_sold",
+          "net_sales",
+          "share",
+          "running_share",
+          "abc_class"
+        ],
+        "title": "AbcRow"
+      },
       "ActivityLogEntry": {
         "properties": {
           "id": {
@@ -7977,6 +8555,106 @@
         ],
         "title": "EmployeeChargeTotal",
         "description": "What one employee still owes."
+      },
+      "FastMoving": {
+        "properties": {
+          "start": {
+            "type": "string",
+            "format": "date",
+            "title": "Start"
+          },
+          "end": {
+            "type": "string",
+            "format": "date",
+            "title": "End"
+          },
+          "rows": {
+            "items": {
+              "$ref": "#/components/schemas/FastMovingRow"
+            },
+            "type": "array",
+            "title": "Rows"
+          }
+        },
+        "type": "object",
+        "required": [
+          "start",
+          "end",
+          "rows"
+        ],
+        "title": "FastMoving"
+      },
+      "FastMovingRow": {
+        "properties": {
+          "sku_id": {
+            "type": "integer",
+            "title": "Sku Id"
+          },
+          "product_name": {
+            "type": "string",
+            "title": "Product Name"
+          },
+          "size": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Size"
+          },
+          "color": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Color"
+          },
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "stock_unit": {
+            "type": "string",
+            "title": "Stock Unit"
+          },
+          "category_name": {
+            "type": "string",
+            "title": "Category Name"
+          },
+          "units_sold": {
+            "type": "string",
+            "title": "Units Sold"
+          },
+          "net_sales": {
+            "type": "integer",
+            "title": "Net Sales"
+          },
+          "stock": {
+            "type": "string",
+            "title": "Stock"
+          }
+        },
+        "type": "object",
+        "required": [
+          "sku_id",
+          "product_name",
+          "size",
+          "color",
+          "code",
+          "stock_unit",
+          "category_name",
+          "units_sold",
+          "net_sales",
+          "stock"
+        ],
+        "title": "FastMovingRow"
       },
       "GoodsReceiptLinePublic": {
         "properties": {

@@ -1,7 +1,7 @@
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
 import type { FormEvent } from 'react'
-import { useNavigate } from 'react-router'
+import { useLocation, useNavigate } from 'react-router'
 import { toast } from 'sonner'
 
 import type { OpnameScope, SkuOption } from '@/client'
@@ -37,8 +37,14 @@ import { skuName } from '@/lib/format'
 import { SCOPE_LABELS } from '@/lib/labels'
 import { toggle } from '@/lib/utils'
 
+type ChosenSku = Pick<SkuOption, 'id' | 'product_name' | 'size' | 'color'>
+
+/** What a report hands over: the SKUs already chosen (slice 4, rule 11). */
+export type OpnameFromReport = { skus: ChosenSku[]; note: string }
+
 export function OpenOpnamePage() {
   const navigate = useNavigate()
+  const handed = useLocation().state as OpnameFromReport | null
   const categories = useQuery(categoriesListCategoriesOptions())
   const staff = useQuery(opnamesListStaffOptions())
   // Only before any stock has moved; after go-live the switch is noise.
@@ -47,9 +53,9 @@ export function OpenOpnamePage() {
   const [scope, setScope] = useState<OpnameScope>('skus')
   const [categoryIds, setCategoryIds] = useState<number[]>([])
   const [subCategoryIds, setSubCategoryIds] = useState<number[]>([])
-  const [skus, setSkus] = useState<SkuOption[]>([])
+  const [skus, setSkus] = useState<ChosenSku[]>(handed?.skus ?? [])
   const [checkerIds, setCheckerIds] = useState<number[]>([])
-  const [note, setNote] = useState('')
+  const [note, setNote] = useState(handed?.note ?? '')
   const [checked, setChecked] = useState(false)
 
   const effectiveScope = opening ? 'everything' : scope

@@ -7342,6 +7342,222 @@
         }
       }
     },
+    "/api/v1/reports/variances": {
+      "get": {
+        "tags": [
+          "reports"
+        ],
+        "summary": "Variances",
+        "operationId": "reports-variances",
+        "parameters": [
+          {
+            "name": "start",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "title": "Start"
+            }
+          },
+          {
+            "name": "end",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "title": "End"
+            }
+          },
+          {
+            "name": "category_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Category Id"
+            }
+          },
+          {
+            "name": "sub_category_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Sub Category Id"
+            }
+          },
+          {
+            "name": "group_by",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/VarianceGroupBy",
+              "default": "sku"
+            }
+          },
+          {
+            "name": "opname360_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Opname360 Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VarianceReport"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/reports/variances/excel": {
+      "get": {
+        "tags": [
+          "reports"
+        ],
+        "summary": "Variances Excel",
+        "operationId": "reports-variances_excel",
+        "parameters": [
+          {
+            "name": "start",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "title": "Start"
+            }
+          },
+          {
+            "name": "end",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "title": "End"
+            }
+          },
+          {
+            "name": "category_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Category Id"
+            }
+          },
+          {
+            "name": "sub_category_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Sub Category Id"
+            }
+          },
+          {
+            "name": "group_by",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/VarianceGroupBy",
+              "default": "sku"
+            }
+          },
+          {
+            "name": "opname360_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Opname360 Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {}
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/reports/dashboard": {
       "get": {
         "tags": [
@@ -7790,6 +8006,37 @@
           "total"
         ],
         "title": "ActivityLogPage"
+      },
+      "Attention": {
+        "properties": {
+          "negative_stock": {
+            "type": "integer",
+            "title": "Negative Stock"
+          },
+          "voids_today": {
+            "items": {
+              "$ref": "#/components/schemas/VoidToday"
+            },
+            "type": "array",
+            "title": "Voids Today"
+          },
+          "opnames_waiting": {
+            "type": "integer",
+            "title": "Opnames Waiting"
+          },
+          "shifts_waiting": {
+            "type": "integer",
+            "title": "Shifts Waiting"
+          }
+        },
+        "type": "object",
+        "required": [
+          "negative_stock",
+          "voids_today",
+          "opnames_waiting",
+          "shifts_waiting"
+        ],
+        "title": "Attention"
       },
       "Body_products-preview_import": {
         "properties": {
@@ -8411,11 +8658,15 @@
         "properties": {
           "today": {
             "$ref": "#/components/schemas/HourlySales"
+          },
+          "attention": {
+            "$ref": "#/components/schemas/Attention"
           }
         },
         "type": "object",
         "required": [
-          "today"
+          "today",
+          "attention"
         ],
         "title": "Dashboard"
       },
@@ -13987,6 +14238,200 @@
           "type"
         ],
         "title": "ValidationError"
+      },
+      "VarianceFigures": {
+        "properties": {
+          "line_count": {
+            "type": "integer",
+            "title": "Line Count"
+          },
+          "shortage_quantity": {
+            "type": "string",
+            "title": "Shortage Quantity"
+          },
+          "shortage_value": {
+            "type": "string",
+            "title": "Shortage Value"
+          },
+          "surplus_quantity": {
+            "type": "string",
+            "title": "Surplus Quantity"
+          },
+          "surplus_value": {
+            "type": "string",
+            "title": "Surplus Value"
+          },
+          "net_value": {
+            "type": "string",
+            "title": "Net Value"
+          }
+        },
+        "type": "object",
+        "required": [
+          "line_count",
+          "shortage_quantity",
+          "shortage_value",
+          "surplus_quantity",
+          "surplus_value",
+          "net_value"
+        ],
+        "title": "VarianceFigures",
+        "description": "Variances of approved Stock Opnames. Quantities and values of a\nShortage are positive; net value is surplus minus shortage."
+      },
+      "VarianceGroupBy": {
+        "type": "string",
+        "enum": [
+          "sku",
+          "reason",
+          "resolution"
+        ],
+        "title": "VarianceGroupBy"
+      },
+      "VarianceReport": {
+        "properties": {
+          "start": {
+            "type": "string",
+            "format": "date",
+            "title": "Start"
+          },
+          "end": {
+            "type": "string",
+            "format": "date",
+            "title": "End"
+          },
+          "group_by": {
+            "$ref": "#/components/schemas/VarianceGroupBy"
+          },
+          "rows": {
+            "items": {
+              "$ref": "#/components/schemas/VarianceRow"
+            },
+            "type": "array",
+            "title": "Rows"
+          },
+          "total": {
+            "$ref": "#/components/schemas/VarianceFigures"
+          }
+        },
+        "type": "object",
+        "required": [
+          "start",
+          "end",
+          "group_by",
+          "rows",
+          "total"
+        ],
+        "title": "VarianceReport"
+      },
+      "VarianceRow": {
+        "properties": {
+          "line_count": {
+            "type": "integer",
+            "title": "Line Count"
+          },
+          "shortage_quantity": {
+            "type": "string",
+            "title": "Shortage Quantity"
+          },
+          "shortage_value": {
+            "type": "string",
+            "title": "Shortage Value"
+          },
+          "surplus_quantity": {
+            "type": "string",
+            "title": "Surplus Quantity"
+          },
+          "surplus_value": {
+            "type": "string",
+            "title": "Surplus Value"
+          },
+          "net_value": {
+            "type": "string",
+            "title": "Net Value"
+          },
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Code"
+          },
+          "stock_unit": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stock Unit"
+          }
+        },
+        "type": "object",
+        "required": [
+          "line_count",
+          "shortage_quantity",
+          "shortage_value",
+          "surplus_quantity",
+          "surplus_value",
+          "net_value",
+          "key",
+          "label"
+        ],
+        "title": "VarianceRow"
+      },
+      "VoidToday": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "number": {
+            "type": "string",
+            "title": "Number"
+          },
+          "cashier_name": {
+            "type": "string",
+            "title": "Cashier Name"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "number",
+          "cashier_name",
+          "reason",
+          "total"
+        ],
+        "title": "VoidToday"
       },
       "ZeroConfirm": {
         "properties": {

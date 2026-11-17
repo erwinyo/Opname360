@@ -38,6 +38,7 @@ import { FastMovingPage } from '@/pages/reports/FastMovingPage'
 import { HourlyPage } from '@/pages/reports/HourlyPage'
 import { SalesPage } from '@/pages/reports/SalesPage'
 import { SalesReceiptsPage } from '@/pages/reports/SalesReceiptsPage'
+import { VariancesPage } from '@/pages/reports/VariancesPage'
 import { PaymentMethodsPage } from '@/pages/settings/PaymentMethodsPage'
 import { ShopSettingsPage } from '@/pages/settings/ShopSettingsPage'
 import { StockCardPage } from '@/pages/stock/StockCardPage'
@@ -140,6 +141,7 @@ export function App() {
             <Route path="laporan/laba-kotor" element={<HourlyPage />} />
             <Route path="laporan/fast-moving" element={<FastMovingPage />} />
             <Route path="laporan/kontribusi-omzet" element={<AbcPage />} />
+            <Route path="laporan/selisih-opname" element={<VariancesPage />} />
           </>
         )}
         {user.role === 'owner' && (

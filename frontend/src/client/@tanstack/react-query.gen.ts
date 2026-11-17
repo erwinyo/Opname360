@@ -96,6 +96,8 @@ import {
   reportsSales,
   reportsSalesExcel,
   reportsSalesReceipts,
+  reportsVariances,
+  reportsVariancesExcel,
   shiftsCloseShift,
   shiftsListShifts,
   shiftsOpenShift,
@@ -371,6 +373,11 @@ import type {
   ReportsSalesReceiptsError,
   ReportsSalesReceiptsResponse,
   ReportsSalesResponse,
+  ReportsVariancesData,
+  ReportsVariancesError,
+  ReportsVariancesExcelData,
+  ReportsVariancesExcelError,
+  ReportsVariancesResponse,
   ShiftsCloseShiftData,
   ShiftsCloseShiftError,
   ShiftsCloseShiftResponse,
@@ -4485,6 +4492,166 @@ export const reportsAbcExcelInfiniteOptions = (
         return data
       },
       queryKey: reportsAbcExcelInfiniteQueryKey(options),
+    },
+  )
+  return opts as Omit<typeof opts, 'initialData'>
+}
+
+export const reportsVariancesQueryKey = (
+  options: Options<ReportsVariancesData>,
+) => createQueryKey('reportsVariances', options)
+
+/**
+ * Variances
+ */
+export const reportsVariancesOptions = (
+  options: Options<ReportsVariancesData>,
+) =>
+  queryOptions<
+    ReportsVariancesResponse,
+    ReportsVariancesError,
+    ReportsVariancesResponse,
+    ReturnType<typeof reportsVariancesQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await reportsVariances({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      })
+      return data
+    },
+    queryKey: reportsVariancesQueryKey(options),
+  })
+
+export const reportsVariancesInfiniteQueryKey = (
+  options: Options<ReportsVariancesData>,
+): QueryKey<Options<ReportsVariancesData>> =>
+  createQueryKey('reportsVariances', options, true)
+
+/**
+ * Variances
+ */
+export const reportsVariancesInfiniteOptions = (
+  options: Options<ReportsVariancesData>,
+) => {
+  const opts = infiniteQueryOptions<
+    ReportsVariancesResponse,
+    ReportsVariancesError,
+    InfiniteData<ReportsVariancesResponse>,
+    QueryKey<Options<ReportsVariancesData>>,
+    | string
+    | Pick<
+        QueryKey<Options<ReportsVariancesData>>[0],
+        'body' | 'headers' | 'path' | 'query'
+      >
+  >(
+    // @ts-ignore
+    {
+      queryFn: async ({ pageParam, queryKey, signal }) => {
+        // @ts-ignore
+        const page: Pick<
+          QueryKey<Options<ReportsVariancesData>>[0],
+          'body' | 'headers' | 'path' | 'query'
+        > =
+          typeof pageParam === 'object'
+            ? pageParam
+            : {
+                query: {
+                  start: pageParam,
+                },
+              }
+        const params = createInfiniteParams(queryKey, page)
+        const { data } = await reportsVariances({
+          ...options,
+          ...params,
+          signal,
+          throwOnError: true,
+        })
+        return data
+      },
+      queryKey: reportsVariancesInfiniteQueryKey(options),
+    },
+  )
+  return opts as Omit<typeof opts, 'initialData'>
+}
+
+export const reportsVariancesExcelQueryKey = (
+  options: Options<ReportsVariancesExcelData>,
+) => createQueryKey('reportsVariancesExcel', options)
+
+/**
+ * Variances Excel
+ */
+export const reportsVariancesExcelOptions = (
+  options: Options<ReportsVariancesExcelData>,
+) =>
+  queryOptions<
+    unknown,
+    ReportsVariancesExcelError,
+    unknown,
+    ReturnType<typeof reportsVariancesExcelQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await reportsVariancesExcel({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      })
+      return data
+    },
+    queryKey: reportsVariancesExcelQueryKey(options),
+  })
+
+export const reportsVariancesExcelInfiniteQueryKey = (
+  options: Options<ReportsVariancesExcelData>,
+): QueryKey<Options<ReportsVariancesExcelData>> =>
+  createQueryKey('reportsVariancesExcel', options, true)
+
+/**
+ * Variances Excel
+ */
+export const reportsVariancesExcelInfiniteOptions = (
+  options: Options<ReportsVariancesExcelData>,
+) => {
+  const opts = infiniteQueryOptions<
+    unknown,
+    ReportsVariancesExcelError,
+    InfiniteData<unknown>,
+    QueryKey<Options<ReportsVariancesExcelData>>,
+    | string
+    | Pick<
+        QueryKey<Options<ReportsVariancesExcelData>>[0],
+        'body' | 'headers' | 'path' | 'query'
+      >
+  >(
+    // @ts-ignore
+    {
+      queryFn: async ({ pageParam, queryKey, signal }) => {
+        // @ts-ignore
+        const page: Pick<
+          QueryKey<Options<ReportsVariancesExcelData>>[0],
+          'body' | 'headers' | 'path' | 'query'
+        > =
+          typeof pageParam === 'object'
+            ? pageParam
+            : {
+                query: {
+                  start: pageParam,
+                },
+              }
+        const params = createInfiniteParams(queryKey, page)
+        const { data } = await reportsVariancesExcel({
+          ...options,
+          ...params,
+          signal,
+          throwOnError: true,
+        })
+        return data
+      },
+      queryKey: reportsVariancesExcelInfiniteQueryKey(options),
     },
   )
   return opts as Omit<typeof opts, 'initialData'>

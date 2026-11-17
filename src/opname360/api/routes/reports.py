@@ -21,6 +21,8 @@ from opname360.models import (
     SalesReceiptFilter,
     SalesReceiptPage,
     SalesReport,
+    VarianceFilter,
+    VarianceReport,
 )
 from opname360.services import excel, reports
 
@@ -135,6 +137,24 @@ def abc_excel(
     return excel_file(
         excel.abc(report),
         f'kontribusi-omzet-{filters.start}-{filters.end}.xlsx',
+    )
+
+
+@router.get('/variances')
+def variances(
+    session: SessionDep, filters: Annotated[VarianceFilter, Query()]
+) -> VarianceReport:
+    return reports.variances(session, filters)
+
+
+@router.get('/variances/excel', response_class=Response, responses=EXCEL)
+def variances_excel(
+    session: SessionDep, filters: Annotated[VarianceFilter, Query()]
+) -> Response:
+    report = reports.variances(session, filters)
+    return excel_file(
+        excel.variances(report),
+        f'selisih-opname-{filters.start}-{filters.end}-{filters.group_by}.xlsx',
     )
 
 

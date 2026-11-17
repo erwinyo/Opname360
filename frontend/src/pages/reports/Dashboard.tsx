@@ -13,6 +13,7 @@ import { errorMessage, queryClient } from '@/lib/api'
 import { formatLongDate, formatTime, money, rupiah } from '@/lib/format'
 import { useLiveUpdates } from '@/lib/live'
 import { hourRange, shownHours } from '@/lib/reports'
+import { AttentionList } from '@/pages/reports/Attention'
 
 /** Today so far, updated within seconds of every sale, return and Void. */
 export function Dashboard() {
@@ -87,6 +88,8 @@ export function Dashboard() {
           </p>
         </div>
       </div>
+
+      <AttentionList attention={dashboard.data.attention} />
 
       <div className="mt-3 rounded-xl border bg-card p-4">
         <div className="flex items-center justify-between gap-2">

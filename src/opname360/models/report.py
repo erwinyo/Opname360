@@ -132,10 +132,6 @@ class HourlySales(SalesFigures):
     hours: list[HourFigures]
 
 
-class Dashboard(SQLModel):
-    today: HourlySales
-
-
 class SalesReceiptFilter(SQLModel):
     """The Receipts behind one row of Penjualan."""
 
@@ -233,3 +229,67 @@ class AbcReport(SQLModel):
     net_sales: int
     classes: list[AbcClassTotal]
     rows: list[AbcRow]
+
+
+# Selisih Opname
+
+
+class VarianceGroupBy(StrEnum):
+    sku = 'sku'
+    reason = 'reason'
+    resolution = 'resolution'
+
+
+class VarianceFilter(ProductSalesFilter):
+    group_by: VarianceGroupBy = VarianceGroupBy.sku
+
+
+class VarianceFigures(SQLModel):
+    """Variances of approved Stock Opnames. Quantities and values of a
+    Shortage are positive; net value is surplus minus shortage."""
+
+    line_count: int
+    shortage_quantity: Decimal
+    shortage_value: Decimal
+    surplus_quantity: Decimal
+    surplus_value: Decimal
+    net_value: Decimal
+
+
+class VarianceRow(VarianceFigures):
+    # A SKU id, a Shortage reason, a Variance Resolution, or "surplus".
+    key: str
+    label: str
+    code: str | None = None
+    stock_unit: str | None = None
+
+
+class VarianceReport(SQLModel):
+    start: date
+    end: date
+    group_by: VarianceGroupBy
+    rows: list[VarianceRow]
+    total: VarianceFigures
+
+
+# The dashboard's attention list
+
+
+class VoidToday(SQLModel):
+    id: int
+    number: str
+    cashier_name: str
+    reason: str | None
+    total: int
+
+
+class Attention(SQLModel):
+    negative_stock: int
+    voids_today: list[VoidToday]
+    opnames_waiting: int
+    shifts_waiting: int
+
+
+class Dashboard(SQLModel):
+    today: HourlySales
+    attention: Attention

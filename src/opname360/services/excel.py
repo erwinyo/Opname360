@@ -21,6 +21,9 @@ from opname360.models import (
     SalesReport,
     SalesRow,
     StockFlow,
+    VarianceFigures,
+    VarianceGroupBy,
+    VarianceReport,
 )
 
 
@@ -300,6 +303,46 @@ def abc(report: AbcReport) -> bytes:
             Column('Penjualan bersih', 16, MONEY),
             Column('Porsi', 10, PERCENT),
             Column('Kumulatif', 10, PERCENT),
+        ],
+        rows,
+    )
+
+
+VARIANCE_TITLES = {
+    VarianceGroupBy.sku: 'Barang',
+    VarianceGroupBy.reason: 'Alasan',
+    VarianceGroupBy.resolution: 'Keputusan',
+}
+
+
+def variances(report: VarianceReport) -> bytes:
+    def figures(part: VarianceFigures) -> list[object]:
+        return [
+            part.line_count,
+            part.shortage_quantity,
+            rupiah(part.shortage_value),
+            part.surplus_quantity,
+            rupiah(part.surplus_value),
+            rupiah(part.net_value),
+        ]
+
+    rows: list[Row] = [
+        ([row.label, row.code or '', *figures(row)], False)
+        for row in report.rows
+    ]
+    rows.append((['Total', '', *figures(report.total)], True))
+    return workbook(
+        'Selisih Opname',
+        _period(report.start, report.end),
+        [
+            Column(VARIANCE_TITLES[report.group_by], 36),
+            Column('Kode', 16),
+            Column('Baris', 8),
+            Column('Kurang', 10),
+            Column('Nilai kurang', 16, MONEY),
+            Column('Lebih', 10),
+            Column('Nilai lebih', 16, MONEY),
+            Column('Selisih bersih', 16, MONEY),
         ],
         rows,
     )

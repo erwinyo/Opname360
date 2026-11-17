@@ -23,7 +23,10 @@ const PAGE_SIZE = 50
 
 /** Every Shift with its Cash Variance; shortages wait for the Owner. */
 export function ShiftsPage() {
-  const [waiting, setWaiting] = useState(false)
+  // The dashboard links here with ?menunggu=1.
+  const [waiting, setWaiting] = useState(
+    () => new URLSearchParams(window.location.search).get('menunggu') === '1',
+  )
   const [offset, setOffset] = useState(0)
   const shifts = useQuery({
     ...shiftsListShiftsOptions({

@@ -33,7 +33,13 @@ const ALL = 'all'
 
 export function OpnamesPage() {
   const navigate = useNavigate()
-  const [status, setStatus] = useState<OpnameStatus | null>(null)
+  // The dashboard links here with ?status=review.
+  const [status, setStatus] = useState<OpnameStatus | null>(
+    () =>
+      new URLSearchParams(window.location.search).get(
+        'status',
+      ) as OpnameStatus | null,
+  )
   const [offset, setOffset] = useState(0)
   const opnames = useQuery({
     ...opnamesListOpnamesOptions({

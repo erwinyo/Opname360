@@ -31,7 +31,10 @@ export function StockPage() {
   const [search, setSearch] = useState('')
   const [categoryId, setCategoryId] = useState(ALL)
   const [subCategoryId, setSubCategoryId] = useState(ALL)
-  const [negativeOnly, setNegativeOnly] = useState(false)
+  // The dashboard links here with ?minus=1.
+  const [negativeOnly, setNegativeOnly] = useState(
+    () => new URLSearchParams(window.location.search).get('minus') === '1',
+  )
   const [offset, setOffset] = useState(0)
 
   useEffect(() => {

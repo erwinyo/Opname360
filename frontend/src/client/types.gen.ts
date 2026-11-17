@@ -154,6 +154,28 @@ export type ActivityLogPage = {
 }
 
 /**
+ * Attention
+ */
+export type Attention = {
+  /**
+   * Negative Stock
+   */
+  negative_stock: number
+  /**
+   * Voids Today
+   */
+  voids_today: Array<VoidToday>
+  /**
+   * Opnames Waiting
+   */
+  opnames_waiting: number
+  /**
+   * Shifts Waiting
+   */
+  shifts_waiting: number
+}
+
+/**
  * Body_products-preview_import
  */
 export type BodyProductsPreviewImport = {
@@ -555,6 +577,7 @@ export type DailyStockSubCategory = {
  */
 export type Dashboard = {
   today: HourlySales
+  attention: Attention
 }
 
 /**
@@ -3664,6 +3687,136 @@ export type ValidationError = {
   ctx?: {
     [key: string]: unknown
   }
+}
+
+/**
+ * VarianceFigures
+ *
+ * Variances of approved Stock Opnames. Quantities and values of a
+ * Shortage are positive; net value is surplus minus shortage.
+ */
+export type VarianceFigures = {
+  /**
+   * Line Count
+   */
+  line_count: number
+  /**
+   * Shortage Quantity
+   */
+  shortage_quantity: string
+  /**
+   * Shortage Value
+   */
+  shortage_value: string
+  /**
+   * Surplus Quantity
+   */
+  surplus_quantity: string
+  /**
+   * Surplus Value
+   */
+  surplus_value: string
+  /**
+   * Net Value
+   */
+  net_value: string
+}
+
+/**
+ * VarianceGroupBy
+ */
+export type VarianceGroupBy = 'sku' | 'reason' | 'resolution'
+
+/**
+ * VarianceReport
+ */
+export type VarianceReport = {
+  /**
+   * Start
+   */
+  start: string
+  /**
+   * End
+   */
+  end: string
+  group_by: VarianceGroupBy
+  /**
+   * Rows
+   */
+  rows: Array<VarianceRow>
+  total: VarianceFigures
+}
+
+/**
+ * VarianceRow
+ */
+export type VarianceRow = {
+  /**
+   * Line Count
+   */
+  line_count: number
+  /**
+   * Shortage Quantity
+   */
+  shortage_quantity: string
+  /**
+   * Shortage Value
+   */
+  shortage_value: string
+  /**
+   * Surplus Quantity
+   */
+  surplus_quantity: string
+  /**
+   * Surplus Value
+   */
+  surplus_value: string
+  /**
+   * Net Value
+   */
+  net_value: string
+  /**
+   * Key
+   */
+  key: string
+  /**
+   * Label
+   */
+  label: string
+  /**
+   * Code
+   */
+  code?: string | null
+  /**
+   * Stock Unit
+   */
+  stock_unit?: string | null
+}
+
+/**
+ * VoidToday
+ */
+export type VoidToday = {
+  /**
+   * Id
+   */
+  id: number
+  /**
+   * Number
+   */
+  number: string
+  /**
+   * Cashier Name
+   */
+  cashier_name: string
+  /**
+   * Reason
+   */
+  reason: string | null
+  /**
+   * Total
+   */
+  total: number
 }
 
 /**
@@ -7249,6 +7402,93 @@ export type ReportsAbcExcelError =
   ReportsAbcExcelErrors[keyof ReportsAbcExcelErrors]
 
 export type ReportsAbcExcelResponses = {
+  /**
+   * Successful Response
+   */
+  200: unknown
+}
+
+export type ReportsVariancesData = {
+  body?: never
+  path?: never
+  query: {
+    /**
+     * Start
+     */
+    start: string
+    /**
+     * End
+     */
+    end: string
+    /**
+     * Category Id
+     */
+    category_id?: number | null
+    /**
+     * Sub Category Id
+     */
+    sub_category_id?: number | null
+    group_by?: VarianceGroupBy
+  }
+  url: '/api/v1/reports/variances'
+}
+
+export type ReportsVariancesErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError
+}
+
+export type ReportsVariancesError =
+  ReportsVariancesErrors[keyof ReportsVariancesErrors]
+
+export type ReportsVariancesResponses = {
+  /**
+   * Successful Response
+   */
+  200: VarianceReport
+}
+
+export type ReportsVariancesResponse =
+  ReportsVariancesResponses[keyof ReportsVariancesResponses]
+
+export type ReportsVariancesExcelData = {
+  body?: never
+  path?: never
+  query: {
+    /**
+     * Start
+     */
+    start: string
+    /**
+     * End
+     */
+    end: string
+    /**
+     * Category Id
+     */
+    category_id?: number | null
+    /**
+     * Sub Category Id
+     */
+    sub_category_id?: number | null
+    group_by?: VarianceGroupBy
+  }
+  url: '/api/v1/reports/variances/excel'
+}
+
+export type ReportsVariancesExcelErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError
+}
+
+export type ReportsVariancesExcelError =
+  ReportsVariancesExcelErrors[keyof ReportsVariancesExcelErrors]
+
+export type ReportsVariancesExcelResponses = {
   /**
    * Successful Response
    */

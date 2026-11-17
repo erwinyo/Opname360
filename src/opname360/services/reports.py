@@ -14,12 +14,14 @@ from sqlalchemy.dialects.postgresql import distinct_on
 from sqlmodel import Session, case, col, func, or_, select
 
 from opname360.core.config import settings
+from opname360.core.formatting import sku_label
 from opname360.models import (
     AbcClass,
     AbcClassTotal,
     AbcReport,
     AbcRow,
     ActivityLog,
+    Attention,
     Category,
     DailyStock,
     DailyStockCategory,
@@ -33,6 +35,8 @@ from opname360.models import (
     HourFigures,
     HourlySales,
     Location,
+    OpnameLine,
+    OpnameStatus,
     Payment,
     PaymentMethod,
     Product,
@@ -40,6 +44,7 @@ from opname360.models import (
     Receipt,
     ReceiptLine,
     ReceiptStatus,
+    Resolution,
     SalesFigures,
     SalesFilter,
     SalesGroupBy,
@@ -48,12 +53,21 @@ from opname360.models import (
     SalesReceiptPage,
     SalesReport,
     SalesRow,
+    Shift,
+    ShortageReason,
     Sku,
     StockBalance,
     StockFlow,
     StockMovement,
+    StockOpname,
     SubCategory,
     User,
+    VarianceFigures,
+    VarianceFilter,
+    VarianceGroupBy,
+    VarianceReport,
+    VarianceRow,
+    VoidToday,
 )
 from opname360.services import shop_settings, stock
 from opname360.services.documents import shop_now
@@ -562,7 +576,10 @@ def shown_hours(session: Session, report: HourlySales) -> list[int]:
 
 
 def dashboard(session: Session) -> Dashboard:
-    return Dashboard(today=hourly_sales(session, shop_now().date()))
+    return Dashboard(
+        today=hourly_sales(session, shop_now().date()),
+        attention=attention(session),
+    )
 
 
 def latest_activity(session: Session) -> int:
@@ -721,4 +738,175 @@ def abc_report(session: Session, filters: ProductSalesFilter) -> AbcReport:
         net_sales=total,
         classes=classes,
         rows=out,
+    )
+
+
+# Selisih Opname
+
+REASON_LABELS = {
+    ShortageReason.damaged: 'Rusak',
+    ShortageReason.lost: 'Hilang',
+    ShortageReason.miscounted: 'Salah hitung',
+    ShortageReason.unknown: 'Tidak diketahui',
+}
+RESOLUTION_LABELS = {
+    Resolution.company_loss: 'Kerugian perusahaan',
+    Resolution.employee_charge: 'Ganti rugi karyawan',
+}
+SURPLUS = 'surplus'
+
+
+def variances(session: Session, filters: VarianceFilter) -> VarianceReport:
+    """Every Variance of a Stock Opname approved in the period and not
+    reversed, by SKU, Shortage reason or Variance Resolution. Opening stock
+    is not a Variance."""
+    start, end = day_bounds(filters.start, filters.end)
+    conditions: list[Any] = [
+        StockOpname.status == OpnameStatus.approved,
+        col(StockOpname.is_opening).is_(False),
+        col(StockOpname.approved_at) >= start,
+        col(StockOpname.approved_at) < end,
+        col(OpnameLine.physical_quantity) != col(OpnameLine.system_quantity),
+    ]
+    if filters.category_id is not None:
+        conditions.append(SubCategory.category_id == filters.category_id)
+    if filters.sub_category_id is not None:
+        conditions.append(Product.sub_category_id == filters.sub_category_id)
+    lines = session.exec(
+        select(OpnameLine, Sku, Product.name)
+        .join(StockOpname, col(OpnameLine.opname_id) == StockOpname.id)
+        .join(Sku, col(OpnameLine.sku_id) == Sku.id)
+        .join(Product, col(Sku.product_id) == Product.id)
+        .join(SubCategory, col(Product.sub_category_id) == SubCategory.id)
+        .where(*conditions)
+    ).all()
+
+    groups: dict[str, list[OpnameLine]] = {}
+    labels: dict[str, tuple[str, str | None, str | None]] = {}
+    for line, sku, product_name in lines:
+        shortage = line.physical_quantity < (line.system_quantity or ZERO)
+        match filters.group_by:
+            case VarianceGroupBy.sku:
+                key = str(sku.id)
+                labels[key] = (
+                    sku_label(product_name, sku.size, sku.color),
+                    sku.code,
+                    sku.stock_unit,
+                )
+            case VarianceGroupBy.reason:
+                reason = line.shortage_reason if shortage else None
+                key = reason.value if reason else SURPLUS
+                labels[key] = (
+                    REASON_LABELS[reason] if reason else 'Selisih lebih',
+                    None,
+                    None,
+                )
+            case VarianceGroupBy.resolution:
+                resolution = line.resolution if shortage else None
+                key = resolution.value if resolution else SURPLUS
+                labels[key] = (
+                    RESOLUTION_LABELS[resolution]
+                    if resolution
+                    else 'Selisih lebih',
+                    None,
+                    None,
+                )
+        groups.setdefault(key, []).append(line)
+
+    rows = [
+        VarianceRow(
+            key=key,
+            label=labels[key][0],
+            code=labels[key][1],
+            stock_unit=labels[key][2],
+            **_variance_figures(members),
+        )
+        for key, members in groups.items()
+    ]
+    rows.sort(key=lambda row: (-row.shortage_value, -row.surplus_value))
+    return VarianceReport(
+        start=filters.start,
+        end=filters.end,
+        group_by=filters.group_by,
+        rows=rows,
+        total=VarianceFigures(
+            **_variance_figures([line for line, _, _ in lines])
+        ),
+    )
+
+
+def _variance_figures(lines: Sequence[OpnameLine]) -> dict[str, Any]:
+    shortage_quantity = shortage_value = surplus_quantity = surplus_value = (
+        ZERO
+    )
+    for line in lines:
+        variance = line.physical_quantity - (line.system_quantity or ZERO)
+        value = line.adjusted_value or ZERO
+        if variance < 0:
+            shortage_quantity -= variance
+            shortage_value -= value
+        else:
+            surplus_quantity += variance
+            surplus_value += value
+    return {
+        'line_count': len(lines),
+        'shortage_quantity': shortage_quantity,
+        'shortage_value': shortage_value,
+        'surplus_quantity': surplus_quantity,
+        'surplus_value': surplus_value,
+        'net_value': surplus_value - shortage_value,
+    }
+
+
+# The dashboard's attention list
+
+
+def attention(session: Session) -> Attention:
+    """SKUs in Negative Stock, today's Voids, Stock Opnames waiting for
+    approval (their Shortages need a Variance Resolution there), and short
+    drawers waiting for the Owner."""
+    start, end = day_bounds(shop_now().date())
+    negative = session.exec(
+        select(func.count())
+        .select_from(StockBalance)
+        .where(col(StockBalance.quantity) < 0)
+    ).one()
+    voids = session.exec(
+        select(Receipt, User.full_name)
+        .join(User, col(Receipt.cashier_id) == User.id)
+        .where(
+            Receipt.status == ReceiptStatus.voided,
+            col(Receipt.voided_at) >= start,
+            col(Receipt.voided_at) < end,
+        )
+        .order_by(col(Receipt.voided_at).desc())
+    ).all()
+    opnames = session.exec(
+        select(func.count())
+        .select_from(StockOpname)
+        .where(StockOpname.status == OpnameStatus.review)
+    ).one()
+    shifts = session.exec(
+        select(func.count())
+        .select_from(Shift)
+        .where(
+            col(Shift.closed_at).is_not(None),
+            col(Shift.cash_variance) < 0,
+            col(Shift.resolution).is_(None),
+        )
+    ).one()
+    return Attention(
+        negative_stock=negative,
+        voids_today=[
+            VoidToday(
+                id=receipt.id or 0,
+                number=receipt.number,
+                cashier_name=name,
+                reason=receipt.void_reason,
+                total=receipt.total,
+            )
+            for receipt, name in voids
+        ],
+        opnames_waiting=opnames,
+        shifts_waiting=shifts,
     )

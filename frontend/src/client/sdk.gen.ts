@@ -268,6 +268,12 @@ import type {
   ReportsSalesReceiptsErrors,
   ReportsSalesReceiptsResponses,
   ReportsSalesResponses,
+  ReportsVariancesData,
+  ReportsVariancesErrors,
+  ReportsVariancesExcelData,
+  ReportsVariancesExcelErrors,
+  ReportsVariancesExcelResponses,
+  ReportsVariancesResponses,
   ShiftsCloseShiftData,
   ShiftsCloseShiftErrors,
   ShiftsCloseShiftResponses,
@@ -2411,6 +2417,38 @@ export const reportsAbcExcel = <ThrowOnError extends boolean = false>(
     ReportsAbcExcelErrors,
     ThrowOnError
   >({ url: '/api/v1/reports/abc/excel', ...options })
+
+/**
+ * Variances
+ */
+export const reportsVariances = <ThrowOnError extends boolean = false>(
+  options: Options<ReportsVariancesData, ThrowOnError>,
+): RequestResult<
+  ReportsVariancesResponses,
+  ReportsVariancesErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    ReportsVariancesResponses,
+    ReportsVariancesErrors,
+    ThrowOnError
+  >({ url: '/api/v1/reports/variances', ...options })
+
+/**
+ * Variances Excel
+ */
+export const reportsVariancesExcel = <ThrowOnError extends boolean = false>(
+  options: Options<ReportsVariancesExcelData, ThrowOnError>,
+): RequestResult<
+  ReportsVariancesExcelResponses,
+  ReportsVariancesExcelErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    ReportsVariancesExcelResponses,
+    ReportsVariancesExcelErrors,
+    ThrowOnError
+  >({ url: '/api/v1/reports/variances/excel', ...options })
 
 /**
  * Dashboard

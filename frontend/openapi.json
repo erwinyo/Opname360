@@ -6306,6 +6306,216 @@
         }
       }
     },
+    "/api/v1/reports/daily-stock": {
+      "get": {
+        "tags": [
+          "reports"
+        ],
+        "summary": "Daily Stock",
+        "operationId": "reports-daily_stock",
+        "parameters": [
+          {
+            "name": "day",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "title": "Day"
+            }
+          },
+          {
+            "name": "category_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Category Id"
+            }
+          },
+          {
+            "name": "sub_category_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Sub Category Id"
+            }
+          },
+          {
+            "name": "location_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Location Id"
+            }
+          },
+          {
+            "name": "opname360_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Opname360 Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DailyStock"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/reports/daily-stock/excel": {
+      "get": {
+        "tags": [
+          "reports"
+        ],
+        "summary": "Daily Stock Excel",
+        "operationId": "reports-daily_stock_excel",
+        "parameters": [
+          {
+            "name": "day",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "title": "Day"
+            }
+          },
+          {
+            "name": "category_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Category Id"
+            }
+          },
+          {
+            "name": "sub_category_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Sub Category Id"
+            }
+          },
+          {
+            "name": "location_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Location Id"
+            }
+          },
+          {
+            "name": "opname360_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Opname360 Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {}
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/activity-log/": {
       "get": {
         "tags": [
@@ -6866,6 +7076,238 @@
           "can_count"
         ],
         "title": "CountingSummary"
+      },
+      "DailyStock": {
+        "properties": {
+          "opening": {
+            "type": "string",
+            "title": "Opening"
+          },
+          "quantity_in": {
+            "type": "string",
+            "title": "Quantity In"
+          },
+          "quantity_out": {
+            "type": "string",
+            "title": "Quantity Out"
+          },
+          "closing": {
+            "type": "string",
+            "title": "Closing"
+          },
+          "closing_value": {
+            "type": "string",
+            "title": "Closing Value"
+          },
+          "day": {
+            "type": "string",
+            "format": "date",
+            "title": "Day"
+          },
+          "location_name": {
+            "type": "string",
+            "title": "Location Name"
+          },
+          "categories": {
+            "items": {
+              "$ref": "#/components/schemas/DailyStockCategory"
+            },
+            "type": "array",
+            "title": "Categories"
+          }
+        },
+        "type": "object",
+        "required": [
+          "opening",
+          "quantity_in",
+          "quantity_out",
+          "closing",
+          "closing_value",
+          "day",
+          "location_name",
+          "categories"
+        ],
+        "title": "DailyStock",
+        "description": "Every SKU that had stock or moved by the end of the day."
+      },
+      "DailyStockCategory": {
+        "properties": {
+          "opening": {
+            "type": "string",
+            "title": "Opening"
+          },
+          "quantity_in": {
+            "type": "string",
+            "title": "Quantity In"
+          },
+          "quantity_out": {
+            "type": "string",
+            "title": "Quantity Out"
+          },
+          "closing": {
+            "type": "string",
+            "title": "Closing"
+          },
+          "closing_value": {
+            "type": "string",
+            "title": "Closing Value"
+          },
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "sub_categories": {
+            "items": {
+              "$ref": "#/components/schemas/DailyStockSubCategory"
+            },
+            "type": "array",
+            "title": "Sub Categories"
+          }
+        },
+        "type": "object",
+        "required": [
+          "opening",
+          "quantity_in",
+          "quantity_out",
+          "closing",
+          "closing_value",
+          "id",
+          "name",
+          "sub_categories"
+        ],
+        "title": "DailyStockCategory"
+      },
+      "DailyStockRow": {
+        "properties": {
+          "opening": {
+            "type": "string",
+            "title": "Opening"
+          },
+          "quantity_in": {
+            "type": "string",
+            "title": "Quantity In"
+          },
+          "quantity_out": {
+            "type": "string",
+            "title": "Quantity Out"
+          },
+          "closing": {
+            "type": "string",
+            "title": "Closing"
+          },
+          "closing_value": {
+            "type": "string",
+            "title": "Closing Value"
+          },
+          "sku_id": {
+            "type": "integer",
+            "title": "Sku Id"
+          },
+          "product_name": {
+            "type": "string",
+            "title": "Product Name"
+          },
+          "size": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Size"
+          },
+          "color": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Color"
+          },
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "stock_unit": {
+            "type": "string",
+            "title": "Stock Unit"
+          }
+        },
+        "type": "object",
+        "required": [
+          "opening",
+          "quantity_in",
+          "quantity_out",
+          "closing",
+          "closing_value",
+          "sku_id",
+          "product_name",
+          "size",
+          "color",
+          "code",
+          "stock_unit"
+        ],
+        "title": "DailyStockRow"
+      },
+      "DailyStockSubCategory": {
+        "properties": {
+          "opening": {
+            "type": "string",
+            "title": "Opening"
+          },
+          "quantity_in": {
+            "type": "string",
+            "title": "Quantity In"
+          },
+          "quantity_out": {
+            "type": "string",
+            "title": "Quantity Out"
+          },
+          "closing": {
+            "type": "string",
+            "title": "Closing"
+          },
+          "closing_value": {
+            "type": "string",
+            "title": "Closing Value"
+          },
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "rows": {
+            "items": {
+              "$ref": "#/components/schemas/DailyStockRow"
+            },
+            "type": "array",
+            "title": "Rows"
+          }
+        },
+        "type": "object",
+        "required": [
+          "opening",
+          "quantity_in",
+          "quantity_out",
+          "closing",
+          "closing_value",
+          "id",
+          "name",
+          "rows"
+        ],
+        "title": "DailyStockSubCategory"
       },
       "DiscountKind": {
         "type": "string",

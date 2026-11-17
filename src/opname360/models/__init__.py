@@ -138,6 +138,14 @@ from opname360.models.receipt import (
     ReturnLineIn,
     TillSku,
 )
+from opname360.models.report import (
+    DailyStock,
+    DailyStockCategory,
+    DailyStockFilter,
+    DailyStockRow,
+    DailyStockSubCategory,
+    StockFlow,
+)
 from opname360.models.shift import (
     PaymentTotal,
     Shift,
@@ -217,6 +225,11 @@ __all__ = [
     'CountSheet',
     'CountSkuOption',
     'CountingSummary',
+    'DailyStock',
+    'DailyStockCategory',
+    'DailyStockFilter',
+    'DailyStockRow',
+    'DailyStockSubCategory',
     'DiscountKind',
     'DocumentCounter',
     'DocumentStatus',
@@ -332,6 +345,7 @@ __all__ = [
     'StockCard',
     'StockCardEntry',
     'StockFilter',
+    'StockFlow',
     'StockMovement',
     'StockOpname',
     'StockPage',

@@ -3,21 +3,12 @@ import { SearchIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router'
 
-import {
-  categoriesListCategoriesOptions,
-  stockListStockOptions,
-} from '@/client/@tanstack/react-query.gen'
+import { stockListStockOptions } from '@/client/@tanstack/react-query.gen'
 import { Pager } from '@/components/Pager'
+import { CategoryFilter } from '@/components/reports'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
 import {
   Table,
@@ -29,10 +20,10 @@ import {
 } from '@/components/ui/table'
 import { errorMessage } from '@/lib/api'
 import { money, quantity, variantLabel } from '@/lib/format'
+import { ALL } from '@/lib/reports'
 import { cn } from '@/lib/utils'
 
 const PAGE_SIZE = 50
-const ALL = 'all'
 
 export function StockPage() {
   const navigate = useNavigate()
@@ -51,8 +42,6 @@ export function StockPage() {
     return () => clearTimeout(timer)
   }, [typed])
 
-  const categories = useQuery(categoriesListCategoriesOptions())
-  const category = categories.data?.find((c) => String(c.id) === categoryId)
   const stock = useQuery({
     ...stockListStockOptions({
       query: {
@@ -103,47 +92,15 @@ export function StockPage() {
             className="bg-card pl-8"
           />
         </div>
-        <Select
-          value={categoryId}
-          onValueChange={(value) => {
-            setCategoryId(value)
-            setSubCategoryId(ALL)
+        <CategoryFilter
+          categoryId={categoryId}
+          subCategoryId={subCategoryId}
+          onChange={(category, sub) => {
+            setCategoryId(category)
+            setSubCategoryId(sub)
             setOffset(0)
           }}
-        >
-          <SelectTrigger className="bg-card" aria-label="Kategori">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value={ALL}>Semua kategori</SelectItem>
-            {categories.data?.map((c) => (
-              <SelectItem key={c.id} value={String(c.id)}>
-                {c.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        {category && (
-          <Select
-            value={subCategoryId}
-            onValueChange={(value) => {
-              setSubCategoryId(value)
-              setOffset(0)
-            }}
-          >
-            <SelectTrigger className="bg-card" aria-label="Sub-kategori">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value={ALL}>Semua sub-kategori</SelectItem>
-              {category.sub_categories.map((sub) => (
-                <SelectItem key={sub.id} value={String(sub.id)}>
-                  {sub.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        )}
+        />
         <span className="flex items-center gap-2 px-1">
           <Switch
             id="negative-only"

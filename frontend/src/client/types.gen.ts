@@ -284,6 +284,172 @@ export type CountingSummary = {
 };
 
 /**
+ * DailyStock
+ *
+ * Every SKU that had stock or moved by the end of the day.
+ */
+export type DailyStock = {
+    /**
+     * Opening
+     */
+    opening: string;
+    /**
+     * Quantity In
+     */
+    quantity_in: string;
+    /**
+     * Quantity Out
+     */
+    quantity_out: string;
+    /**
+     * Closing
+     */
+    closing: string;
+    /**
+     * Closing Value
+     */
+    closing_value: string;
+    /**
+     * Day
+     */
+    day: string;
+    /**
+     * Location Name
+     */
+    location_name: string;
+    /**
+     * Categories
+     */
+    categories: Array<DailyStockCategory>;
+};
+
+/**
+ * DailyStockCategory
+ */
+export type DailyStockCategory = {
+    /**
+     * Opening
+     */
+    opening: string;
+    /**
+     * Quantity In
+     */
+    quantity_in: string;
+    /**
+     * Quantity Out
+     */
+    quantity_out: string;
+    /**
+     * Closing
+     */
+    closing: string;
+    /**
+     * Closing Value
+     */
+    closing_value: string;
+    /**
+     * Id
+     */
+    id: number;
+    /**
+     * Name
+     */
+    name: string;
+    /**
+     * Sub Categories
+     */
+    sub_categories: Array<DailyStockSubCategory>;
+};
+
+/**
+ * DailyStockRow
+ */
+export type DailyStockRow = {
+    /**
+     * Opening
+     */
+    opening: string;
+    /**
+     * Quantity In
+     */
+    quantity_in: string;
+    /**
+     * Quantity Out
+     */
+    quantity_out: string;
+    /**
+     * Closing
+     */
+    closing: string;
+    /**
+     * Closing Value
+     */
+    closing_value: string;
+    /**
+     * Sku Id
+     */
+    sku_id: number;
+    /**
+     * Product Name
+     */
+    product_name: string;
+    /**
+     * Size
+     */
+    size: string | null;
+    /**
+     * Color
+     */
+    color: string | null;
+    /**
+     * Code
+     */
+    code: string;
+    /**
+     * Stock Unit
+     */
+    stock_unit: string;
+};
+
+/**
+ * DailyStockSubCategory
+ */
+export type DailyStockSubCategory = {
+    /**
+     * Opening
+     */
+    opening: string;
+    /**
+     * Quantity In
+     */
+    quantity_in: string;
+    /**
+     * Quantity Out
+     */
+    quantity_out: string;
+    /**
+     * Closing
+     */
+    closing: string;
+    /**
+     * Closing Value
+     */
+    closing_value: string;
+    /**
+     * Id
+     */
+    id: number;
+    /**
+     * Name
+     */
+    name: string;
+    /**
+     * Rows
+     */
+    rows: Array<DailyStockRow>;
+};
+
+/**
  * DiscountKind
  */
 export type DiscountKind = 'percentage' | 'fixed';
@@ -6042,6 +6208,88 @@ export type PromotionsEndPromotionResponses = {
 };
 
 export type PromotionsEndPromotionResponse = PromotionsEndPromotionResponses[keyof PromotionsEndPromotionResponses];
+
+export type ReportsDailyStockData = {
+    body?: never;
+    path?: never;
+    query: {
+        /**
+         * Day
+         */
+        day: string;
+        /**
+         * Category Id
+         */
+        category_id?: number | null;
+        /**
+         * Sub Category Id
+         */
+        sub_category_id?: number | null;
+        /**
+         * Location Id
+         */
+        location_id?: number | null;
+    };
+    url: '/api/v1/reports/daily-stock';
+};
+
+export type ReportsDailyStockErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type ReportsDailyStockError = ReportsDailyStockErrors[keyof ReportsDailyStockErrors];
+
+export type ReportsDailyStockResponses = {
+    /**
+     * Successful Response
+     */
+    200: DailyStock;
+};
+
+export type ReportsDailyStockResponse = ReportsDailyStockResponses[keyof ReportsDailyStockResponses];
+
+export type ReportsDailyStockExcelData = {
+    body?: never;
+    path?: never;
+    query: {
+        /**
+         * Day
+         */
+        day: string;
+        /**
+         * Category Id
+         */
+        category_id?: number | null;
+        /**
+         * Sub Category Id
+         */
+        sub_category_id?: number | null;
+        /**
+         * Location Id
+         */
+        location_id?: number | null;
+    };
+    url: '/api/v1/reports/daily-stock/excel';
+};
+
+export type ReportsDailyStockExcelErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type ReportsDailyStockExcelError = ReportsDailyStockExcelErrors[keyof ReportsDailyStockExcelErrors];
+
+export type ReportsDailyStockExcelResponses = {
+    /**
+     * Successful Response
+     */
+    200: unknown;
+};
 
 export type ActivityLogListEntriesData = {
     body?: never;

@@ -15,6 +15,7 @@ from opname360.api.routes import (
     products,
     promotions,
     receipts,
+    reports,
     shifts,
     shop_settings,
     stock,
@@ -45,6 +46,7 @@ api_router.include_router(payment_methods.router)
 api_router.include_router(shifts.router)
 api_router.include_router(receipts.router)
 api_router.include_router(promotions.router)
+api_router.include_router(reports.router)
 api_router.include_router(activity_log.router)
 
 

@@ -7901,6 +7901,74 @@
         }
       }
     },
+    "/api/v1/ledger/roles/{role}": {
+      "put": {
+        "tags": [
+          "ledger"
+        ],
+        "summary": "Assign Role",
+        "description": "Rule 15: only the Owner changes the system accounts.",
+        "operationId": "ledger-assign_role",
+        "parameters": [
+          {
+            "name": "role",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/AccountRole"
+            }
+          },
+          {
+            "name": "opname360_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Opname360 Session"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoleAssign"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountPublic"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/ledger/accounts/{account_id}/book": {
       "get": {
         "tags": [
@@ -12018,13 +12086,25 @@
           "is_cash": {
             "type": "boolean",
             "title": "Is Cash"
+          },
+          "account_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Account Id"
           }
         },
         "type": "object",
         "required": [
           "name",
           "id",
-          "is_cash"
+          "is_cash",
+          "account_id"
         ],
         "title": "PaymentMethodPublic"
       },
@@ -12053,6 +12133,17 @@
               }
             ],
             "title": "Is Active"
+          },
+          "account_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Account Id"
           }
         },
         "type": "object",
@@ -13458,6 +13549,19 @@
           "cashier"
         ],
         "title": "Role"
+      },
+      "RoleAssign": {
+        "properties": {
+          "account_id": {
+            "type": "integer",
+            "title": "Account Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "account_id"
+        ],
+        "title": "RoleAssign"
       },
       "SalesFigures": {
         "properties": {

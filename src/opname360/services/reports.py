@@ -2,6 +2,7 @@
 Stock Movements, Receipts and Stock Opnames. Days and hours are the shop's
 (rule 7)."""
 
+from collections import defaultdict
 from collections.abc import Sequence
 from datetime import date, datetime, time, timedelta
 from decimal import Decimal
@@ -9,7 +10,7 @@ from itertools import groupby
 from typing import Any, Literal
 from zoneinfo import ZoneInfo
 
-from sqlalchemy import Date, and_, cast, not_
+from sqlalchemy import Date, and_, cast
 from sqlalchemy.dialects.postgresql import distinct_on
 from sqlmodel import Session, case, col, func, or_, select
 
@@ -35,6 +36,7 @@ from opname360.models import (
     HourFigures,
     HourlySales,
     Location,
+    MovementReason,
     OpnameLine,
     OpnameStatus,
     Payment,
@@ -45,6 +47,7 @@ from opname360.models import (
     ReceiptLine,
     ReceiptStatus,
     Resolution,
+    Reversal,
     SalesFigures,
     SalesFilter,
     SalesGroupBy,
@@ -61,6 +64,8 @@ from opname360.models import (
     StockMovement,
     StockOpname,
     SubCategory,
+    SupplierReturn,
+    SupplierReturnLine,
     User,
     VarianceFigures,
     VarianceFilter,
@@ -279,8 +284,9 @@ def _sales(
     session: Session, start: datetime, end: datetime, by: By
 ) -> dict[Any, SalesFigures]:
     """Net Sales and COGS of completed Receipts, by the time each Receipt
-    was made (rules 1-3), plus Negative Stock cost adjustments by the time
-    they were booked."""
+    was made (rules 1-3), plus what else the Ledger books to Harga Pokok
+    Penjualan, by the time it was booked: Negative Stock cost adjustments
+    and Supplier Returns at a cost other than stock's (slice 5, rule 7)."""
     created = col(Receipt.created_at)
     line_key = {
         None: None,
@@ -298,12 +304,6 @@ def _sales(
         func.sum(case((sold, ReceiptLine.discount), else_=0)),
         func.sum(case((sold, 0), else_=-total)),
         func.sum(total),
-        # Each line's cost to 4 decimals, so hours add up to the day.
-        func.sum(
-            func.round(
-                col(ReceiptLine.quantity) * col(ReceiptLine.unit_cogs), 4
-            )
-        ),
     ]
     query: Any = (
         select(*columns)
@@ -323,7 +323,7 @@ def _sales(
     figures: dict[Any, SalesFigures] = {}
     for row in session.exec(query).all():
         key, values = (None, row) if line_key is None else (row[0], row[1:])
-        count, gross, discounts, refunds, net, cogs = values
+        count, gross, discounts, refunds, net = values
         if count == 0:
             continue
         figures[_key(key)] = SalesFigures(
@@ -332,8 +332,8 @@ def _sales(
             discounts=discounts,
             refunds=refunds,
             net_sales=net,
-            cogs=cogs,
-            gross_profit=net - cogs,
+            cogs=ZERO,
+            gross_profit=Decimal(net),
         )
     if by == 'cashier':
         # COGS belongs to goods; a Cashier's figures stop at Net Sales.
@@ -342,7 +342,15 @@ def _sales(
             for key, value in figures.items()
         }
 
-    for key, adjustment in _cost_adjustments(session, start, end, by).items():
+    costs: dict[Any, Decimal] = defaultdict(lambda: ZERO)
+    for part in (
+        _receipt_cogs(session, start, end, by),
+        _cost_adjustments(session, start, end, by),
+        _supplier_return_differences(session, start, end, by),
+    ):
+        for key, amount in part.items():
+            costs[key] += amount
+    for key, adjustment in costs.items():
         current = figures.get(key) or _empty()
         cogs = (current.cogs or ZERO) + adjustment
         figures[key] = current.model_copy(
@@ -351,34 +359,47 @@ def _sales(
     return figures
 
 
-def _cost_adjustments(
+def _receipt_cogs(
     session: Session, start: datetime, end: datetime, by: By
 ) -> dict[Any, Decimal]:
-    """Stock Value moved without goods moving (costing rule 6, and the
-    Reversals of such moves) is COGS on the day it is booked. A voided
-    Receipt's count for nothing."""
-    created = col(StockMovement.created_at)
+    """What the goods of completed Receipts cost: their Stock Movements'
+    values, exactly as the Ledger posts them. A Damaged Return's write-off
+    is a loss, not COGS."""
+    created = col(Receipt.created_at)
     key = {
         None: None,
         'hour': func.extract('hour', _local(created)),
         'day': cast(_local(created), Date),
         'category': col(SubCategory.category_id),
     }[by]
-    voided = select(Receipt.id).where(Receipt.status == ReceiptStatus.voided)
-    query: Any = select(
-        *([] if key is None else [key]),
-        func.sum(-col(StockMovement.value)),
-    ).where(
-        StockMovement.quantity == 0,
-        created >= start,
-        created < end,
-        not_(
+    query: Any = (
+        select(
+            *([] if key is None else [key]),
+            func.sum(-col(StockMovement.value)),
+        )
+        .select_from(StockMovement)
+        .join(
+            Receipt,
             and_(
                 col(StockMovement.document_type) == RECEIPT,
-                col(StockMovement.document_id).in_(voided),
-            )
-        ),
+                col(StockMovement.document_id) == Receipt.id,
+            ),
+        )
+        .where(
+            Receipt.status == ReceiptStatus.completed,
+            created >= start,
+            created < end,
+            col(StockMovement.reason).not_in(
+                [MovementReason.write_off, MovementReason.reversal]
+            ),
+        )
     )
+    return _sums(session, query, key, by)
+
+
+def _sums(
+    session: Session, query: Any, key: Any, by: By
+) -> dict[Any, Decimal]:
     if by == 'category':
         query = _by_category(query, col(StockMovement.sku_id))
     if key is not None:
@@ -388,6 +409,77 @@ def _cost_adjustments(
         [amount] = rows
         return {} if amount is None else {None: amount}
     return {_key(key): amount for key, amount in rows}
+
+
+def _supplier_return_differences(
+    session: Session, start: datetime, end: datetime, by: By
+) -> dict[Any, Decimal]:
+    """A Supplier Return refunds the receipt's cost while stock gives up its
+    own; the Ledger books the difference to Harga Pokok Penjualan when the
+    return is completed, and back when it is reversed."""
+    sums: dict[Any, Decimal] = defaultdict(lambda: ZERO)
+    reversed_at = (
+        select(Reversal.created_at)
+        .where(
+            Reversal.document_type == 'supplier_return',
+            Reversal.document_id == SupplierReturn.id,
+        )
+        .scalar_subquery()
+    )
+    for at, sign in ((col(SupplierReturn.completed_at), 1), (reversed_at, -1)):
+        rows = session.exec(
+            select(
+                at,
+                SubCategory.category_id,
+                col(SupplierReturnLine.stock_cost)
+                - col(SupplierReturnLine.total_refund),
+            )
+            .join(
+                SupplierReturn,
+                col(SupplierReturnLine.return_id) == SupplierReturn.id,
+            )
+            .join(Sku, col(SupplierReturnLine.sku_id) == Sku.id)
+            .join(Product, col(Sku.product_id) == Product.id)
+            .join(SubCategory, col(Product.sub_category_id) == SubCategory.id)
+            .where(at >= start, at < end)
+        ).all()
+        for moment, category_id, difference in rows:
+            if not difference or moment is None:
+                continue
+            local = moment.astimezone(shop_zone())
+            key = {
+                None: None,
+                'hour': local.hour,
+                'day': local.date(),
+                'category': category_id,
+            }[by]
+            sums[key] += sign * difference
+    return dict(sums)
+
+
+def _cost_adjustments(
+    session: Session, start: datetime, end: datetime, by: By
+) -> dict[Any, Decimal]:
+    """Stock Value moved without goods moving (costing rule 6, and the
+    Reversals of such moves) is COGS when it is booked. A Receipt's own
+    adjustments come with its goods, in `_receipt_cogs`."""
+    created = col(StockMovement.created_at)
+    key = {
+        None: None,
+        'hour': func.extract('hour', _local(created)),
+        'day': cast(_local(created), Date),
+        'category': col(SubCategory.category_id),
+    }[by]
+    query: Any = select(
+        *([] if key is None else [key]),
+        func.sum(-col(StockMovement.value)),
+    ).where(
+        StockMovement.quantity == 0,
+        created >= start,
+        created < end,
+        col(StockMovement.document_type) != RECEIPT,
+    )
+    return _sums(session, query, key, by)
 
 
 def _key(value: Any) -> Any:

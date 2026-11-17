@@ -480,6 +480,89 @@ def delete_account(session: Session, account: Account, *, actor: User) -> None:
     session.commit()
 
 
+# The role each system account plays: only the Owner moves them.
+
+ROLE_TYPES = {
+    **dict.fromkeys(
+        (
+            AccountRole.cash_main,
+            AccountRole.cash_drawer,
+            AccountRole.bank,
+            AccountRole.inventory,
+            AccountRole.employee_receivable,
+        ),
+        AccountType.asset,
+    ),
+    AccountRole.accounts_payable: AccountType.liability,
+    AccountRole.opening_balance: AccountType.equity,
+    AccountRole.retained_earnings: AccountType.equity,
+    **dict.fromkeys(
+        (
+            AccountRole.sales,
+            AccountRole.sales_discount,
+            AccountRole.sales_return,
+            AccountRole.other_income,
+            AccountRole.inventory_surplus,
+            AccountRole.cash_over,
+        ),
+        AccountType.revenue,
+    ),
+    AccountRole.cogs: AccountType.cogs,
+    **dict.fromkeys(
+        (
+            AccountRole.inventory_shortage,
+            AccountRole.damaged_goods,
+            AccountRole.cash_short,
+            AccountRole.production_cost,
+            AccountRole.salary,
+        ),
+        AccountType.expense,
+    ),
+}
+CASH_ROLES = {AccountRole.cash_main, AccountRole.cash_drawer, AccountRole.bank}
+
+
+def assign_role(
+    session: Session, role: AccountRole, account: Account, *, actor: User
+) -> Account:
+    """Let another account play `role` from now on. Accounts whose balance
+    must match the stock, the drawer, the debts or the charges keep their
+    role once they have entries."""
+    current = session.exec(select(Account).where(Account.role == role)).one()
+    if current.id == account.id:
+        return account
+    if account.role is not None:
+        raise ConflictError(
+            f'{account.name} sudah dipakai sistem untuk hal lain.'
+        )
+    if account.type != ROLE_TYPES[role] or not account.is_active:
+        raise ConflictError('Jenis akun ini tidak cocok untuk peran itu.')
+    if role in CASH_ROLES and not account.is_cash:
+        raise ConflictError('Peran ini butuh akun kas atau bank.')
+    if role in SYSTEM_ONLY and _is_used(session, current):
+        raise ConflictError(
+            f'{current.name} sudah punya jurnal; perannya tidak bisa '
+            'dipindahkan.'
+        )
+    current.role = None
+    session.add(current)
+    session.flush()
+    account.role = role
+    session.add(account)
+    activity_log.record(
+        session,
+        actor=actor,
+        action='account.role',
+        summary=(
+            f'Peran {role.value} pindah dari {current.name} ke {account.name}.'
+        ),
+        entity_type='account',
+        entity_id=account.id,
+    )
+    session.commit()
+    return account
+
+
 # Journal entries
 
 

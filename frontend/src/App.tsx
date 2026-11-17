@@ -40,6 +40,7 @@ import { SalesPage } from '@/pages/reports/SalesPage'
 import { SalesReceiptsPage } from '@/pages/reports/SalesReceiptsPage'
 import { VariancesPage } from '@/pages/reports/VariancesPage'
 import { AccountBookPage } from '@/pages/ledger/AccountBookPage'
+import { AccountSettingsPage } from '@/pages/ledger/AccountSettingsPage'
 import { AccountsPage } from '@/pages/ledger/AccountsPage'
 import { JournalEntryPage } from '@/pages/ledger/JournalEntryPage'
 import { JournalPage } from '@/pages/ledger/JournalPage'
@@ -163,6 +164,7 @@ export function App() {
             <Route path="ganti-rugi" element={<EmployeeChargesPage />} />
             <Route path="pengaturan-toko" element={<ShopSettingsPage />} />
             <Route path="metode-pembayaran" element={<PaymentMethodsPage />} />
+            <Route path="pengaturan-akun" element={<AccountSettingsPage />} />
           </>
         )}
         <Route path="*" element={<Navigate to="/" replace />} />

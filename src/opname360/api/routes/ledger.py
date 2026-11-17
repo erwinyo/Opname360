@@ -3,17 +3,24 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, Path, Query, status
 
-from opname360.api.deps import AdminDep, SessionDep, require_admin
+from opname360.api.deps import (
+    AdminDep,
+    OwnerDep,
+    SessionDep,
+    require_admin,
+)
 from opname360.models import (
     AccountBook,
     AccountBookFilter,
     AccountPublic,
+    AccountRole,
     AccountSave,
     JournalEntryPublic,
     JournalFilter,
     JournalPage,
     ManualEntryIn,
     ReversalCreate,
+    RoleAssign,
     TrialBalance,
 )
 from opname360.services import ledger
@@ -62,6 +69,16 @@ def delete_account(
     ledger.delete_account(
         session, ledger.get_account(session, account_id), actor=actor
     )
+
+
+@router.put('/roles/{role}')
+def assign_role(
+    session: SessionDep, role: AccountRole, data: RoleAssign, owner: OwnerDep
+) -> AccountPublic:
+    """Rule 15: only the Owner changes the system accounts."""
+    account = ledger.get_account(session, data.account_id)
+    account = ledger.assign_role(session, role, account, actor=owner)
+    return ledger.account_public(session, account)
 
 
 @router.get('/accounts/{account_id}/book')

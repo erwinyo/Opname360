@@ -154,6 +154,10 @@ class AccountPublic(SQLModel):
     used: bool
 
 
+class RoleAssign(SQLModel):
+    account_id: int
+
+
 # Journal entries: requests and responses
 
 

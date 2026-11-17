@@ -74,6 +74,7 @@ from opname360.models.ledger import (
     JournalLinePublic,
     JournalPage,
     ManualEntryIn,
+    RoleAssign,
     TrialBalance,
     TrialBalanceRow,
 )
@@ -399,6 +400,7 @@ __all__ = [
     'ReversalCreate',
     'ReversalPublic',
     'Role',
+    'RoleAssign',
     'SalesFigures',
     'SalesFilter',
     'SalesGroupBy',

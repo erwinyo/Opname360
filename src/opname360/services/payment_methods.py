@@ -9,7 +9,7 @@ from opname360.models import (
     PaymentMethodUpdate,
     User,
 )
-from opname360.services import activity_log
+from opname360.services import activity_log, ledger
 
 
 def list_methods(
@@ -81,6 +81,14 @@ def update_method(
         _keep_one_cash_method(session, method)
     if sent.get('is_active') is not None:
         method.is_active = sent['is_active']
+    if 'account_id' in sent:
+        if method.is_cash:
+            raise ConflictError('Uang tunai selalu masuk ke Kas Kasir.')
+        method.account_id = (
+            None
+            if sent['account_id'] is None
+            else ledger.paying_account(session, sent['account_id'])
+        )
     session.add(method)
     activity_log.record(
         session,

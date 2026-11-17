@@ -2015,6 +2015,10 @@ export type PaymentMethodPublic = {
    * Is Cash
    */
   is_cash: boolean
+  /**
+   * Account Id
+   */
+  account_id: number | null
 }
 
 /**
@@ -2029,6 +2033,10 @@ export type PaymentMethodUpdate = {
    * Is Active
    */
   is_active?: boolean | null
+  /**
+   * Account Id
+   */
+  account_id?: number | null
 }
 
 /**
@@ -2854,6 +2862,16 @@ export type ReversalPublic = {
  * Role
  */
 export type Role = 'owner' | 'admin' | 'cashier'
+
+/**
+ * RoleAssign
+ */
+export type RoleAssign = {
+  /**
+   * Account Id
+   */
+  account_id: number
+}
 
 /**
  * SalesFigures
@@ -8074,6 +8092,35 @@ export type LedgerUpdateAccountResponses = {
 
 export type LedgerUpdateAccountResponse =
   LedgerUpdateAccountResponses[keyof LedgerUpdateAccountResponses]
+
+export type LedgerAssignRoleData = {
+  body: RoleAssign
+  path: {
+    role: AccountRole
+  }
+  query?: never
+  url: '/api/v1/ledger/roles/{role}'
+}
+
+export type LedgerAssignRoleErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError
+}
+
+export type LedgerAssignRoleError =
+  LedgerAssignRoleErrors[keyof LedgerAssignRoleErrors]
+
+export type LedgerAssignRoleResponses = {
+  /**
+   * Successful Response
+   */
+  200: AccountPublic
+}
+
+export type LedgerAssignRoleResponse =
+  LedgerAssignRoleResponses[keyof LedgerAssignRoleResponses]
 
 export type LedgerReadAccountBookData = {
   body?: never

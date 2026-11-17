@@ -23,10 +23,16 @@ from opname360.models import (
     MovementReason,
     OpnameLine,
     OpnameStatus,
+    Payment,
+    PaymentMethod,
     PaymentStatus,
     ProductionReceipt,
+    Receipt,
+    ReceiptKind,
+    ReceiptLine,
     Resolution,
     Reversal,
+    Shift,
     ShopSettings,
     StockMovement,
     StockOpname,
@@ -289,21 +295,21 @@ def backfill(session: Session) -> int:
         if at is not None:
             events.append((at, len(events), run))
 
-    for receipt in session.exec(
+    for document in session.exec(
         select(GoodsReceipt).where(GoodsReceipt.status != DocumentStatus.draft)
     ).all():
         add(
-            receipt.completed_at,
-            lambda r=receipt: goods_receipt(session, r, actor=None),
+            document.completed_at,
+            lambda r=document: goods_receipt(session, r, actor=None),
         )
-    for receipt in session.exec(
+    for document in session.exec(
         select(ProductionReceipt).where(
             ProductionReceipt.status != DocumentStatus.draft
         )
     ).all():
         add(
-            receipt.completed_at,
-            lambda r=receipt: production_receipt(session, r, actor=None),
+            document.completed_at,
+            lambda r=document: production_receipt(session, r, actor=None),
         )
     for item in session.exec(
         select(SupplierReturn).where(
@@ -325,6 +331,20 @@ def backfill(session: Session) -> int:
             opname.approved_at,
             lambda o=opname: stock_opname(session, o, actor=None),
         )
+    for sale in session.exec(select(Receipt)).all():
+        add(sale.created_at, lambda r=sale: receipt(session, r, actor=None))
+    for shift in session.exec(select(Shift)).all():
+        add(
+            shift.opened_at, lambda s=shift: shift_open(session, s, actor=None)
+        )
+        add(
+            shift.closed_at,
+            lambda s=shift: shift_close(session, s, actor=None),
+        )
+        add(
+            shift.resolved_at,
+            lambda s=shift: shift_resolve(session, s, actor=None),
+        )
     for reversal in session.exec(select(Reversal)).all():
         add(
             reversal.created_at,
@@ -345,3 +365,166 @@ def backfill(session: Session) -> int:
 
 def _entry_count(session: Session) -> int:
     return session.exec(select(func.count()).select_from(JournalEntry)).one()
+
+
+# The till
+
+
+def _method_accounts(session: Session) -> dict[int, int]:
+    """Where each Payment Method's money goes: cash into the drawer,
+    anything else into its own account, Bank unless the Owner chose one."""
+    drawer = ledger.account_of(session, AccountRole.cash_drawer)
+    bank = ledger.account_of(session, AccountRole.bank)
+    return {
+        method.id or 0: drawer
+        if method.is_cash
+        else (method.account_id or bank)
+        for method in session.exec(select(PaymentMethod)).all()
+    }
+
+
+def receipt(session: Session, receipt: Receipt, *, actor: User | None) -> None:
+    """A sale, return or exchange: Penjualan at price times quantity,
+    Diskon Penjualan and Retur Penjualan, each payment to its account; the
+    goods against Persediaan at cost, Harga Pokok Penjualan except a Damaged
+    Return's write-off, which is Barang Rusak."""
+    assert receipt.id is not None
+    lines = session.exec(
+        select(ReceiptLine).where(ReceiptLine.receipt_id == receipt.id)
+    ).all()
+    payments = session.exec(
+        select(Payment).where(Payment.receipt_id == receipt.id)
+    ).all()
+    sold = [line for line in lines if line.quantity > 0]
+    returned = [line for line in lines if line.quantity < 0]
+    accounts = _method_accounts(session)
+    amounts = [
+        Amount(
+            ledger.account_of(session, AccountRole.sales),
+            -Decimal(sum(line.line_total + line.discount for line in sold)),
+        ),
+        Amount(
+            ledger.account_of(session, AccountRole.sales_discount),
+            Decimal(sum(line.discount for line in sold)),
+        ),
+        Amount(
+            ledger.account_of(session, AccountRole.sales_return),
+            -Decimal(sum(line.line_total for line in returned)),
+        ),
+        *(
+            Amount(
+                accounts[payment.payment_method_id], Decimal(payment.amount)
+            )
+            for payment in payments
+        ),
+    ]
+    inventory = ledger.account_of(session, AccountRole.inventory)
+    cogs = ledger.account_of(session, AccountRole.cogs)
+    damaged = ledger.account_of(session, AccountRole.damaged_goods)
+    for movement in _movements(session, 'receipt', receipt.id):
+        amounts.append(Amount(inventory, movement.value))
+        counter = (
+            damaged if movement.reason == MovementReason.write_off else cogs
+        )
+        amounts.append(Amount(counter, -movement.value))
+    kind = {
+        ReceiptKind.sale: 'Penjualan',
+        ReceiptKind.return_: 'Retur penjualan',
+        ReceiptKind.exchange: 'Tukar tambah',
+    }[receipt.kind]
+    _post(
+        session,
+        at=receipt.created_at,
+        description=f'{kind} {receipt.number}',
+        amounts=amounts,
+        document=Source('receipt', receipt.id, receipt.number),
+        event='complete',
+        actor=actor,
+    )
+
+
+def shift_open(session: Session, shift: Shift, *, actor: User | None) -> None:
+    """The float goes from Kas Besar into the drawer."""
+    assert shift.id is not None
+    _post(
+        session,
+        at=shift.opened_at,
+        description=f'Modal kas shift {shift.number}',
+        amounts=[
+            Amount(
+                ledger.account_of(session, AccountRole.cash_drawer),
+                Decimal(shift.opening_float),
+            ),
+            Amount(
+                ledger.account_of(session, AccountRole.cash_main),
+                Decimal(-shift.opening_float),
+            ),
+        ],
+        document=Source('shift', shift.id, shift.number),
+        event='open',
+        actor=actor,
+    )
+
+
+def shift_close(session: Session, shift: Shift, *, actor: User | None) -> None:
+    """All the cash counted goes to Kas Besar and the drawer is empty again
+    (rule 8); a difference is Selisih Kurang Kas or Selisih Lebih Kas."""
+    assert shift.id is not None and shift.closed_at is not None
+    assert shift.expected_cash is not None and shift.counted_cash is not None
+    variance = shift.counted_cash - shift.expected_cash
+    _post(
+        session,
+        at=shift.closed_at,
+        description=f'Tutup shift {shift.number}',
+        amounts=[
+            Amount(
+                ledger.account_of(session, AccountRole.cash_main),
+                Decimal(shift.counted_cash),
+            ),
+            Amount(
+                ledger.account_of(session, AccountRole.cash_drawer),
+                Decimal(-shift.expected_cash),
+            ),
+            Amount(
+                ledger.account_of(
+                    session,
+                    AccountRole.cash_over
+                    if variance > 0
+                    else AccountRole.cash_short,
+                ),
+                Decimal(-variance),
+            ),
+        ],
+        document=Source('shift', shift.id, shift.number),
+        event='close',
+        actor=actor,
+    )
+
+
+def shift_resolve(
+    session: Session, shift: Shift, *, actor: User | None
+) -> None:
+    """A short drawer charged to an employee: Piutang Karyawan instead of
+    Selisih Kurang Kas. A Company Loss posts nothing more."""
+    assert shift.id is not None and shift.resolved_at is not None
+    if shift.resolution != Resolution.employee_charge:
+        return
+    shortage = Decimal(-(shift.cash_variance or 0))
+    _post(
+        session,
+        at=shift.resolved_at,
+        description=f'Ganti rugi selisih kas shift {shift.number}',
+        amounts=[
+            Amount(
+                ledger.account_of(session, AccountRole.employee_receivable),
+                shortage,
+                user_id=shift.charged_user_id,
+            ),
+            Amount(
+                ledger.account_of(session, AccountRole.cash_short), -shortage
+            ),
+        ],
+        document=Source('shift', shift.id, shift.number),
+        event='resolve',
+        actor=actor,
+    )

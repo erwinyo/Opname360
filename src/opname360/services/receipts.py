@@ -44,6 +44,7 @@ from opname360.services import (
     costing,
     documents,
     payment_methods,
+    posting,
     promotions,
     shop_settings,
 )
@@ -393,6 +394,7 @@ def complete(
         entity_type=DOCUMENT_TYPE,
         entity_id=receipt.id,
     )
+    posting.receipt(session, receipt, actor=actor)
     session.commit()
     session.refresh(receipt)
     return receipt

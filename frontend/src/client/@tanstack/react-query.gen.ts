@@ -36,6 +36,7 @@ import {
   goodsReceiptsReverseReceipt,
   goodsReceiptsUpdateReceipt,
   healthHealthCheck,
+  ledgerAssignRole,
   ledgerCreateAccount,
   ledgerCreateManualEntry,
   ledgerDeleteAccount,
@@ -212,6 +213,9 @@ import type {
   GoodsReceiptsUpdateReceiptResponse,
   HealthHealthCheckData,
   HealthHealthCheckResponse,
+  LedgerAssignRoleData,
+  LedgerAssignRoleError,
+  LedgerAssignRoleResponse,
   LedgerCreateAccountData,
   LedgerCreateAccountError,
   LedgerCreateAccountResponse,
@@ -4824,6 +4828,35 @@ export const ledgerUpdateAccountMutation = (
   > = {
     mutationFn: async (fnOptions) => {
       const { data } = await ledgerUpdateAccount({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      })
+      return data
+    },
+  }
+  return mutationOptions
+}
+
+/**
+ * Assign Role
+ *
+ * Rule 15: only the Owner changes the system accounts.
+ */
+export const ledgerAssignRoleMutation = (
+  options?: Partial<Options<LedgerAssignRoleData>>,
+): UseMutationOptions<
+  LedgerAssignRoleResponse,
+  LedgerAssignRoleError,
+  Options<LedgerAssignRoleData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    LedgerAssignRoleResponse,
+    LedgerAssignRoleError,
+    Options<LedgerAssignRoleData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await ledgerAssignRole({
         ...options,
         ...fnOptions,
         throwOnError: true,

@@ -26,7 +26,7 @@ from opname360.models import (
     User,
 )
 from opname360.models._types import utc_now
-from opname360.services import activity_log, documents, stock
+from opname360.services import activity_log, documents, posting, stock
 
 
 PREFIX = 'SH'
@@ -118,6 +118,7 @@ def open_shift(session: Session, shift_in: ShiftOpen, *, actor: User) -> Shift:
         entity_type=DOCUMENT_TYPE,
         entity_id=shift.id,
     )
+    posting.shift_open(session, shift, actor=actor)
     session.commit()
     return shift
 
@@ -158,6 +159,7 @@ def close_shift(
         entity_type=DOCUMENT_TYPE,
         entity_id=shift.id,
     )
+    posting.shift_close(session, shift, actor=actor)
     session.commit()
     return shift
 
@@ -345,6 +347,7 @@ def resolve(
         entity_type=DOCUMENT_TYPE,
         entity_id=shift.id,
     )
+    posting.shift_resolve(session, shift, actor=actor)
     session.commit()
     return shift
 

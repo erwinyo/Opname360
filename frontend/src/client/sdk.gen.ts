@@ -88,6 +88,9 @@ import type {
   GoodsReceiptsUpdateReceiptResponses,
   HealthHealthCheckData,
   HealthHealthCheckResponses,
+  LedgerAssignRoleData,
+  LedgerAssignRoleErrors,
+  LedgerAssignRoleResponses,
   LedgerCreateAccountData,
   LedgerCreateAccountErrors,
   LedgerCreateAccountResponses,
@@ -2583,6 +2586,31 @@ export const ledgerUpdateAccount = <ThrowOnError extends boolean = false>(
     ThrowOnError
   >({
     url: '/api/v1/ledger/accounts/{account_id}',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  })
+
+/**
+ * Assign Role
+ *
+ * Rule 15: only the Owner changes the system accounts.
+ */
+export const ledgerAssignRole = <ThrowOnError extends boolean = false>(
+  options: Options<LedgerAssignRoleData, ThrowOnError>,
+): RequestResult<
+  LedgerAssignRoleResponses,
+  LedgerAssignRoleErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).put<
+    LedgerAssignRoleResponses,
+    LedgerAssignRoleErrors,
+    ThrowOnError
+  >({
+    url: '/api/v1/ledger/roles/{role}',
     ...options,
     headers: {
       'Content-Type': 'application/json',

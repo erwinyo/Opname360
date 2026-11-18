@@ -26,6 +26,7 @@ from opname360.models import (
 from opname360.models._types import utc_now
 from opname360.services import (
     activity_log,
+    batches,
     costing,
     documents,
     ledger,
@@ -114,6 +115,7 @@ def receipt_public(
                     ),
                     'purchase_pack_name': sku.purchase_pack_name,
                     'purchase_pack_size': sku.purchase_pack_size,
+                    'tracks_batches': batches.tracks(sku),
                 },
             )
         )
@@ -247,6 +249,7 @@ def complete(
             reason=MovementReason.goods_receipt,
             source=source,
             actor=actor,
+            batch_id=_batch_id(session, line, sku),
         )
     activity_log.record(
         session,
@@ -345,6 +348,9 @@ def _apply(
             unit_cost=row.unit_cost,
             total_cost=costing.money(row.quantity * row.unit_cost),
         )
+        if batches.tracks(sku):
+            line.batch_number = batches.clean_number(row.batch_number)
+            line.expires_on = row.expires_on
         if row.in_packs:
             if sku.purchase_pack_size is None:
                 label = sku_label(sku.product.name, sku.size, sku.color)
@@ -362,6 +368,26 @@ def _apply(
     receipt.total_cost = total
     session.flush()
     session.refresh(receipt)
+
+
+def _batch_id(
+    session: Session, line: GoodsReceiptLine, sku: Sku
+) -> int | None:
+    """The Batch a medicine line brings in (slice 6, rule 6)."""
+    if not batches.tracks(sku):
+        return None
+    label = sku_label(sku.product.name, sku.size, sku.color)
+    if line.batch_number is None or line.expires_on is None:
+        raise ConflictError(
+            f'{label}: isi nomor batch dan tanggal kedaluwarsanya.'
+        )
+    if batches.is_expired_on(line.expires_on, batches.today()):
+        raise ConflictError(
+            f'{label}: batch {line.batch_number} sudah kedaluwarsa '
+            f'({batches.long_date(line.expires_on)}) dan tidak bisa '
+            'diterima.'
+        )
+    return batches.resolve(session, sku, line.batch_number, line.expires_on).id
 
 
 def _require_draft(receipt: GoodsReceipt) -> None:

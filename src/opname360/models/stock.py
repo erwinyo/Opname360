@@ -5,6 +5,7 @@ from enum import StrEnum
 from sqlmodel import Field, SQLModel
 
 from opname360.models._types import enum_type, utc_now
+from opname360.models.batch import BatchStock
 
 
 class MovementReason(StrEnum):
@@ -63,6 +64,10 @@ class StockMovement(SQLModel, table=True):
     document_type: str = Field(max_length=30)
     document_id: int
     document_number: str = Field(max_length=30)
+    # Medicine: the Batch the units moved in or out of (slice 6).
+    batch_id: int | None = Field(
+        default=None, foreign_key='batch.id', index=True
+    )
     created_by: int | None = Field(default=None, foreign_key='user.id')
     created_at: datetime = Field(default_factory=utc_now, index=True)
 
@@ -147,11 +152,14 @@ class StockCardEntry(SQLModel):
     value: Decimal
     quantity_after: Decimal
     value_after: Decimal
+    batch_number: str | None = None
     created_by_name: str | None
 
 
 class StockCard(SQLModel):
     sku: StockRow
     location: LocationPublic
+    # Medicine only: every Batch the SKU has, the earliest-expiring first.
+    batches: list[BatchStock]
     items: list[StockCardEntry]
     total: int

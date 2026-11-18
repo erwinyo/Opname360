@@ -26,6 +26,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import {
   Select,
   SelectContent,
@@ -33,6 +34,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { Switch } from '@/components/ui/switch'
 import { errorMessage, queryClient } from '@/lib/api'
 import { useMe } from '@/lib/auth'
 
@@ -99,6 +101,9 @@ export function CategoriesPage() {
               <h2 className="min-w-0 flex-1 truncate font-semibold">
                 {category.name}
               </h2>
+              {category.tracks_batches && (
+                <Badge variant="outline">Batch</Badge>
+              )}
               <Badge variant="secondary">
                 HPP {METHOD_LABELS[category.costing_method]}
               </Badge>
@@ -234,6 +239,9 @@ function CategoryDialog({
   const [method, setMethod] = useState<CostingMethod>(
     category?.costing_method ?? 'moving_average',
   )
+  const [tracksBatches, setTracksBatches] = useState(
+    category?.tracks_batches ?? false,
+  )
   const [checked, setChecked] = useState(false)
   const nameError = name.trim() ? undefined : 'Nama kategori wajib diisi.'
 
@@ -254,9 +262,14 @@ function CategoryDialog({
     setChecked(true)
     if (nameError) return
     if (category) {
-      update.mutate({ path: { category_id: category.id }, body: { name } })
+      update.mutate({
+        path: { category_id: category.id },
+        body: { name, tracks_batches: tracksBatches },
+      })
     } else {
-      create.mutate({ body: { name, costing_method: method } })
+      create.mutate({
+        body: { name, costing_method: method, tracks_batches: tracksBatches },
+      })
     }
   }
 
@@ -303,6 +316,22 @@ function CategoryDialog({
           </Select>
         </Field>
       )}
+      <div className="flex items-start gap-3">
+        <Switch
+          id="tracks-batches"
+          checked={tracksBatches}
+          onCheckedChange={setTracksBatches}
+          className="mt-0.5"
+        />
+        <div>
+          <Label htmlFor="tracks-batches">Lacak batch & kedaluwarsa</Label>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Untuk obat: setiap barang masuk dicatat nomor batch dan tanggal
+            kedaluwarsanya, dan yang paling cepat kedaluwarsa terjual lebih
+            dulu. Tidak bisa diubah setelah stoknya bergerak.
+          </p>
+        </div>
+      </div>
     </FormDialog>
   )
 }

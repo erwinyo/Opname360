@@ -106,6 +106,10 @@ type Line = {
   inPacks: boolean
   quantity: string
   cost: string
+  // Medicine only: the Batch this line brings in.
+  tracksBatches: boolean
+  batchNumber: string
+  expiresOn: string
 }
 
 let nextKey = 1
@@ -128,6 +132,9 @@ function lineFromOption(option: SkuOption): Line {
     cost: option.latest_unit_cost
       ? String(Math.round(Number(option.latest_unit_cost)))
       : '',
+    tracksBatches: option.tracks_batches ?? false,
+    batchNumber: '',
+    expiresOn: '',
   }
 }
 
@@ -150,10 +157,13 @@ function lineFromSaved(saved: GoodsReceiptLinePublic): Line {
     cost: String(
       Math.round(Number(inPacks ? saved.pack_cost : saved.unit_cost)),
     ),
+    tracksBatches: saved.tracks_batches,
+    batchNumber: saved.batch_number ?? '',
+    expiresOn: saved.expires_on ?? '',
   }
 }
 
-type LineErrors = { quantity?: string; cost?: string }
+type LineErrors = { quantity?: string; cost?: string; batch?: string }
 
 const lineTotal = (line: Line) =>
   (parseQuantity(line.quantity) || 0) * Number(line.cost || 0)
@@ -178,6 +188,7 @@ function ReceiptForm({ receipt }: { receipt?: GoodsReceiptPublic }) {
     receipt ? receipt.lines.map(lineFromSaved) : [],
   )
   const [checked, setChecked] = useState(false)
+  const [completing, setCompleting] = useState(false)
   const [dialog, setDialog] = useState<
     'complete' | 'discard' | 'supplier' | null
   >(null)
@@ -189,6 +200,11 @@ function ReceiptForm({ receipt }: { receipt?: GoodsReceiptPublic }) {
     return {
       quantity: amount > 0 ? undefined : 'Jumlah harus lebih dari 0.',
       cost: line.cost === '' ? 'Harga beli wajib diisi.' : undefined,
+      // Needed only to complete; a draft may wait for it.
+      batch:
+        line.tracksBatches && !(line.batchNumber.trim() && line.expiresOn)
+          ? 'Isi nomor batch dan tanggal kedaluwarsa.'
+          : undefined,
     }
   })
   const errors = {
@@ -214,6 +230,9 @@ function ReceiptForm({ receipt }: { receipt?: GoodsReceiptPublic }) {
         quantity: parseQuantity(line.quantity),
         unit_cost: Number(line.cost),
         in_packs: line.inPacks,
+        batch_number: line.tracksBatches ? line.batchNumber : null,
+        expires_on:
+          line.tracksBatches && line.expiresOn ? line.expiresOn : null,
       })),
     }
     const { data } =
@@ -263,18 +282,22 @@ function ReceiptForm({ receipt }: { receipt?: GoodsReceiptPublic }) {
   const submit = (event: FormEvent) => {
     event.preventDefault()
     setChecked(true)
+    setCompleting(false)
     if (!invalid) saveDraft.mutate()
   }
+  const missingBatch = lineErrors.some((error) => error.batch)
   const askToComplete = () => {
     setChecked(true)
-    if (!invalid && lines.length > 0) setDialog('complete')
+    setCompleting(true)
+    if (!invalid && !missingBatch && lines.length > 0) setDialog('complete')
   }
 
   const addSku = (option: SkuOption) =>
     setLines((current) => {
-      const existing = current.find(
-        (line) => line.skuId === option.id && !line.inPacks,
-      )
+      // A medicine adds to its latest line; "Batch lain" starts another.
+      const existing = option.tracks_batches
+        ? current.findLast((line) => line.skuId === option.id)
+        : current.find((line) => line.skuId === option.id && !line.inPacks)
       if (!existing) return [...current, lineFromOption(option)]
       // Scanning the same SKU again counts one more.
       return current.map((line) =>
@@ -404,6 +427,7 @@ function ReceiptForm({ receipt }: { receipt?: GoodsReceiptPublic }) {
           <div className="mt-3 rounded-xl border bg-card">
             {lines.map((line, index) => {
               const error: LineErrors = checked ? lineErrors[index] : {}
+              const batchError = completing ? error.batch : undefined
               const unit = line.inPacks ? line.packName : line.stockUnit
               return (
                 <div
@@ -415,9 +439,9 @@ function ReceiptForm({ receipt }: { receipt?: GoodsReceiptPublic }) {
                     <p className="text-sm text-muted-foreground tabular-nums">
                       {line.detail}
                     </p>
-                    {(error.quantity || error.cost) && (
+                    {(error.quantity || error.cost || batchError) && (
                       <p className="mt-1 text-sm text-destructive">
-                        {error.quantity ?? error.cost}
+                        {error.quantity ?? error.cost ?? batchError}
                       </p>
                     )}
                   </div>
@@ -487,6 +511,61 @@ function ReceiptForm({ receipt }: { receipt?: GoodsReceiptPublic }) {
                   >
                     <Trash2Icon />
                   </Button>
+                  {line.tracksBatches && (
+                    <div className="flex basis-full flex-wrap items-center gap-2">
+                      <Input
+                        value={line.batchNumber}
+                        onChange={(e) =>
+                          change(line.key, { batchNumber: e.target.value })
+                        }
+                        placeholder="No. batch"
+                        maxLength={50}
+                        aria-label={`Nomor batch ${line.name}`}
+                        aria-invalid={Boolean(
+                          batchError && !line.batchNumber.trim(),
+                        )}
+                        className="w-40 uppercase"
+                      />
+                      <label className="flex items-center gap-2 text-sm text-muted-foreground">
+                        Kedaluwarsa
+                        <Input
+                          type="date"
+                          value={line.expiresOn}
+                          onChange={(e) =>
+                            change(line.key, { expiresOn: e.target.value })
+                          }
+                          aria-label={`Tanggal kedaluwarsa ${line.name}`}
+                          aria-invalid={Boolean(batchError && !line.expiresOn)}
+                          className="w-40"
+                        />
+                      </label>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() =>
+                          setLines((current) => {
+                            const at = current.indexOf(line) + 1
+                            const another = {
+                              ...line,
+                              key: nextKey++,
+                              quantity: '1',
+                              batchNumber: '',
+                              expiresOn: '',
+                            }
+                            return [
+                              ...current.slice(0, at),
+                              another,
+                              ...current.slice(at),
+                            ]
+                          })
+                        }
+                      >
+                        <PlusIcon />
+                        Batch lain
+                      </Button>
+                    </div>
+                  )}
                 </div>
               )
             })}
@@ -502,7 +581,7 @@ function ReceiptForm({ receipt }: { receipt?: GoodsReceiptPublic }) {
             {errorMessage(failure)}
           </p>
         )}
-        {checked && invalid && (
+        {checked && (invalid || (completing && missingBatch)) && (
           <p role="alert" className="mt-6 text-sm text-destructive">
             Masih ada isian yang perlu diperbaiki.
           </p>
@@ -681,6 +760,13 @@ function ReceiptView({ receipt }: { receipt: GoodsReceiptPublic }) {
                   <span className="block text-sm text-muted-foreground tabular-nums">
                     {line.code} · {line.barcode}
                   </span>
+                  {line.batch_number && (
+                    <span className="block text-sm tabular-nums">
+                      Batch {line.batch_number}
+                      {line.expires_on &&
+                        ` · kedaluwarsa ${formatDate(line.expires_on)}`}
+                    </span>
+                  )}
                 </TableCell>
                 <TableCell className="text-right whitespace-nowrap tabular-nums">
                   {quantity(line.quantity)} {line.stock_unit}

@@ -89,11 +89,16 @@ def new_category(
     name: str = 'Seragam',
     sub_categories: tuple[str, ...] = ('Kemeja',),
     costing_method: str = 'moving_average',
+    tracks_batches: bool = False,
 ) -> dict:
     """Create a Category through the API and return it with its subs."""
     category = client.post(
         '/api/v1/categories/',
-        json={'name': name, 'costing_method': costing_method},
+        json={
+            'name': name,
+            'costing_method': costing_method,
+            'tracks_batches': tracks_batches,
+        },
     ).json()
     for sub_category in sub_categories:
         category = client.post(
@@ -143,6 +148,46 @@ def new_sku(
     sku = session.get(Sku, product['skus'][0]['id'])
     assert sku is not None
     return sku
+
+
+def new_medicine(
+    client: TestClient, session: Session, costing_method: str = 'fifo'
+) -> Sku:
+    """A SKU in its own Category that tracks Batches (slice 6)."""
+    name = f'Obat-{next(_names)}'
+    category = new_category(
+        client, name, ('Sub',), costing_method, tracks_batches=True
+    )
+    product = new_product(
+        client,
+        category['sub_categories'][0]['id'],
+        f'Pil {name}',
+        [sku_row(size=None, stock_unit='botol', selling_price=50000)],
+    )
+    sku = session.get(Sku, product['skus'][0]['id'])
+    assert sku is not None
+    return sku
+
+
+def expiry(days: int) -> str:
+    """A date `days` from today's Shop Day."""
+    from opname360.services.documents import shop_now
+
+    return str(shop_now().date() + timedelta(days=days))
+
+
+def batch_line(
+    sku_id: int | None,
+    quantity: float,
+    unit_cost: float,
+    batch_number: str,
+    expires_on: str,
+) -> dict:
+    return {
+        **receipt_line(sku_id, quantity, unit_cost),
+        'batch_number': batch_number,
+        'expires_on': expires_on,
+    }
 
 
 def new_supplier(client: TestClient, name: str = 'CV Sumber Jaya') -> dict:

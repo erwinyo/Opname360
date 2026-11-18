@@ -385,6 +385,32 @@ export type BalanceSheet = {
 }
 
 /**
+ * BatchStock
+ */
+export type BatchStock = {
+  /**
+   * Id
+   */
+  id: number
+  /**
+   * Number
+   */
+  number: string
+  /**
+   * Expires On
+   */
+  expires_on: string
+  /**
+   * Quantity
+   */
+  quantity: string
+  /**
+   * Expired
+   */
+  expired: boolean
+}
+
+/**
  * Body_products-preview_import
  */
 export type BodyProductsPreviewImport = {
@@ -645,6 +671,10 @@ export type CategoryCreate = {
    */
   name: string
   costing_method?: CostingMethod
+  /**
+   * Tracks Batches
+   */
+  tracks_batches?: boolean
 }
 
 /**
@@ -661,6 +691,10 @@ export type CategoryPublic = {
   name: string
   costing_method: CostingMethod
   /**
+   * Tracks Batches
+   */
+  tracks_batches: boolean
+  /**
    * Sub Categories
    */
   sub_categories: Array<SubCategoryPublic>
@@ -674,6 +708,10 @@ export type CategoryUpdate = {
    * Name
    */
   name?: string | null
+  /**
+   * Tracks Batches
+   */
+  tracks_batches?: boolean | null
 }
 
 /**
@@ -1257,6 +1295,18 @@ export type GoodsReceiptLinePublic = {
    * Returned Quantity
    */
   returned_quantity: string
+  /**
+   * Tracks Batches
+   */
+  tracks_batches: boolean
+  /**
+   * Batch Number
+   */
+  batch_number: string | null
+  /**
+   * Expires On
+   */
+  expires_on: string | null
 }
 
 /**
@@ -1279,6 +1329,14 @@ export type GoodsReceiptLineSave = {
    * In Packs
    */
   in_packs?: boolean
+  /**
+   * Batch Number
+   */
+  batch_number?: string | null
+  /**
+   * Expires On
+   */
+  expires_on?: string | null
 }
 
 /**
@@ -3707,6 +3765,10 @@ export type SkuOption = {
    * Latest Unit Cost
    */
   latest_unit_cost: string | null
+  /**
+   * Tracks Batches
+   */
+  tracks_batches?: boolean
 }
 
 /**
@@ -3881,6 +3943,10 @@ export type StockCard = {
   sku: StockRow
   location: LocationPublic
   /**
+   * Batches
+   */
+  batches: Array<BatchStock>
+  /**
    * Items
    */
   items: Array<StockCardEntry>
@@ -3935,6 +4001,10 @@ export type StockCardEntry = {
    * Value After
    */
   value_after: string
+  /**
+   * Batch Number
+   */
+  batch_number?: string | null
   /**
    * Created By Name
    */

@@ -22,6 +22,8 @@ class Category(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True)
     name: str = Field(max_length=100, unique=True)
     costing_method: CostingMethod = Field(sa_type=enum_type(CostingMethod))
+    # Medicine: stock kept per Batch, with expiry dates (slice 6).
+    tracks_batches: bool = False
 
     sub_categories: list['SubCategory'] = Relationship(
         back_populates='category',
@@ -103,10 +105,13 @@ class SkuPriceChange(SQLModel, table=True):
 class CategoryCreate(SQLModel):
     name: str = Field(min_length=1, max_length=100)
     costing_method: CostingMethod = CostingMethod.moving_average
+    tracks_batches: bool = False
 
 
 class CategoryUpdate(SQLModel):
     name: str | None = Field(default=None, min_length=1, max_length=100)
+    # Only while none of its SKUs has moved.
+    tracks_batches: bool | None = None
 
 
 class CostingMethodSwitch(SQLModel):
@@ -128,6 +133,7 @@ class CategoryPublic(SQLModel):
     id: int
     name: str
     costing_method: CostingMethod
+    tracks_batches: bool
     sub_categories: list[SubCategoryPublic]
 
 
@@ -231,6 +237,7 @@ class SkuOption(SQLModel):
     purchase_pack_size: Decimal | None
     selling_price: int
     latest_unit_cost: Decimal | None
+    tracks_batches: bool = False
 
 
 class ImportProblem(SQLModel):

@@ -185,6 +185,7 @@ export type {
   AuthReadMeResponse,
   AuthReadMeResponses,
   BalanceSheet,
+  BatchStock,
   BodyProductsPreviewImport,
   BodyProductsRunImport,
   Cart,

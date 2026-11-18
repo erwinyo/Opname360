@@ -7,6 +7,7 @@ from sqlmodel import Session, col, func, or_, select
 
 from opname360.core.errors import NotFoundError
 from opname360.models import (
+    Batch,
     Location,
     LocationPublic,
     Product,
@@ -21,6 +22,7 @@ from opname360.models import (
     SubCategory,
     User,
 )
+from opname360.services import batches
 
 
 def list_locations(session: Session) -> list[Location]:
@@ -136,21 +138,25 @@ def stock_card(
         select(func.count()).select_from(StockMovement).where(*scope)
     ).one()
     rows = session.exec(
-        select(StockMovement, User.full_name)
+        select(StockMovement, User.full_name, Batch.number)
         .join(User, isouter=True)
+        .join(Batch, isouter=True)
         .where(*scope)
         .order_by(col(StockMovement.id).desc())
         .offset(offset)
         .limit(limit)
     ).all()
+    assert sku.id is not None and location.id is not None
     return StockCard(
         sku=_stock_row(sku, balance),
         location=LocationPublic.model_validate(location),
+        batches=batches.stock(session, sku.id, location.id),
         items=[
             StockCardEntry.model_validate(
-                movement, update={'created_by_name': name}
+                movement,
+                update={'created_by_name': name, 'batch_number': number},
             )
-            for movement, name in rows
+            for movement, name, number in rows
         ],
         total=total,
     )

@@ -6,6 +6,7 @@ from opname360.models.activity_log import (
     ActivityLogFilter,
     ActivityLogPage,
 )
+from opname360.models.batch import Batch, BatchStock
 from opname360.models.cash import (
     CashFilter,
     CashOut,
@@ -304,6 +305,8 @@ __all__ = [
     'ActivityLogPage',
     'Attention',
     'BalanceSheet',
+    'Batch',
+    'BatchStock',
     'Cart',
     'CartLine',
     'CashFilter',

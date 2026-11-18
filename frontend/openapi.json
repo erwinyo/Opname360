@@ -10679,6 +10679,40 @@
         "title": "BalanceSheet",
         "description": "Rule 13, in T layout: assets on the left, the rest on the right."
       },
+      "BatchStock": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "number": {
+            "type": "string",
+            "title": "Number"
+          },
+          "expires_on": {
+            "type": "string",
+            "format": "date",
+            "title": "Expires On"
+          },
+          "quantity": {
+            "type": "string",
+            "title": "Quantity"
+          },
+          "expired": {
+            "type": "boolean",
+            "title": "Expired"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "number",
+          "expires_on",
+          "quantity",
+          "expired"
+        ],
+        "title": "BatchStock"
+      },
       "Body_products-preview_import": {
         "properties": {
           "file": {
@@ -11129,6 +11163,11 @@
           "costing_method": {
             "$ref": "#/components/schemas/CostingMethod",
             "default": "moving_average"
+          },
+          "tracks_batches": {
+            "type": "boolean",
+            "title": "Tracks Batches",
+            "default": false
           }
         },
         "type": "object",
@@ -11150,6 +11189,10 @@
           "costing_method": {
             "$ref": "#/components/schemas/CostingMethod"
           },
+          "tracks_batches": {
+            "type": "boolean",
+            "title": "Tracks Batches"
+          },
           "sub_categories": {
             "items": {
               "$ref": "#/components/schemas/SubCategoryPublic"
@@ -11163,6 +11206,7 @@
           "id",
           "name",
           "costing_method",
+          "tracks_batches",
           "sub_categories"
         ],
         "title": "CategoryPublic"
@@ -11181,6 +11225,17 @@
               }
             ],
             "title": "Name"
+          },
+          "tracks_batches": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tracks Batches"
           }
         },
         "type": "object",
@@ -12085,6 +12140,33 @@
           "returned_quantity": {
             "type": "string",
             "title": "Returned Quantity"
+          },
+          "tracks_batches": {
+            "type": "boolean",
+            "title": "Tracks Batches"
+          },
+          "batch_number": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Batch Number"
+          },
+          "expires_on": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expires On"
           }
         },
         "type": "object",
@@ -12106,7 +12188,10 @@
           "pack_size",
           "pack_quantity",
           "pack_cost",
-          "returned_quantity"
+          "returned_quantity",
+          "tracks_batches",
+          "batch_number",
+          "expires_on"
         ],
         "title": "GoodsReceiptLinePublic"
       },
@@ -12144,6 +12229,30 @@
             "type": "boolean",
             "title": "In Packs",
             "default": false
+          },
+          "batch_number": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 50
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Batch Number"
+          },
+          "expires_on": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expires On"
           }
         },
         "type": "object",
@@ -16572,6 +16681,11 @@
               }
             ],
             "title": "Latest Unit Cost"
+          },
+          "tracks_batches": {
+            "type": "boolean",
+            "title": "Tracks Batches",
+            "default": false
           }
         },
         "type": "object",
@@ -16928,6 +17042,13 @@
           "location": {
             "$ref": "#/components/schemas/LocationPublic"
           },
+          "batches": {
+            "items": {
+              "$ref": "#/components/schemas/BatchStock"
+            },
+            "type": "array",
+            "title": "Batches"
+          },
           "items": {
             "items": {
               "$ref": "#/components/schemas/StockCardEntry"
@@ -16944,6 +17065,7 @@
         "required": [
           "sku",
           "location",
+          "batches",
           "items",
           "total"
         ],
@@ -16994,6 +17116,17 @@
           "value_after": {
             "type": "string",
             "title": "Value After"
+          },
+          "batch_number": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Batch Number"
           },
           "created_by_name": {
             "anyOf": [

@@ -52,12 +52,13 @@ def receive(
     source: Source,
     actor: User | None,
     sets_latest_cost: bool = True,
+    batch_id: int | None = None,
 ) -> StockMovement:
     """Goods in: `quantity` Stock Units that cost `value` altogether."""
     assert quantity > 0
     assert value >= 0
     assert sku.id is not None
-    balance = _lock_balance(session, sku.id, location_id)
+    balance = lock_balance(session, sku.id, location_id)
     unit_cost = money(value / quantity)
 
     old_quantity, old_value = balance.quantity, balance.value
@@ -81,6 +82,7 @@ def receive(
         value=value,
         source=source,
         actor=actor,
+        batch_id=batch_id,
     )
     session.flush()
     assert movement.id is not None
@@ -129,6 +131,7 @@ def issue(
     actor: User | None,
     unit_cost: Decimal | None = None,
     layer_of: int | None = None,
+    batch_id: int | None = None,
 ) -> StockMovement:
     """Goods out, costed by the SKU's Costing Method.
 
@@ -141,7 +144,7 @@ def issue(
     """
     assert quantity > 0
     assert sku.id is not None
-    balance = _lock_balance(session, sku.id, location_id)
+    balance = lock_balance(session, sku.id, location_id)
 
     available = max(balance.quantity, ZERO)
     from_stock = min(quantity, available)
@@ -174,6 +177,7 @@ def issue(
         value=-cost,
         source=source,
         actor=actor,
+        batch_id=batch_id,
     )
 
 
@@ -215,6 +219,7 @@ def reverse(
                 actor=actor,
                 unit_cost=original.unit_cost,
                 layer_of=original.id,
+                batch_id=original.batch_id,
             )
         elif original.quantity < 0:
             receive(
@@ -227,9 +232,10 @@ def reverse(
                 source=source,
                 actor=actor,
                 sets_latest_cost=False,
+                batch_id=original.batch_id,
             )
         else:
-            balance = _lock_balance(
+            balance = lock_balance(
                 session, original.sku_id, original.location_id
             )
             _record(
@@ -255,6 +261,7 @@ def found(
     source: Source,
     actor: User | None,
     unit_cost: Decimal | None = None,
+    batch_id: int | None = None,
 ) -> StockMovement:
     """A Surplus found in an opname, valued by costing rule 5.
 
@@ -262,7 +269,7 @@ def found(
     had a cost; it then becomes the SKU's latest unit cost.
     """
     assert sku.id is not None
-    balance = _lock_balance(session, sku.id, location_id)
+    balance = lock_balance(session, sku.id, location_id)
     cost = found_unit_cost(sku, balance)
     if cost is None:
         assert unit_cost is not None, 'the caller checks a cost is known'
@@ -277,6 +284,7 @@ def found(
         source=source,
         actor=actor,
         sets_latest_cost=sku.latest_unit_cost is None,
+        batch_id=batch_id,
     )
 
 
@@ -343,7 +351,7 @@ def _method(sku: Sku) -> CostingMethod:
     return sku.product.sub_category.category.costing_method
 
 
-def _lock_balance(
+def lock_balance(
     session: Session, sku_id: int, location_id: int
 ) -> StockBalance:
     """The SKU's balance row, created if missing, locked until commit."""
@@ -373,6 +381,7 @@ def _record(
     value: Decimal,
     source: Source,
     actor: User | None,
+    batch_id: int | None = None,
 ) -> StockMovement:
     """Apply a change to the balance and write its Stock Movement."""
     balance.quantity += quantity
@@ -390,6 +399,7 @@ def _record(
         document_type=source.type,
         document_id=source.id,
         document_number=source.number,
+        batch_id=batch_id,
         created_by=actor.id if actor else None,
     )
     session.add(movement)

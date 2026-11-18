@@ -25,7 +25,7 @@ from opname360.models import (
     SubCategoryPublic,
     User,
 )
-from opname360.services import activity_log, costing, stock
+from opname360.services import activity_log, batches, costing, stock
 
 
 METHOD_LABELS = {
@@ -97,16 +97,21 @@ def create_category(
     name = _required(category_in.name, 'Nama kategori')
     _check_category_name(session, name)
 
-    category = Category(name=name, costing_method=category_in.costing_method)
+    category = Category(
+        name=name,
+        costing_method=category_in.costing_method,
+        tracks_batches=category_in.tracks_batches,
+    )
     session.add(category)
     session.flush()
+    batch_words = ', lacak batch' if category.tracks_batches else ''
     activity_log.record(
         session,
         actor=actor,
         action='category.create',
         summary=(
             f'Menambah kategori {name} '
-            f'(HPP {METHOD_LABELS[category.costing_method]}).'
+            f'(HPP {METHOD_LABELS[category.costing_method]}{batch_words}).'
         ),
         entity_type='category',
         entity_id=category.id,
@@ -129,6 +134,15 @@ def update_category(
             _check_category_name(session, name, exclude=category)
             changes.append(f'nama dari {category.name} menjadi {name}')
             category.name = name
+    tracks = category_in.tracks_batches
+    if tracks is not None and tracks != category.tracks_batches:
+        if stock.has_movements(session, _sku_ids(session, category=category)):
+            raise ConflictError(
+                f'Pelacakan batch {category.name} tidak bisa diubah karena '
+                'stoknya sudah bergerak.'
+            )
+        changes.append('lacak batch' if tracks else 'tanpa batch')
+        category.tracks_batches = tracks
     if changes:
         session.add(category)
         activity_log.record(
@@ -703,12 +717,7 @@ def search_skus(
                 .limit(limit)
             ).all()
         )
-    return [
-        SkuOption.model_validate(
-            sku, update={'product_name': sku.product.name}
-        )
-        for sku in found
-    ]
+    return [_sku_option(sku) for sku in found]
 
 
 def _sku_ids(
@@ -736,9 +745,17 @@ def skus_by_id(session: Session, sku_ids: list[int]) -> list[SkuOption]:
         ).all()
     }
     return [
-        SkuOption.model_validate(
-            found[sku_id], update={'product_name': found[sku_id].product.name}
-        )
+        _sku_option(found[sku_id])
         for sku_id in dict.fromkeys(sku_ids)
         if sku_id in found
     ]
+
+
+def _sku_option(sku: Sku) -> SkuOption:
+    return SkuOption.model_validate(
+        sku,
+        update={
+            'product_name': sku.product.name,
+            'tracks_batches': batches.tracks(sku),
+        },
+    )

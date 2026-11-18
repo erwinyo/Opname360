@@ -14,7 +14,13 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { errorMessage } from '@/lib/api'
-import { formatDateTime, money, quantity, variantLabel } from '@/lib/format'
+import {
+  formatDate,
+  formatDateTime,
+  money,
+  quantity,
+  variantLabel,
+} from '@/lib/format'
 import { documentPath, REASON_LABELS } from '@/lib/labels'
 import { cn } from '@/lib/utils'
 
@@ -51,7 +57,7 @@ export function StockCardPage() {
     )
   }
 
-  const { sku, location, items, total } = card.data
+  const { sku, location, batches, items, total } = card.data
   const onHand = Number(sku.quantity)
 
   return (
@@ -90,6 +96,34 @@ export function StockCardPage() {
           </dd>
         </div>
       </dl>
+
+      {batches.length > 0 && (
+        <section className="mt-6">
+          <h2 className="font-semibold">Batch</h2>
+          <ul className="mt-2 divide-y rounded-xl border bg-card sm:max-w-md">
+            {batches.map((batch) => (
+              <li
+                key={batch.id}
+                className="flex items-center gap-3 px-4 py-2 tabular-nums"
+              >
+                <span className="font-medium">{batch.number}</span>
+                <span
+                  className={cn(
+                    'flex-1 text-sm text-muted-foreground',
+                    batch.expired && 'text-destructive',
+                  )}
+                >
+                  {batch.expired ? 'Kedaluwarsa' : 'Sampai'}{' '}
+                  {formatDate(batch.expires_on)}
+                </span>
+                <span>
+                  {quantity(batch.quantity)} {sku.stock_unit}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       {total === 0 ? (
         <p className="mt-6 rounded-xl border border-dashed p-6 text-muted-foreground">
@@ -140,6 +174,8 @@ export function StockCardPage() {
                         )}
                         <span className="block text-sm text-muted-foreground">
                           {REASON_LABELS[entry.reason]}
+                          {entry.batch_number &&
+                            ` · batch ${entry.batch_number}`}
                         </span>
                       </TableCell>
                       <TableCell

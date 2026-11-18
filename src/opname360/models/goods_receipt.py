@@ -70,6 +70,9 @@ class GoodsReceiptLine(SQLModel, table=True):
     pack_cost: Decimal | None = Field(
         default=None, max_digits=18, decimal_places=4
     )
+    # Medicine: the Batch the line brings in (slice 6).
+    batch_number: str | None = Field(default=None, max_length=50)
+    expires_on: date | None = None
 
 
 # Requests and responses
@@ -81,6 +84,9 @@ class GoodsReceiptLineSave(SQLModel):
     quantity: Decimal = Field(gt=0, max_digits=14, decimal_places=3)
     unit_cost: Decimal = Field(ge=0, max_digits=18, decimal_places=4)
     in_packs: bool = False
+    # Needed before completing when the SKU tracks Batches.
+    batch_number: str | None = Field(default=None, max_length=50)
+    expires_on: date | None = None
 
 
 class GoodsReceiptSave(SQLModel):
@@ -118,6 +124,9 @@ class GoodsReceiptLinePublic(SQLModel):
     pack_cost: Decimal | None
     # Sent back on completed Supplier Returns.
     returned_quantity: Decimal
+    tracks_batches: bool
+    batch_number: str | None
+    expires_on: date | None
 
 
 class GoodsReceiptPublic(SQLModel):

@@ -3,7 +3,7 @@ from decimal import Decimal
 from sqlmodel import Session, col, func, select
 
 from opname360.core.errors import ConflictError, NotFoundError
-from opname360.core.formatting import rupiah
+from opname360.core.formatting import rupiah, sku_label
 from opname360.models import (
     DocumentStatus,
     Location,
@@ -22,6 +22,7 @@ from opname360.models import (
 from opname360.models._types import utc_now
 from opname360.services import (
     activity_log,
+    batches,
     costing,
     documents,
     posting,
@@ -249,8 +250,15 @@ def _apply(
 
     total = Decimal(0)
     for row in receipt_in.lines:
-        if session.get(Sku, row.sku_id) is None:
+        sku = session.get(Sku, row.sku_id)
+        if sku is None:
             raise NotFoundError('SKU tidak ditemukan.')
+        if batches.tracks(sku):
+            # Slice 6, rule 7: medicine is bought, not made.
+            label = sku_label(sku.product.name, sku.size, sku.color)
+            raise ConflictError(
+                f'{label} dicatat per batch; terima lewat Barang Masuk.'
+            )
         line = ProductionReceiptLine(
             receipt_id=receipt.id,
             sku_id=row.sku_id,

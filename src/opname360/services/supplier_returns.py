@@ -25,6 +25,7 @@ from opname360.models import (
 from opname360.models._types import utc_now
 from opname360.services import (
     activity_log,
+    batches,
     costing,
     documents,
     goods_receipts,
@@ -233,6 +234,12 @@ def complete(
     for line in sorted(supplier_return.lines, key=lambda line: line.sku_id):
         sku = session.get(Sku, line.sku_id)
         assert sku is not None
+        receipt_line = session.get(
+            GoodsReceiptLine, line.goods_receipt_line_id
+        )
+        assert receipt_line is not None
+        # Slice 6, rule 8: back from the Batch the receipt brought in.
+        batch = batches.find(session, sku.id or 0, receipt_line.batch_number)
         movement = costing.issue(
             session,
             sku=sku,
@@ -241,6 +248,7 @@ def complete(
             reason=MovementReason.supplier_return,
             source=source,
             actor=actor,
+            batch_id=batch.id if batch else None,
         )
         line.stock_cost = -movement.value
         session.add(line)

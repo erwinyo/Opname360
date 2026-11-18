@@ -133,6 +133,8 @@ class GoodsReceiptPublic(SQLModel):
     payment_status: PaymentStatus
     paid_from_account_id: int | None
     paid_from_name: str | None
+    # Owed to the Supplier: what is still unpaid; 0 once fully paid.
+    owed_amount: int | None
     note: str | None
     total_cost: Decimal
     created_by_name: str | None

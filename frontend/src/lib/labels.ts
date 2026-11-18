@@ -106,5 +106,9 @@ export function documentPath(type: string, id: number): string | null {
   if (type === 'stock_opname') return `/stok-opname/${id}`
   if (type === 'receipt') return `/struk/${id}`
   if (type === 'shift') return `/shift/${id}`
+  if (type === 'cash_out') return '/kas-keluar'
+  if (type === 'cash_transfer') return '/pindah-kas'
+  if (type === 'supplier_payment') return '/bayar-hutang'
+  if (type === 'employee_charge') return '/ganti-rugi'
   return null
 }

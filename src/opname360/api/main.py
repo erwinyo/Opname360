@@ -4,6 +4,7 @@ from opname360.api.deps import verify_same_origin
 from opname360.api.routes import (
     activity_log,
     auth,
+    cash,
     categories,
     counting,
     employee_charges,
@@ -20,6 +21,7 @@ from opname360.api.routes import (
     shifts,
     shop_settings,
     stock,
+    supplier_payments,
     supplier_returns,
     suppliers,
     users,
@@ -49,6 +51,8 @@ api_router.include_router(receipts.router)
 api_router.include_router(promotions.router)
 api_router.include_router(reports.router)
 api_router.include_router(ledger.router)
+api_router.include_router(cash.router)
+api_router.include_router(supplier_payments.router)
 api_router.include_router(activity_log.router)
 
 

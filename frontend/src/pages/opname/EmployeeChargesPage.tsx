@@ -1,12 +1,15 @@
-import { keepPreviousData, useQuery } from '@tanstack/react-query'
+import { keepPreviousData, useMutation, useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
 import { Link } from 'react-router'
+import { toast } from 'sonner'
 
-import type { ChargeStatus } from '@/client'
+import type { ChargeStatus, EmployeeChargePublic } from '@/client'
 import {
   employeeChargesListChargesOptions,
+  employeeChargesSettleChargeMutation,
   employeeChargesOutstandingTotalsOptions,
 } from '@/client/@tanstack/react-query.gen'
+import { Field, FormDialog } from '@/components/FormDialog'
 import { Pager } from '@/components/Pager'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -18,10 +21,11 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { errorMessage } from '@/lib/api'
+import { errorMessage, queryClient } from '@/lib/api'
 import { formatDateTime, rupiah } from '@/lib/format'
 import { documentPath } from '@/lib/labels'
 import { cn } from '@/lib/utils'
+import { AccountSelect } from '@/pages/ledger/shared'
 
 const PAGE_SIZE = 50
 
@@ -33,6 +37,7 @@ const CHARGE_LABELS: Record<ChargeStatus, string> = {
 
 /** What employees owe for Shortages charged to them. */
 export function EmployeeChargesPage() {
+  const [settling, setSettling] = useState<EmployeeChargePublic | null>(null)
   const totals = useQuery(employeeChargesOutstandingTotalsOptions())
   const [userId, setUserId] = useState<number | null>(null)
   const [offset, setOffset] = useState(0)
@@ -159,6 +164,23 @@ export function EmployeeChargesPage() {
                         >
                           {CHARGE_LABELS[charge.status]}
                         </Badge>
+                        {charge.status === 'settled' && (
+                          <span className="block text-xs text-muted-foreground">
+                            {charge.settled_by_salary
+                              ? 'Potong gaji'
+                              : 'Dibayar'}
+                          </span>
+                        )}
+                        {charge.status === 'outstanding' && (
+                          <Button
+                            variant="link"
+                            size="sm"
+                            className="h-auto px-0"
+                            onClick={() => setSettling(charge)}
+                          >
+                            Lunasi
+                          </Button>
+                        )}
                       </TableCell>
                     </TableRow>
                   )
@@ -173,8 +195,79 @@ export function EmployeeChargesPage() {
             unit="ganti rugi"
             onChange={setOffset}
           />
+          {settling && (
+            <SettleDialog charge={settling} onClose={() => setSettling(null)} />
+          )}
         </>
       )}
     </>
+  )
+}
+
+/** Paid back in cash, or deducted from salary. */
+function SettleDialog({
+  charge,
+  onClose,
+}: {
+  charge: EmployeeChargePublic
+  onClose: () => void
+}) {
+  const [bySalary, setBySalary] = useState(false)
+  const [accountId, setAccountId] = useState('')
+  const settle = useMutation({
+    ...employeeChargesSettleChargeMutation(),
+    onSuccess: () => {
+      queryClient.invalidateQueries()
+      toast.success(`Ganti rugi ${charge.user_name} lunas.`)
+      onClose()
+    },
+  })
+  return (
+    <FormDialog
+      title={`Lunasi ganti rugi ${charge.user_name}`}
+      description={`${rupiah(charge.amount)}: ${charge.description}`}
+      submitLabel="Lunasi"
+      pending={settle.isPending}
+      error={settle.error}
+      onSubmit={() =>
+        settle.mutate({
+          path: { charge_id: charge.id },
+          body: {
+            by_salary: bySalary,
+            account_id: !bySalary && accountId ? Number(accountId) : null,
+          },
+        })
+      }
+      onClose={onClose}
+    >
+      <fieldset className="grid gap-2">
+        <legend className="sr-only">Cara melunasi</legend>
+        {[false, true].map((salary) => (
+          <label key={String(salary)} className="flex items-center gap-2.5">
+            <input
+              type="radio"
+              name="settle"
+              checked={bySalary === salary}
+              onChange={() => setBySalary(salary)}
+              className="size-4 accent-primary"
+            />
+            {salary ? 'Dipotong dari gaji' : 'Dibayar tunai atau transfer'}
+          </label>
+        ))}
+      </fieldset>
+      {!bySalary && (
+        <Field id="settle-account" label="Uangnya masuk ke">
+          <AccountSelect
+            id="settle-account"
+            value={accountId}
+            onChange={setAccountId}
+            filter={(account) =>
+              account.is_cash && account.role !== 'cash_drawer'
+            }
+            placeholder="Kas Besar"
+          />
+        </Field>
+      )}
+    </FormDialog>
   )
 }

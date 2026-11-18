@@ -19,11 +19,12 @@ from opname360.models import (
     JournalFilter,
     JournalPage,
     ManualEntryIn,
+    OpeningBalanceIn,
     ReversalCreate,
     RoleAssign,
     TrialBalance,
 )
-from opname360.services import ledger
+from opname360.services import cash, ledger
 
 
 # Rule 15: the Owner and the Admin keep the books; a Cashier sees none.
@@ -121,6 +122,21 @@ def reverse_entry(
     entry = ledger.get_entry(session, entry_id)
     mirror = ledger.reverse_entry(session, entry, data.reason, actor=actor)
     return ledger.entry_public(session, mirror)
+
+
+@router.get('/opening-balances')
+def read_opening_balances(session: SessionDep) -> JournalEntryPublic | None:
+    entry = cash.opening_entry(session)
+    return ledger.entry_public(session, entry) if entry else None
+
+
+@router.post('/opening-balances', status_code=status.HTTP_201_CREATED)
+def enter_opening_balances(
+    session: SessionDep, data: OpeningBalanceIn, owner: OwnerDep
+) -> JournalEntryPublic:
+    """Rule 11: once, by the Owner."""
+    entry = cash.enter_opening_balances(session, data, actor=owner)
+    return ledger.entry_public(session, entry)
 
 
 @router.get('/trial-balance')

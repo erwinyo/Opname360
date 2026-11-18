@@ -29,6 +29,7 @@ client.interceptors.response.use((response, request) => {
 
 /** The message to show for a failed API call. Business errors arrive in Indonesian. */
 export function errorMessage(error: unknown): string {
+  if (typeof error === 'string') return error
   if (error && typeof error === 'object' && 'detail' in error) {
     const { detail } = error
     if (typeof detail === 'string') return detail

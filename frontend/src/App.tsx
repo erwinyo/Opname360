@@ -41,10 +41,14 @@ import { SalesReceiptsPage } from '@/pages/reports/SalesReceiptsPage'
 import { VariancesPage } from '@/pages/reports/VariancesPage'
 import { AccountBookPage } from '@/pages/ledger/AccountBookPage'
 import { AccountSettingsPage } from '@/pages/ledger/AccountSettingsPage'
+import { CashOutsPage } from '@/pages/ledger/CashOutsPage'
 import { AccountsPage } from '@/pages/ledger/AccountsPage'
 import { JournalEntryPage } from '@/pages/ledger/JournalEntryPage'
 import { JournalPage } from '@/pages/ledger/JournalPage'
 import { ManualEntryPage } from '@/pages/ledger/ManualEntryPage'
+import { OpeningBalancesPage } from '@/pages/ledger/OpeningBalancesPage'
+import { SupplierPaymentsPage } from '@/pages/ledger/SupplierPaymentsPage'
+import { TransfersPage } from '@/pages/ledger/TransfersPage'
 import { TrialBalancePage } from '@/pages/ledger/TrialBalancePage'
 import { PaymentMethodsPage } from '@/pages/settings/PaymentMethodsPage'
 import { ShopSettingsPage } from '@/pages/settings/ShopSettingsPage'
@@ -155,6 +159,9 @@ export function App() {
             <Route path="jurnal/:entryId" element={<JournalEntryPage />} />
             <Route path="buku-besar" element={<AccountBookPage />} />
             <Route path="neraca-saldo" element={<TrialBalancePage />} />
+            <Route path="kas-keluar" element={<CashOutsPage />} />
+            <Route path="pindah-kas" element={<TransfersPage />} />
+            <Route path="bayar-hutang" element={<SupplierPaymentsPage />} />
           </>
         )}
         {user.role === 'owner' && (
@@ -165,6 +172,7 @@ export function App() {
             <Route path="pengaturan-toko" element={<ShopSettingsPage />} />
             <Route path="metode-pembayaran" element={<PaymentMethodsPage />} />
             <Route path="pengaturan-akun" element={<AccountSettingsPage />} />
+            <Route path="saldo-awal" element={<OpeningBalancesPage />} />
           </>
         )}
         <Route path="*" element={<Navigate to="/" replace />} />

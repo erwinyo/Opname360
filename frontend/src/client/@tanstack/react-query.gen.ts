@@ -14,6 +14,14 @@ import {
   authLogin,
   authLogout,
   authReadMe,
+  cashCreateCashOut,
+  cashCreateTransfer,
+  cashListCashOuts,
+  cashListTransfers,
+  cashReadCashOut,
+  cashReadTransfer,
+  cashReverseCashOut,
+  cashReverseTransfer,
   categoriesCreateCategory,
   categoriesCreateSubCategory,
   categoriesDeleteCategory,
@@ -28,6 +36,7 @@ import {
   countingReadSheet,
   employeeChargesListCharges,
   employeeChargesOutstandingTotals,
+  employeeChargesSettleCharge,
   goodsReceiptsCompleteReceipt,
   goodsReceiptsCreateReceipt,
   goodsReceiptsDiscardReceipt,
@@ -40,10 +49,12 @@ import {
   ledgerCreateAccount,
   ledgerCreateManualEntry,
   ledgerDeleteAccount,
+  ledgerEnterOpeningBalances,
   ledgerListAccounts,
   ledgerListEntries,
   ledgerReadAccountBook,
   ledgerReadEntry,
+  ledgerReadOpeningBalances,
   ledgerReverseEntry,
   ledgerTrialBalance,
   ledgerUpdateAccount,
@@ -120,6 +131,11 @@ import {
   stockListLocations,
   stockListStock,
   stockReadStockCard,
+  supplierPaymentsCreatePayment,
+  supplierPaymentsListDebts,
+  supplierPaymentsListPayments,
+  supplierPaymentsReadPayment,
+  supplierPaymentsReversePayment,
   supplierReturnsCompleteReturn,
   supplierReturnsCreateReturn,
   supplierReturnsDiscardReturn,
@@ -148,6 +164,30 @@ import type {
   AuthReadMeData,
   AuthReadMeError,
   AuthReadMeResponse,
+  CashCreateCashOutData,
+  CashCreateCashOutError,
+  CashCreateCashOutResponse,
+  CashCreateTransferData,
+  CashCreateTransferError,
+  CashCreateTransferResponse,
+  CashListCashOutsData,
+  CashListCashOutsError,
+  CashListCashOutsResponse,
+  CashListTransfersData,
+  CashListTransfersError,
+  CashListTransfersResponse,
+  CashReadCashOutData,
+  CashReadCashOutError,
+  CashReadCashOutResponse,
+  CashReadTransferData,
+  CashReadTransferError,
+  CashReadTransferResponse,
+  CashReverseCashOutData,
+  CashReverseCashOutError,
+  CashReverseCashOutResponse,
+  CashReverseTransferData,
+  CashReverseTransferError,
+  CashReverseTransferResponse,
   CategoriesCreateCategoryData,
   CategoriesCreateCategoryError,
   CategoriesCreateCategoryResponse,
@@ -190,6 +230,9 @@ import type {
   EmployeeChargesOutstandingTotalsData,
   EmployeeChargesOutstandingTotalsError,
   EmployeeChargesOutstandingTotalsResponse,
+  EmployeeChargesSettleChargeData,
+  EmployeeChargesSettleChargeError,
+  EmployeeChargesSettleChargeResponse,
   GoodsReceiptsCompleteReceiptData,
   GoodsReceiptsCompleteReceiptError,
   GoodsReceiptsCompleteReceiptResponse,
@@ -225,6 +268,9 @@ import type {
   LedgerDeleteAccountData,
   LedgerDeleteAccountError,
   LedgerDeleteAccountResponse,
+  LedgerEnterOpeningBalancesData,
+  LedgerEnterOpeningBalancesError,
+  LedgerEnterOpeningBalancesResponse,
   LedgerListAccountsData,
   LedgerListAccountsError,
   LedgerListAccountsResponse,
@@ -237,6 +283,9 @@ import type {
   LedgerReadEntryData,
   LedgerReadEntryError,
   LedgerReadEntryResponse,
+  LedgerReadOpeningBalancesData,
+  LedgerReadOpeningBalancesError,
+  LedgerReadOpeningBalancesResponse,
   LedgerReverseEntryData,
   LedgerReverseEntryError,
   LedgerReverseEntryResponse,
@@ -455,6 +504,21 @@ import type {
   StockReadStockCardData,
   StockReadStockCardError,
   StockReadStockCardResponse,
+  SupplierPaymentsCreatePaymentData,
+  SupplierPaymentsCreatePaymentError,
+  SupplierPaymentsCreatePaymentResponse,
+  SupplierPaymentsListDebtsData,
+  SupplierPaymentsListDebtsError,
+  SupplierPaymentsListDebtsResponse,
+  SupplierPaymentsListPaymentsData,
+  SupplierPaymentsListPaymentsError,
+  SupplierPaymentsListPaymentsResponse,
+  SupplierPaymentsReadPaymentData,
+  SupplierPaymentsReadPaymentError,
+  SupplierPaymentsReadPaymentResponse,
+  SupplierPaymentsReversePaymentData,
+  SupplierPaymentsReversePaymentError,
+  SupplierPaymentsReversePaymentResponse,
   SupplierReturnsCompleteReturnData,
   SupplierReturnsCompleteReturnError,
   SupplierReturnsCompleteReturnResponse,
@@ -3048,6 +3112,35 @@ export const employeeChargesOutstandingTotalsOptions = (
     queryKey: employeeChargesOutstandingTotalsQueryKey(options),
   })
 
+/**
+ * Settle Charge
+ *
+ * Paid back in cash, or deducted from salary.
+ */
+export const employeeChargesSettleChargeMutation = (
+  options?: Partial<Options<EmployeeChargesSettleChargeData>>,
+): UseMutationOptions<
+  EmployeeChargesSettleChargeResponse,
+  EmployeeChargesSettleChargeError,
+  Options<EmployeeChargesSettleChargeData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    EmployeeChargesSettleChargeResponse,
+    EmployeeChargesSettleChargeError,
+    Options<EmployeeChargesSettleChargeData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await employeeChargesSettleCharge({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      })
+      return data
+    },
+  }
+  return mutationOptions
+}
+
 export const shopSettingsReadSettingsQueryKey = (
   options?: Options<ShopSettingsReadSettingsData>,
 ) => createQueryKey('shopSettingsReadSettings', options)
@@ -5108,6 +5201,63 @@ export const ledgerReverseEntryMutation = (
   return mutationOptions
 }
 
+export const ledgerReadOpeningBalancesQueryKey = (
+  options?: Options<LedgerReadOpeningBalancesData>,
+) => createQueryKey('ledgerReadOpeningBalances', options)
+
+/**
+ * Read Opening Balances
+ */
+export const ledgerReadOpeningBalancesOptions = (
+  options?: Options<LedgerReadOpeningBalancesData>,
+) =>
+  queryOptions<
+    LedgerReadOpeningBalancesResponse,
+    LedgerReadOpeningBalancesError,
+    LedgerReadOpeningBalancesResponse,
+    ReturnType<typeof ledgerReadOpeningBalancesQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await ledgerReadOpeningBalances({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      })
+      return data
+    },
+    queryKey: ledgerReadOpeningBalancesQueryKey(options),
+  })
+
+/**
+ * Enter Opening Balances
+ *
+ * Rule 11: once, by the Owner.
+ */
+export const ledgerEnterOpeningBalancesMutation = (
+  options?: Partial<Options<LedgerEnterOpeningBalancesData>>,
+): UseMutationOptions<
+  LedgerEnterOpeningBalancesResponse,
+  LedgerEnterOpeningBalancesError,
+  Options<LedgerEnterOpeningBalancesData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    LedgerEnterOpeningBalancesResponse,
+    LedgerEnterOpeningBalancesError,
+    Options<LedgerEnterOpeningBalancesData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await ledgerEnterOpeningBalances({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      })
+      return data
+    },
+  }
+  return mutationOptions
+}
+
 export const ledgerTrialBalanceQueryKey = (
   options: Options<LedgerTrialBalanceData>,
 ) => createQueryKey('ledgerTrialBalance', options)
@@ -5135,6 +5285,523 @@ export const ledgerTrialBalanceOptions = (
     },
     queryKey: ledgerTrialBalanceQueryKey(options),
   })
+
+export const cashListCashOutsQueryKey = (
+  options?: Options<CashListCashOutsData>,
+) => createQueryKey('cashListCashOuts', options)
+
+/**
+ * List Cash Outs
+ */
+export const cashListCashOutsOptions = (
+  options?: Options<CashListCashOutsData>,
+) =>
+  queryOptions<
+    CashListCashOutsResponse,
+    CashListCashOutsError,
+    CashListCashOutsResponse,
+    ReturnType<typeof cashListCashOutsQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await cashListCashOuts({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      })
+      return data
+    },
+    queryKey: cashListCashOutsQueryKey(options),
+  })
+
+export const cashListCashOutsInfiniteQueryKey = (
+  options?: Options<CashListCashOutsData>,
+): QueryKey<Options<CashListCashOutsData>> =>
+  createQueryKey('cashListCashOuts', options, true)
+
+/**
+ * List Cash Outs
+ */
+export const cashListCashOutsInfiniteOptions = (
+  options?: Options<CashListCashOutsData>,
+) => {
+  const opts = infiniteQueryOptions<
+    CashListCashOutsResponse,
+    CashListCashOutsError,
+    InfiniteData<CashListCashOutsResponse>,
+    QueryKey<Options<CashListCashOutsData>>,
+    | string
+    | null
+    | Pick<
+        QueryKey<Options<CashListCashOutsData>>[0],
+        'body' | 'headers' | 'path' | 'query'
+      >
+  >(
+    // @ts-ignore
+    {
+      queryFn: async ({ pageParam, queryKey, signal }) => {
+        // @ts-ignore
+        const page: Pick<
+          QueryKey<Options<CashListCashOutsData>>[0],
+          'body' | 'headers' | 'path' | 'query'
+        > =
+          typeof pageParam === 'object'
+            ? pageParam
+            : {
+                query: {
+                  start: pageParam,
+                },
+              }
+        const params = createInfiniteParams(queryKey, page)
+        const { data } = await cashListCashOuts({
+          ...options,
+          ...params,
+          signal,
+          throwOnError: true,
+        })
+        return data
+      },
+      queryKey: cashListCashOutsInfiniteQueryKey(options),
+    },
+  )
+  return opts as Omit<typeof opts, 'initialData'>
+}
+
+/**
+ * Create Cash Out
+ */
+export const cashCreateCashOutMutation = (
+  options?: Partial<Options<CashCreateCashOutData>>,
+): UseMutationOptions<
+  CashCreateCashOutResponse,
+  CashCreateCashOutError,
+  Options<CashCreateCashOutData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    CashCreateCashOutResponse,
+    CashCreateCashOutError,
+    Options<CashCreateCashOutData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await cashCreateCashOut({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      })
+      return data
+    },
+  }
+  return mutationOptions
+}
+
+export const cashReadCashOutQueryKey = (
+  options: Options<CashReadCashOutData>,
+) => createQueryKey('cashReadCashOut', options)
+
+/**
+ * Read Cash Out
+ */
+export const cashReadCashOutOptions = (options: Options<CashReadCashOutData>) =>
+  queryOptions<
+    CashReadCashOutResponse,
+    CashReadCashOutError,
+    CashReadCashOutResponse,
+    ReturnType<typeof cashReadCashOutQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await cashReadCashOut({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      })
+      return data
+    },
+    queryKey: cashReadCashOutQueryKey(options),
+  })
+
+/**
+ * Reverse Cash Out
+ */
+export const cashReverseCashOutMutation = (
+  options?: Partial<Options<CashReverseCashOutData>>,
+): UseMutationOptions<
+  CashReverseCashOutResponse,
+  CashReverseCashOutError,
+  Options<CashReverseCashOutData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    CashReverseCashOutResponse,
+    CashReverseCashOutError,
+    Options<CashReverseCashOutData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await cashReverseCashOut({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      })
+      return data
+    },
+  }
+  return mutationOptions
+}
+
+export const cashListTransfersQueryKey = (
+  options?: Options<CashListTransfersData>,
+) => createQueryKey('cashListTransfers', options)
+
+/**
+ * List Transfers
+ */
+export const cashListTransfersOptions = (
+  options?: Options<CashListTransfersData>,
+) =>
+  queryOptions<
+    CashListTransfersResponse,
+    CashListTransfersError,
+    CashListTransfersResponse,
+    ReturnType<typeof cashListTransfersQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await cashListTransfers({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      })
+      return data
+    },
+    queryKey: cashListTransfersQueryKey(options),
+  })
+
+export const cashListTransfersInfiniteQueryKey = (
+  options?: Options<CashListTransfersData>,
+): QueryKey<Options<CashListTransfersData>> =>
+  createQueryKey('cashListTransfers', options, true)
+
+/**
+ * List Transfers
+ */
+export const cashListTransfersInfiniteOptions = (
+  options?: Options<CashListTransfersData>,
+) => {
+  const opts = infiniteQueryOptions<
+    CashListTransfersResponse,
+    CashListTransfersError,
+    InfiniteData<CashListTransfersResponse>,
+    QueryKey<Options<CashListTransfersData>>,
+    | string
+    | null
+    | Pick<
+        QueryKey<Options<CashListTransfersData>>[0],
+        'body' | 'headers' | 'path' | 'query'
+      >
+  >(
+    // @ts-ignore
+    {
+      queryFn: async ({ pageParam, queryKey, signal }) => {
+        // @ts-ignore
+        const page: Pick<
+          QueryKey<Options<CashListTransfersData>>[0],
+          'body' | 'headers' | 'path' | 'query'
+        > =
+          typeof pageParam === 'object'
+            ? pageParam
+            : {
+                query: {
+                  start: pageParam,
+                },
+              }
+        const params = createInfiniteParams(queryKey, page)
+        const { data } = await cashListTransfers({
+          ...options,
+          ...params,
+          signal,
+          throwOnError: true,
+        })
+        return data
+      },
+      queryKey: cashListTransfersInfiniteQueryKey(options),
+    },
+  )
+  return opts as Omit<typeof opts, 'initialData'>
+}
+
+/**
+ * Create Transfer
+ */
+export const cashCreateTransferMutation = (
+  options?: Partial<Options<CashCreateTransferData>>,
+): UseMutationOptions<
+  CashCreateTransferResponse,
+  CashCreateTransferError,
+  Options<CashCreateTransferData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    CashCreateTransferResponse,
+    CashCreateTransferError,
+    Options<CashCreateTransferData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await cashCreateTransfer({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      })
+      return data
+    },
+  }
+  return mutationOptions
+}
+
+export const cashReadTransferQueryKey = (
+  options: Options<CashReadTransferData>,
+) => createQueryKey('cashReadTransfer', options)
+
+/**
+ * Read Transfer
+ */
+export const cashReadTransferOptions = (
+  options: Options<CashReadTransferData>,
+) =>
+  queryOptions<
+    CashReadTransferResponse,
+    CashReadTransferError,
+    CashReadTransferResponse,
+    ReturnType<typeof cashReadTransferQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await cashReadTransfer({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      })
+      return data
+    },
+    queryKey: cashReadTransferQueryKey(options),
+  })
+
+/**
+ * Reverse Transfer
+ */
+export const cashReverseTransferMutation = (
+  options?: Partial<Options<CashReverseTransferData>>,
+): UseMutationOptions<
+  CashReverseTransferResponse,
+  CashReverseTransferError,
+  Options<CashReverseTransferData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    CashReverseTransferResponse,
+    CashReverseTransferError,
+    Options<CashReverseTransferData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await cashReverseTransfer({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      })
+      return data
+    },
+  }
+  return mutationOptions
+}
+
+export const supplierPaymentsListPaymentsQueryKey = (
+  options?: Options<SupplierPaymentsListPaymentsData>,
+) => createQueryKey('supplierPaymentsListPayments', options)
+
+/**
+ * List Payments
+ */
+export const supplierPaymentsListPaymentsOptions = (
+  options?: Options<SupplierPaymentsListPaymentsData>,
+) =>
+  queryOptions<
+    SupplierPaymentsListPaymentsResponse,
+    SupplierPaymentsListPaymentsError,
+    SupplierPaymentsListPaymentsResponse,
+    ReturnType<typeof supplierPaymentsListPaymentsQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await supplierPaymentsListPayments({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      })
+      return data
+    },
+    queryKey: supplierPaymentsListPaymentsQueryKey(options),
+  })
+
+export const supplierPaymentsListPaymentsInfiniteQueryKey = (
+  options?: Options<SupplierPaymentsListPaymentsData>,
+): QueryKey<Options<SupplierPaymentsListPaymentsData>> =>
+  createQueryKey('supplierPaymentsListPayments', options, true)
+
+/**
+ * List Payments
+ */
+export const supplierPaymentsListPaymentsInfiniteOptions = (
+  options?: Options<SupplierPaymentsListPaymentsData>,
+) => {
+  const opts = infiniteQueryOptions<
+    SupplierPaymentsListPaymentsResponse,
+    SupplierPaymentsListPaymentsError,
+    InfiniteData<SupplierPaymentsListPaymentsResponse>,
+    QueryKey<Options<SupplierPaymentsListPaymentsData>>,
+    | string
+    | null
+    | Pick<
+        QueryKey<Options<SupplierPaymentsListPaymentsData>>[0],
+        'body' | 'headers' | 'path' | 'query'
+      >
+  >(
+    // @ts-ignore
+    {
+      queryFn: async ({ pageParam, queryKey, signal }) => {
+        // @ts-ignore
+        const page: Pick<
+          QueryKey<Options<SupplierPaymentsListPaymentsData>>[0],
+          'body' | 'headers' | 'path' | 'query'
+        > =
+          typeof pageParam === 'object'
+            ? pageParam
+            : {
+                query: {
+                  start: pageParam,
+                },
+              }
+        const params = createInfiniteParams(queryKey, page)
+        const { data } = await supplierPaymentsListPayments({
+          ...options,
+          ...params,
+          signal,
+          throwOnError: true,
+        })
+        return data
+      },
+      queryKey: supplierPaymentsListPaymentsInfiniteQueryKey(options),
+    },
+  )
+  return opts as Omit<typeof opts, 'initialData'>
+}
+
+/**
+ * Create Payment
+ */
+export const supplierPaymentsCreatePaymentMutation = (
+  options?: Partial<Options<SupplierPaymentsCreatePaymentData>>,
+): UseMutationOptions<
+  SupplierPaymentsCreatePaymentResponse,
+  SupplierPaymentsCreatePaymentError,
+  Options<SupplierPaymentsCreatePaymentData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    SupplierPaymentsCreatePaymentResponse,
+    SupplierPaymentsCreatePaymentError,
+    Options<SupplierPaymentsCreatePaymentData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await supplierPaymentsCreatePayment({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      })
+      return data
+    },
+  }
+  return mutationOptions
+}
+
+export const supplierPaymentsListDebtsQueryKey = (
+  options?: Options<SupplierPaymentsListDebtsData>,
+) => createQueryKey('supplierPaymentsListDebts', options)
+
+/**
+ * List Debts
+ *
+ * Hutang Usaha: what is owed per Supplier, receipt by receipt.
+ */
+export const supplierPaymentsListDebtsOptions = (
+  options?: Options<SupplierPaymentsListDebtsData>,
+) =>
+  queryOptions<
+    SupplierPaymentsListDebtsResponse,
+    SupplierPaymentsListDebtsError,
+    SupplierPaymentsListDebtsResponse,
+    ReturnType<typeof supplierPaymentsListDebtsQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await supplierPaymentsListDebts({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      })
+      return data
+    },
+    queryKey: supplierPaymentsListDebtsQueryKey(options),
+  })
+
+export const supplierPaymentsReadPaymentQueryKey = (
+  options: Options<SupplierPaymentsReadPaymentData>,
+) => createQueryKey('supplierPaymentsReadPayment', options)
+
+/**
+ * Read Payment
+ */
+export const supplierPaymentsReadPaymentOptions = (
+  options: Options<SupplierPaymentsReadPaymentData>,
+) =>
+  queryOptions<
+    SupplierPaymentsReadPaymentResponse,
+    SupplierPaymentsReadPaymentError,
+    SupplierPaymentsReadPaymentResponse,
+    ReturnType<typeof supplierPaymentsReadPaymentQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await supplierPaymentsReadPayment({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      })
+      return data
+    },
+    queryKey: supplierPaymentsReadPaymentQueryKey(options),
+  })
+
+/**
+ * Reverse Payment
+ */
+export const supplierPaymentsReversePaymentMutation = (
+  options?: Partial<Options<SupplierPaymentsReversePaymentData>>,
+): UseMutationOptions<
+  SupplierPaymentsReversePaymentResponse,
+  SupplierPaymentsReversePaymentError,
+  Options<SupplierPaymentsReversePaymentData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    SupplierPaymentsReversePaymentResponse,
+    SupplierPaymentsReversePaymentError,
+    Options<SupplierPaymentsReversePaymentData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await supplierPaymentsReversePayment({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      })
+      return data
+    },
+  }
+  return mutationOptions
+}
 
 export const activityLogListEntriesQueryKey = (
   options?: Options<ActivityLogListEntriesData>,

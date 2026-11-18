@@ -397,6 +397,206 @@ export type CartLine = {
 }
 
 /**
+ * CashOutCreate
+ */
+export type CashOutCreate = {
+  /**
+   * Paid On
+   */
+  paid_on: string
+  /**
+   * Paid From Account Id
+   */
+  paid_from_account_id: number
+  /**
+   * Expense Account Id
+   */
+  expense_account_id: number
+  /**
+   * Amount
+   */
+  amount: number
+  /**
+   * Description
+   */
+  description: string
+  /**
+   * Paid To
+   */
+  paid_to?: string | null
+}
+
+/**
+ * CashOutPage
+ */
+export type CashOutPage = {
+  /**
+   * Items
+   */
+  items: Array<CashOutPublic>
+  /**
+   * Total
+   */
+  total: number
+}
+
+/**
+ * CashOutPublic
+ */
+export type CashOutPublic = {
+  /**
+   * Id
+   */
+  id: number
+  /**
+   * Number
+   */
+  number: string
+  status: DocumentStatus
+  /**
+   * Paid On
+   */
+  paid_on: string
+  /**
+   * Paid From Account Id
+   */
+  paid_from_account_id: number
+  /**
+   * Paid From Name
+   */
+  paid_from_name: string
+  /**
+   * Expense Account Id
+   */
+  expense_account_id: number
+  /**
+   * Expense Name
+   */
+  expense_name: string
+  /**
+   * Amount
+   */
+  amount: number
+  /**
+   * Description
+   */
+  description: string
+  /**
+   * Paid To
+   */
+  paid_to: string | null
+  /**
+   * Shift Id
+   */
+  shift_id: number | null
+  /**
+   * Shift Number
+   */
+  shift_number: string | null
+  /**
+   * Created By Name
+   */
+  created_by_name: string | null
+  /**
+   * Created At
+   */
+  created_at: string
+  reversal: ReversalPublic | null
+}
+
+/**
+ * CashTransferCreate
+ */
+export type CashTransferCreate = {
+  /**
+   * Transferred On
+   */
+  transferred_on: string
+  /**
+   * From Account Id
+   */
+  from_account_id: number
+  /**
+   * To Account Id
+   */
+  to_account_id: number
+  /**
+   * Amount
+   */
+  amount: number
+  /**
+   * Description
+   */
+  description?: string | null
+}
+
+/**
+ * CashTransferPage
+ */
+export type CashTransferPage = {
+  /**
+   * Items
+   */
+  items: Array<CashTransferPublic>
+  /**
+   * Total
+   */
+  total: number
+}
+
+/**
+ * CashTransferPublic
+ */
+export type CashTransferPublic = {
+  /**
+   * Id
+   */
+  id: number
+  /**
+   * Number
+   */
+  number: string
+  status: DocumentStatus
+  /**
+   * Transferred On
+   */
+  transferred_on: string
+  /**
+   * From Account Id
+   */
+  from_account_id: number
+  /**
+   * From Name
+   */
+  from_name: string
+  /**
+   * To Account Id
+   */
+  to_account_id: number
+  /**
+   * To Name
+   */
+  to_name: string
+  /**
+   * Amount
+   */
+  amount: number
+  /**
+   * Description
+   */
+  description: string | null
+  /**
+   * Created By Name
+   */
+  created_by_name: string | null
+  /**
+   * Created At
+   */
+  created_at: string
+  reversal: ReversalPublic | null
+}
+
+/**
  * CategoryCreate
  */
 export type CategoryCreate = {
@@ -435,6 +635,20 @@ export type CategoryUpdate = {
    */
   name?: string | null
   costing_method?: CostingMethod | null
+}
+
+/**
+ * ChargeSettle
+ */
+export type ChargeSettle = {
+  /**
+   * By Salary
+   */
+  by_salary?: boolean
+  /**
+   * Account Id
+   */
+  account_id?: number | null
 }
 
 /**
@@ -818,6 +1032,14 @@ export type EmployeeChargePublic = {
    * Created At
    */
   created_at: string
+  /**
+   * Settled At
+   */
+  settled_at: string | null
+  /**
+   * Settled By Salary
+   */
+  settled_by_salary: boolean | null
 }
 
 /**
@@ -1073,6 +1295,10 @@ export type GoodsReceiptPublic = {
    * Paid From Name
    */
   paid_from_name: string | null
+  /**
+   * Owed Amount
+   */
+  owed_amount: number | null
   /**
    * Note
    */
@@ -1622,6 +1848,23 @@ export type MyCountEntry = {
 }
 
 /**
+ * OpeningBalanceIn
+ *
+ * Cash, bank, debts and capital on the day the books start; Saldo
+ * Awal takes the difference.
+ */
+export type OpeningBalanceIn = {
+  /**
+   * Entry Date
+   */
+  entry_date: string
+  /**
+   * Lines
+   */
+  lines: Array<JournalLineIn>
+}
+
+/**
  * OpnameLinePage
  */
 export type OpnameLinePage = {
@@ -1943,6 +2186,46 @@ export type OpnameSummary = {
    * Counted Count
    */
   counted_count: number
+}
+
+/**
+ * OwedReceipt
+ *
+ * One Goods Receipt still owed, or (no id) the opening balance.
+ */
+export type OwedReceipt = {
+  /**
+   * Goods Receipt Id
+   */
+  goods_receipt_id: number | null
+  /**
+   * Number
+   */
+  number: string | null
+  /**
+   * Received On
+   */
+  received_on: string | null
+  /**
+   * Supplier Invoice
+   */
+  supplier_invoice: string | null
+  /**
+   * Total
+   */
+  total: number
+  /**
+   * Returned
+   */
+  returned: number
+  /**
+   * Paid
+   */
+  paid: number
+  /**
+   * Owed
+   */
+  owed: number
 }
 
 /**
@@ -3647,6 +3930,156 @@ export type SupplierCreate = {
    * Address
    */
   address?: string | null
+}
+
+/**
+ * SupplierDebt
+ */
+export type SupplierDebt = {
+  /**
+   * Supplier Id
+   */
+  supplier_id: number
+  /**
+   * Supplier Name
+   */
+  supplier_name: string
+  /**
+   * Owed
+   */
+  owed: number
+  /**
+   * Receipts
+   */
+  receipts: Array<OwedReceipt>
+}
+
+/**
+ * SupplierPaymentCreate
+ */
+export type SupplierPaymentCreate = {
+  /**
+   * Supplier Id
+   */
+  supplier_id: number
+  /**
+   * Paid On
+   */
+  paid_on: string
+  /**
+   * Paid From Account Id
+   */
+  paid_from_account_id?: number | null
+  /**
+   * Note
+   */
+  note?: string | null
+  /**
+   * Lines
+   */
+  lines: Array<SupplierPaymentLineIn>
+}
+
+/**
+ * SupplierPaymentLineIn
+ */
+export type SupplierPaymentLineIn = {
+  /**
+   * Goods Receipt Id
+   */
+  goods_receipt_id?: number | null
+  /**
+   * Amount
+   */
+  amount: number
+}
+
+/**
+ * SupplierPaymentLinePublic
+ */
+export type SupplierPaymentLinePublic = {
+  /**
+   * Goods Receipt Id
+   */
+  goods_receipt_id: number | null
+  /**
+   * Goods Receipt Number
+   */
+  goods_receipt_number: string | null
+  /**
+   * Amount
+   */
+  amount: number
+}
+
+/**
+ * SupplierPaymentPage
+ */
+export type SupplierPaymentPage = {
+  /**
+   * Items
+   */
+  items: Array<SupplierPaymentPublic>
+  /**
+   * Total
+   */
+  total: number
+}
+
+/**
+ * SupplierPaymentPublic
+ */
+export type SupplierPaymentPublic = {
+  /**
+   * Id
+   */
+  id: number
+  /**
+   * Number
+   */
+  number: string
+  status: DocumentStatus
+  /**
+   * Supplier Id
+   */
+  supplier_id: number
+  /**
+   * Supplier Name
+   */
+  supplier_name: string
+  /**
+   * Paid On
+   */
+  paid_on: string
+  /**
+   * Paid From Account Id
+   */
+  paid_from_account_id: number
+  /**
+   * Paid From Name
+   */
+  paid_from_name: string
+  /**
+   * Amount
+   */
+  amount: number
+  /**
+   * Note
+   */
+  note: string | null
+  /**
+   * Created By Name
+   */
+  created_by_name: string | null
+  /**
+   * Created At
+   */
+  created_at: string
+  /**
+   * Lines
+   */
+  lines: Array<SupplierPaymentLinePublic>
+  reversal: ReversalPublic | null
 }
 
 /**
@@ -6632,6 +7065,38 @@ export type EmployeeChargesOutstandingTotalsResponses = {
 export type EmployeeChargesOutstandingTotalsResponse =
   EmployeeChargesOutstandingTotalsResponses[keyof EmployeeChargesOutstandingTotalsResponses]
 
+export type EmployeeChargesSettleChargeData = {
+  body: ChargeSettle
+  path: {
+    /**
+     * Charge Id
+     */
+    charge_id: number
+  }
+  query?: never
+  url: '/api/v1/employee-charges/{charge_id}/settle'
+}
+
+export type EmployeeChargesSettleChargeErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError
+}
+
+export type EmployeeChargesSettleChargeError =
+  EmployeeChargesSettleChargeErrors[keyof EmployeeChargesSettleChargeErrors]
+
+export type EmployeeChargesSettleChargeResponses = {
+  /**
+   * Successful Response
+   */
+  200: EmployeeChargePublic
+}
+
+export type EmployeeChargesSettleChargeResponse =
+  EmployeeChargesSettleChargeResponses[keyof EmployeeChargesSettleChargeResponses]
+
 export type ShopSettingsReadSettingsData = {
   body?: never
   path?: never
@@ -8310,6 +8775,62 @@ export type LedgerReverseEntryResponses = {
 export type LedgerReverseEntryResponse =
   LedgerReverseEntryResponses[keyof LedgerReverseEntryResponses]
 
+export type LedgerReadOpeningBalancesData = {
+  body?: never
+  path?: never
+  query?: never
+  url: '/api/v1/ledger/opening-balances'
+}
+
+export type LedgerReadOpeningBalancesErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError
+}
+
+export type LedgerReadOpeningBalancesError =
+  LedgerReadOpeningBalancesErrors[keyof LedgerReadOpeningBalancesErrors]
+
+export type LedgerReadOpeningBalancesResponses = {
+  /**
+   * Response Ledger-Read Opening Balances
+   *
+   * Successful Response
+   */
+  200: JournalEntryPublic | null
+}
+
+export type LedgerReadOpeningBalancesResponse =
+  LedgerReadOpeningBalancesResponses[keyof LedgerReadOpeningBalancesResponses]
+
+export type LedgerEnterOpeningBalancesData = {
+  body: OpeningBalanceIn
+  path?: never
+  query?: never
+  url: '/api/v1/ledger/opening-balances'
+}
+
+export type LedgerEnterOpeningBalancesErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError
+}
+
+export type LedgerEnterOpeningBalancesError =
+  LedgerEnterOpeningBalancesErrors[keyof LedgerEnterOpeningBalancesErrors]
+
+export type LedgerEnterOpeningBalancesResponses = {
+  /**
+   * Successful Response
+   */
+  201: JournalEntryPublic
+}
+
+export type LedgerEnterOpeningBalancesResponse =
+  LedgerEnterOpeningBalancesResponses[keyof LedgerEnterOpeningBalancesResponses]
+
 export type LedgerTrialBalanceData = {
   body?: never
   path?: never
@@ -8341,6 +8862,445 @@ export type LedgerTrialBalanceResponses = {
 
 export type LedgerTrialBalanceResponse =
   LedgerTrialBalanceResponses[keyof LedgerTrialBalanceResponses]
+
+export type CashListCashOutsData = {
+  body?: never
+  path?: never
+  query?: {
+    /**
+     * Start
+     */
+    start?: string | null
+    /**
+     * End
+     */
+    end?: string | null
+    /**
+     * Offset
+     */
+    offset?: number
+    /**
+     * Limit
+     */
+    limit?: number
+  }
+  url: '/api/v1/cash/outs'
+}
+
+export type CashListCashOutsErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError
+}
+
+export type CashListCashOutsError =
+  CashListCashOutsErrors[keyof CashListCashOutsErrors]
+
+export type CashListCashOutsResponses = {
+  /**
+   * Successful Response
+   */
+  200: CashOutPage
+}
+
+export type CashListCashOutsResponse =
+  CashListCashOutsResponses[keyof CashListCashOutsResponses]
+
+export type CashCreateCashOutData = {
+  body: CashOutCreate
+  path?: never
+  query?: never
+  url: '/api/v1/cash/outs'
+}
+
+export type CashCreateCashOutErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError
+}
+
+export type CashCreateCashOutError =
+  CashCreateCashOutErrors[keyof CashCreateCashOutErrors]
+
+export type CashCreateCashOutResponses = {
+  /**
+   * Successful Response
+   */
+  201: CashOutPublic
+}
+
+export type CashCreateCashOutResponse =
+  CashCreateCashOutResponses[keyof CashCreateCashOutResponses]
+
+export type CashReadCashOutData = {
+  body?: never
+  path: {
+    /**
+     * Cash Out Id
+     */
+    cash_out_id: number
+  }
+  query?: never
+  url: '/api/v1/cash/outs/{cash_out_id}'
+}
+
+export type CashReadCashOutErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError
+}
+
+export type CashReadCashOutError =
+  CashReadCashOutErrors[keyof CashReadCashOutErrors]
+
+export type CashReadCashOutResponses = {
+  /**
+   * Successful Response
+   */
+  200: CashOutPublic
+}
+
+export type CashReadCashOutResponse =
+  CashReadCashOutResponses[keyof CashReadCashOutResponses]
+
+export type CashReverseCashOutData = {
+  body: ReversalCreate
+  path: {
+    /**
+     * Cash Out Id
+     */
+    cash_out_id: number
+  }
+  query?: never
+  url: '/api/v1/cash/outs/{cash_out_id}/reverse'
+}
+
+export type CashReverseCashOutErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError
+}
+
+export type CashReverseCashOutError =
+  CashReverseCashOutErrors[keyof CashReverseCashOutErrors]
+
+export type CashReverseCashOutResponses = {
+  /**
+   * Successful Response
+   */
+  200: CashOutPublic
+}
+
+export type CashReverseCashOutResponse =
+  CashReverseCashOutResponses[keyof CashReverseCashOutResponses]
+
+export type CashListTransfersData = {
+  body?: never
+  path?: never
+  query?: {
+    /**
+     * Start
+     */
+    start?: string | null
+    /**
+     * End
+     */
+    end?: string | null
+    /**
+     * Offset
+     */
+    offset?: number
+    /**
+     * Limit
+     */
+    limit?: number
+  }
+  url: '/api/v1/cash/transfers'
+}
+
+export type CashListTransfersErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError
+}
+
+export type CashListTransfersError =
+  CashListTransfersErrors[keyof CashListTransfersErrors]
+
+export type CashListTransfersResponses = {
+  /**
+   * Successful Response
+   */
+  200: CashTransferPage
+}
+
+export type CashListTransfersResponse =
+  CashListTransfersResponses[keyof CashListTransfersResponses]
+
+export type CashCreateTransferData = {
+  body: CashTransferCreate
+  path?: never
+  query?: never
+  url: '/api/v1/cash/transfers'
+}
+
+export type CashCreateTransferErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError
+}
+
+export type CashCreateTransferError =
+  CashCreateTransferErrors[keyof CashCreateTransferErrors]
+
+export type CashCreateTransferResponses = {
+  /**
+   * Successful Response
+   */
+  201: CashTransferPublic
+}
+
+export type CashCreateTransferResponse =
+  CashCreateTransferResponses[keyof CashCreateTransferResponses]
+
+export type CashReadTransferData = {
+  body?: never
+  path: {
+    /**
+     * Transfer Id
+     */
+    transfer_id: number
+  }
+  query?: never
+  url: '/api/v1/cash/transfers/{transfer_id}'
+}
+
+export type CashReadTransferErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError
+}
+
+export type CashReadTransferError =
+  CashReadTransferErrors[keyof CashReadTransferErrors]
+
+export type CashReadTransferResponses = {
+  /**
+   * Successful Response
+   */
+  200: CashTransferPublic
+}
+
+export type CashReadTransferResponse =
+  CashReadTransferResponses[keyof CashReadTransferResponses]
+
+export type CashReverseTransferData = {
+  body: ReversalCreate
+  path: {
+    /**
+     * Transfer Id
+     */
+    transfer_id: number
+  }
+  query?: never
+  url: '/api/v1/cash/transfers/{transfer_id}/reverse'
+}
+
+export type CashReverseTransferErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError
+}
+
+export type CashReverseTransferError =
+  CashReverseTransferErrors[keyof CashReverseTransferErrors]
+
+export type CashReverseTransferResponses = {
+  /**
+   * Successful Response
+   */
+  200: CashTransferPublic
+}
+
+export type CashReverseTransferResponse =
+  CashReverseTransferResponses[keyof CashReverseTransferResponses]
+
+export type SupplierPaymentsListPaymentsData = {
+  body?: never
+  path?: never
+  query?: {
+    /**
+     * Start
+     */
+    start?: string | null
+    /**
+     * End
+     */
+    end?: string | null
+    /**
+     * Offset
+     */
+    offset?: number
+    /**
+     * Limit
+     */
+    limit?: number
+  }
+  url: '/api/v1/supplier-payments/'
+}
+
+export type SupplierPaymentsListPaymentsErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError
+}
+
+export type SupplierPaymentsListPaymentsError =
+  SupplierPaymentsListPaymentsErrors[keyof SupplierPaymentsListPaymentsErrors]
+
+export type SupplierPaymentsListPaymentsResponses = {
+  /**
+   * Successful Response
+   */
+  200: SupplierPaymentPage
+}
+
+export type SupplierPaymentsListPaymentsResponse =
+  SupplierPaymentsListPaymentsResponses[keyof SupplierPaymentsListPaymentsResponses]
+
+export type SupplierPaymentsCreatePaymentData = {
+  body: SupplierPaymentCreate
+  path?: never
+  query?: never
+  url: '/api/v1/supplier-payments/'
+}
+
+export type SupplierPaymentsCreatePaymentErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError
+}
+
+export type SupplierPaymentsCreatePaymentError =
+  SupplierPaymentsCreatePaymentErrors[keyof SupplierPaymentsCreatePaymentErrors]
+
+export type SupplierPaymentsCreatePaymentResponses = {
+  /**
+   * Successful Response
+   */
+  201: SupplierPaymentPublic
+}
+
+export type SupplierPaymentsCreatePaymentResponse =
+  SupplierPaymentsCreatePaymentResponses[keyof SupplierPaymentsCreatePaymentResponses]
+
+export type SupplierPaymentsListDebtsData = {
+  body?: never
+  path?: never
+  query?: {
+    /**
+     * Supplier Id
+     */
+    supplier_id?: number | null
+  }
+  url: '/api/v1/supplier-payments/debts'
+}
+
+export type SupplierPaymentsListDebtsErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError
+}
+
+export type SupplierPaymentsListDebtsError =
+  SupplierPaymentsListDebtsErrors[keyof SupplierPaymentsListDebtsErrors]
+
+export type SupplierPaymentsListDebtsResponses = {
+  /**
+   * Response Supplier Payments-List Debts
+   *
+   * Successful Response
+   */
+  200: Array<SupplierDebt>
+}
+
+export type SupplierPaymentsListDebtsResponse =
+  SupplierPaymentsListDebtsResponses[keyof SupplierPaymentsListDebtsResponses]
+
+export type SupplierPaymentsReadPaymentData = {
+  body?: never
+  path: {
+    /**
+     * Payment Id
+     */
+    payment_id: number
+  }
+  query?: never
+  url: '/api/v1/supplier-payments/{payment_id}'
+}
+
+export type SupplierPaymentsReadPaymentErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError
+}
+
+export type SupplierPaymentsReadPaymentError =
+  SupplierPaymentsReadPaymentErrors[keyof SupplierPaymentsReadPaymentErrors]
+
+export type SupplierPaymentsReadPaymentResponses = {
+  /**
+   * Successful Response
+   */
+  200: SupplierPaymentPublic
+}
+
+export type SupplierPaymentsReadPaymentResponse =
+  SupplierPaymentsReadPaymentResponses[keyof SupplierPaymentsReadPaymentResponses]
+
+export type SupplierPaymentsReversePaymentData = {
+  body: ReversalCreate
+  path: {
+    /**
+     * Payment Id
+     */
+    payment_id: number
+  }
+  query?: never
+  url: '/api/v1/supplier-payments/{payment_id}/reverse'
+}
+
+export type SupplierPaymentsReversePaymentErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError
+}
+
+export type SupplierPaymentsReversePaymentError =
+  SupplierPaymentsReversePaymentErrors[keyof SupplierPaymentsReversePaymentErrors]
+
+export type SupplierPaymentsReversePaymentResponses = {
+  /**
+   * Successful Response
+   */
+  200: SupplierPaymentPublic
+}
+
+export type SupplierPaymentsReversePaymentResponse =
+  SupplierPaymentsReversePaymentResponses[keyof SupplierPaymentsReversePaymentResponses]
 
 export type ActivityLogListEntriesData = {
   body?: never

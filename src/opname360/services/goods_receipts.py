@@ -134,9 +134,26 @@ def receipt_public(
             'paid_from_name': ledger.account_name(
                 session, receipt.paid_from_account_id
             ),
+            'owed_amount': _owed(session, receipt),
             'lines': lines,
         },
     )
+
+
+def _owed(session: Session, receipt: GoodsReceipt) -> int | None:
+    """What is still owed on a completed receipt bought on credit."""
+    if (
+        receipt.payment_status != PaymentStatus.owed
+        or receipt.status != DocumentStatus.completed
+    ):
+        return None
+    from opname360.services.cash import supplier_debts
+
+    for debt in supplier_debts(session, receipt.supplier_id):
+        for row in debt.receipts:
+            if row.goods_receipt_id == receipt.id:
+                return row.owed
+    return 0
 
 
 def create_draft(

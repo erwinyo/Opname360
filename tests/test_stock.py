@@ -75,8 +75,9 @@ def test_stock_lists_every_sku_with_quantity_and_value(
 def test_stock_filters_by_search_category_and_negative_stock(
     owner_client: TestClient, session: Session
 ) -> None:
-    kemeja = new_sku(owner_client, session, barcode='111')
-    pulpen = new_sku(owner_client, session, barcode='222')
+    # Long barcodes, so the search can't also match a generated SKU code.
+    kemeja = new_sku(owner_client, session, barcode='8990000000111')
+    pulpen = new_sku(owner_client, session, barcode='8990000000222')
     supplier = new_supplier(owner_client)
     new_receipt(owner_client, supplier['id'], [line(kemeja.id, 10, 5000)])
     oversell(session, pulpen, 3)
@@ -87,7 +88,7 @@ def test_stock_filters_by_search_category_and_negative_stock(
 
     category_of_kemeja = kemeja.product.sub_category.category_id
 
-    assert skus(search='222') == [pulpen.id]
+    assert skus(search='8990000000222') == [pulpen.id]
     assert skus(category_id=category_of_kemeja) == [kemeja.id]
     assert skus(negative_only=True) == [pulpen.id]
     assert set(skus()) == {kemeja.id, pulpen.id}

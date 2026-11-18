@@ -23,6 +23,30 @@ import type {
   AuthReadMeData,
   AuthReadMeErrors,
   AuthReadMeResponses,
+  CashCreateCashOutData,
+  CashCreateCashOutErrors,
+  CashCreateCashOutResponses,
+  CashCreateTransferData,
+  CashCreateTransferErrors,
+  CashCreateTransferResponses,
+  CashListCashOutsData,
+  CashListCashOutsErrors,
+  CashListCashOutsResponses,
+  CashListTransfersData,
+  CashListTransfersErrors,
+  CashListTransfersResponses,
+  CashReadCashOutData,
+  CashReadCashOutErrors,
+  CashReadCashOutResponses,
+  CashReadTransferData,
+  CashReadTransferErrors,
+  CashReadTransferResponses,
+  CashReverseCashOutData,
+  CashReverseCashOutErrors,
+  CashReverseCashOutResponses,
+  CashReverseTransferData,
+  CashReverseTransferErrors,
+  CashReverseTransferResponses,
   CategoriesCreateCategoryData,
   CategoriesCreateCategoryErrors,
   CategoriesCreateCategoryResponses,
@@ -65,6 +89,9 @@ import type {
   EmployeeChargesOutstandingTotalsData,
   EmployeeChargesOutstandingTotalsErrors,
   EmployeeChargesOutstandingTotalsResponses,
+  EmployeeChargesSettleChargeData,
+  EmployeeChargesSettleChargeErrors,
+  EmployeeChargesSettleChargeResponses,
   GoodsReceiptsCompleteReceiptData,
   GoodsReceiptsCompleteReceiptErrors,
   GoodsReceiptsCompleteReceiptResponses,
@@ -100,6 +127,9 @@ import type {
   LedgerDeleteAccountData,
   LedgerDeleteAccountErrors,
   LedgerDeleteAccountResponses,
+  LedgerEnterOpeningBalancesData,
+  LedgerEnterOpeningBalancesErrors,
+  LedgerEnterOpeningBalancesResponses,
   LedgerListAccountsData,
   LedgerListAccountsErrors,
   LedgerListAccountsResponses,
@@ -112,6 +142,9 @@ import type {
   LedgerReadEntryData,
   LedgerReadEntryErrors,
   LedgerReadEntryResponses,
+  LedgerReadOpeningBalancesData,
+  LedgerReadOpeningBalancesErrors,
+  LedgerReadOpeningBalancesResponses,
   LedgerReverseEntryData,
   LedgerReverseEntryErrors,
   LedgerReverseEntryResponses,
@@ -340,6 +373,21 @@ import type {
   StockReadStockCardData,
   StockReadStockCardErrors,
   StockReadStockCardResponses,
+  SupplierPaymentsCreatePaymentData,
+  SupplierPaymentsCreatePaymentErrors,
+  SupplierPaymentsCreatePaymentResponses,
+  SupplierPaymentsListDebtsData,
+  SupplierPaymentsListDebtsErrors,
+  SupplierPaymentsListDebtsResponses,
+  SupplierPaymentsListPaymentsData,
+  SupplierPaymentsListPaymentsErrors,
+  SupplierPaymentsListPaymentsResponses,
+  SupplierPaymentsReadPaymentData,
+  SupplierPaymentsReadPaymentErrors,
+  SupplierPaymentsReadPaymentResponses,
+  SupplierPaymentsReversePaymentData,
+  SupplierPaymentsReversePaymentErrors,
+  SupplierPaymentsReversePaymentResponses,
   SupplierReturnsCompleteReturnData,
   SupplierReturnsCompleteReturnErrors,
   SupplierReturnsCompleteReturnResponses,
@@ -1808,6 +1856,33 @@ export const employeeChargesOutstandingTotals = <
   >({ url: '/api/v1/employee-charges/totals', ...options })
 
 /**
+ * Settle Charge
+ *
+ * Paid back in cash, or deducted from salary.
+ */
+export const employeeChargesSettleCharge = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<EmployeeChargesSettleChargeData, ThrowOnError>,
+): RequestResult<
+  EmployeeChargesSettleChargeResponses,
+  EmployeeChargesSettleChargeErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    EmployeeChargesSettleChargeResponses,
+    EmployeeChargesSettleChargeErrors,
+    ThrowOnError
+  >({
+    url: '/api/v1/employee-charges/{charge_id}/settle',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  })
+
+/**
  * Read Settings
  *
  * Everyone reads them: the till prints them on Receipts.
@@ -2713,6 +2788,49 @@ export const ledgerReverseEntry = <ThrowOnError extends boolean = false>(
   })
 
 /**
+ * Read Opening Balances
+ */
+export const ledgerReadOpeningBalances = <ThrowOnError extends boolean = false>(
+  options?: Options<LedgerReadOpeningBalancesData, ThrowOnError>,
+): RequestResult<
+  LedgerReadOpeningBalancesResponses,
+  LedgerReadOpeningBalancesErrors,
+  ThrowOnError
+> =>
+  (options?.client ?? client).get<
+    LedgerReadOpeningBalancesResponses,
+    LedgerReadOpeningBalancesErrors,
+    ThrowOnError
+  >({ url: '/api/v1/ledger/opening-balances', ...options })
+
+/**
+ * Enter Opening Balances
+ *
+ * Rule 11: once, by the Owner.
+ */
+export const ledgerEnterOpeningBalances = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<LedgerEnterOpeningBalancesData, ThrowOnError>,
+): RequestResult<
+  LedgerEnterOpeningBalancesResponses,
+  LedgerEnterOpeningBalancesErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    LedgerEnterOpeningBalancesResponses,
+    LedgerEnterOpeningBalancesErrors,
+    ThrowOnError
+  >({
+    url: '/api/v1/ledger/opening-balances',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  })
+
+/**
  * Trial Balance
  */
 export const ledgerTrialBalance = <ThrowOnError extends boolean = false>(
@@ -2727,6 +2845,266 @@ export const ledgerTrialBalance = <ThrowOnError extends boolean = false>(
     LedgerTrialBalanceErrors,
     ThrowOnError
   >({ url: '/api/v1/ledger/trial-balance', ...options })
+
+/**
+ * List Cash Outs
+ */
+export const cashListCashOuts = <ThrowOnError extends boolean = false>(
+  options?: Options<CashListCashOutsData, ThrowOnError>,
+): RequestResult<
+  CashListCashOutsResponses,
+  CashListCashOutsErrors,
+  ThrowOnError
+> =>
+  (options?.client ?? client).get<
+    CashListCashOutsResponses,
+    CashListCashOutsErrors,
+    ThrowOnError
+  >({ url: '/api/v1/cash/outs', ...options })
+
+/**
+ * Create Cash Out
+ */
+export const cashCreateCashOut = <ThrowOnError extends boolean = false>(
+  options: Options<CashCreateCashOutData, ThrowOnError>,
+): RequestResult<
+  CashCreateCashOutResponses,
+  CashCreateCashOutErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    CashCreateCashOutResponses,
+    CashCreateCashOutErrors,
+    ThrowOnError
+  >({
+    url: '/api/v1/cash/outs',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  })
+
+/**
+ * Read Cash Out
+ */
+export const cashReadCashOut = <ThrowOnError extends boolean = false>(
+  options: Options<CashReadCashOutData, ThrowOnError>,
+): RequestResult<
+  CashReadCashOutResponses,
+  CashReadCashOutErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    CashReadCashOutResponses,
+    CashReadCashOutErrors,
+    ThrowOnError
+  >({ url: '/api/v1/cash/outs/{cash_out_id}', ...options })
+
+/**
+ * Reverse Cash Out
+ */
+export const cashReverseCashOut = <ThrowOnError extends boolean = false>(
+  options: Options<CashReverseCashOutData, ThrowOnError>,
+): RequestResult<
+  CashReverseCashOutResponses,
+  CashReverseCashOutErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    CashReverseCashOutResponses,
+    CashReverseCashOutErrors,
+    ThrowOnError
+  >({
+    url: '/api/v1/cash/outs/{cash_out_id}/reverse',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  })
+
+/**
+ * List Transfers
+ */
+export const cashListTransfers = <ThrowOnError extends boolean = false>(
+  options?: Options<CashListTransfersData, ThrowOnError>,
+): RequestResult<
+  CashListTransfersResponses,
+  CashListTransfersErrors,
+  ThrowOnError
+> =>
+  (options?.client ?? client).get<
+    CashListTransfersResponses,
+    CashListTransfersErrors,
+    ThrowOnError
+  >({ url: '/api/v1/cash/transfers', ...options })
+
+/**
+ * Create Transfer
+ */
+export const cashCreateTransfer = <ThrowOnError extends boolean = false>(
+  options: Options<CashCreateTransferData, ThrowOnError>,
+): RequestResult<
+  CashCreateTransferResponses,
+  CashCreateTransferErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    CashCreateTransferResponses,
+    CashCreateTransferErrors,
+    ThrowOnError
+  >({
+    url: '/api/v1/cash/transfers',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  })
+
+/**
+ * Read Transfer
+ */
+export const cashReadTransfer = <ThrowOnError extends boolean = false>(
+  options: Options<CashReadTransferData, ThrowOnError>,
+): RequestResult<
+  CashReadTransferResponses,
+  CashReadTransferErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    CashReadTransferResponses,
+    CashReadTransferErrors,
+    ThrowOnError
+  >({ url: '/api/v1/cash/transfers/{transfer_id}', ...options })
+
+/**
+ * Reverse Transfer
+ */
+export const cashReverseTransfer = <ThrowOnError extends boolean = false>(
+  options: Options<CashReverseTransferData, ThrowOnError>,
+): RequestResult<
+  CashReverseTransferResponses,
+  CashReverseTransferErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    CashReverseTransferResponses,
+    CashReverseTransferErrors,
+    ThrowOnError
+  >({
+    url: '/api/v1/cash/transfers/{transfer_id}/reverse',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  })
+
+/**
+ * List Payments
+ */
+export const supplierPaymentsListPayments = <
+  ThrowOnError extends boolean = false,
+>(
+  options?: Options<SupplierPaymentsListPaymentsData, ThrowOnError>,
+): RequestResult<
+  SupplierPaymentsListPaymentsResponses,
+  SupplierPaymentsListPaymentsErrors,
+  ThrowOnError
+> =>
+  (options?.client ?? client).get<
+    SupplierPaymentsListPaymentsResponses,
+    SupplierPaymentsListPaymentsErrors,
+    ThrowOnError
+  >({ url: '/api/v1/supplier-payments/', ...options })
+
+/**
+ * Create Payment
+ */
+export const supplierPaymentsCreatePayment = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<SupplierPaymentsCreatePaymentData, ThrowOnError>,
+): RequestResult<
+  SupplierPaymentsCreatePaymentResponses,
+  SupplierPaymentsCreatePaymentErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    SupplierPaymentsCreatePaymentResponses,
+    SupplierPaymentsCreatePaymentErrors,
+    ThrowOnError
+  >({
+    url: '/api/v1/supplier-payments/',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  })
+
+/**
+ * List Debts
+ *
+ * Hutang Usaha: what is owed per Supplier, receipt by receipt.
+ */
+export const supplierPaymentsListDebts = <ThrowOnError extends boolean = false>(
+  options?: Options<SupplierPaymentsListDebtsData, ThrowOnError>,
+): RequestResult<
+  SupplierPaymentsListDebtsResponses,
+  SupplierPaymentsListDebtsErrors,
+  ThrowOnError
+> =>
+  (options?.client ?? client).get<
+    SupplierPaymentsListDebtsResponses,
+    SupplierPaymentsListDebtsErrors,
+    ThrowOnError
+  >({ url: '/api/v1/supplier-payments/debts', ...options })
+
+/**
+ * Read Payment
+ */
+export const supplierPaymentsReadPayment = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<SupplierPaymentsReadPaymentData, ThrowOnError>,
+): RequestResult<
+  SupplierPaymentsReadPaymentResponses,
+  SupplierPaymentsReadPaymentErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    SupplierPaymentsReadPaymentResponses,
+    SupplierPaymentsReadPaymentErrors,
+    ThrowOnError
+  >({ url: '/api/v1/supplier-payments/{payment_id}', ...options })
+
+/**
+ * Reverse Payment
+ */
+export const supplierPaymentsReversePayment = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<SupplierPaymentsReversePaymentData, ThrowOnError>,
+): RequestResult<
+  SupplierPaymentsReversePaymentResponses,
+  SupplierPaymentsReversePaymentErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    SupplierPaymentsReversePaymentResponses,
+    SupplierPaymentsReversePaymentErrors,
+    ThrowOnError
+  >({
+    url: '/api/v1/supplier-payments/{payment_id}/reverse',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  })
 
 /**
  * List Entries

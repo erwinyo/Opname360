@@ -5,6 +5,8 @@ from sqlmodel import Session, col, func, select
 from opname360.core.errors import ConflictError, ForbiddenError, NotFoundError
 from opname360.core.formatting import rupiah
 from opname360.models import (
+    CashOut,
+    DocumentStatus,
     EmployeeCharge,
     Location,
     Payment,
@@ -165,8 +167,8 @@ def close_shift(
 
 
 def expected_cash(session: Session, shift: Shift) -> int:
-    """Float plus cash taken minus cash given back (rule 2). A voided
-    Receipt took nothing."""
+    """Float plus cash taken minus cash given back (rule 2) and paid out as
+    Cash-outs (slice 5, rule 9). A voided Receipt took nothing."""
     if shift.expected_cash is not None:
         return shift.expected_cash
     cash = session.exec(
@@ -181,7 +183,13 @@ def expected_cash(session: Session, shift: Shift) -> int:
             col(PaymentMethod.is_cash).is_(True),
         )
     ).one()
-    return shift.opening_float + int(cash)
+    paid_out = session.exec(
+        select(func.coalesce(func.sum(CashOut.amount), 0)).where(
+            CashOut.shift_id == shift.id,
+            CashOut.status == DocumentStatus.completed,
+        )
+    ).one()
+    return shift.opening_float + int(cash) - int(paid_out)
 
 
 def needs_resolution(shift: Shift) -> bool:

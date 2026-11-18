@@ -34,6 +34,10 @@ class EmployeeCharge(SQLModel, table=True):
     created_by: int | None = Field(default=None, foreign_key='user.id')
     created_at: datetime = Field(default_factory=utc_now)
     cancelled_at: datetime | None = None
+    settled_at: datetime | None = None
+    settled_by: int | None = Field(default=None, foreign_key='user.id')
+    # Deducted from salary rather than paid back.
+    settled_by_salary: bool | None = None
 
 
 class EmployeeChargePublic(SQLModel):
@@ -48,6 +52,14 @@ class EmployeeChargePublic(SQLModel):
     source_number: str
     created_by_name: str | None
     created_at: datetime
+    settled_at: datetime | None
+    settled_by_salary: bool | None
+
+
+class ChargeSettle(SQLModel):
+    by_salary: bool = False
+    # Paid back in cash: the account it went into, Kas Besar if not given.
+    account_id: int | None = None
 
 
 class EmployeeChargePage(SQLModel):

@@ -23,7 +23,11 @@ def upgrade() -> None:
         sa.Column('paid_from_account_id', sa.Integer(), nullable=True),
     )
     op.create_foreign_key(
-        None, 'goods_receipt', 'account', ['paid_from_account_id'], ['id']
+        'goods_receipt_paid_from_account_id_fkey',
+        'goods_receipt',
+        'account',
+        ['paid_from_account_id'],
+        ['id'],
     )
     # ### end Alembic commands ###
 
@@ -33,6 +37,10 @@ def downgrade() -> None:
     # WARNING: constraint name is None; this directive will fail as
     # rendered.  Add a name, or use a naming convention; see
     # https://alembic.sqlalchemy.org/en/latest/naming.html
-    op.drop_constraint(None, 'goods_receipt', type_='foreignkey')
+    op.drop_constraint(
+        'goods_receipt_paid_from_account_id_fkey',
+        'goods_receipt',
+        type_='foreignkey',
+    )
     op.drop_column('goods_receipt', 'paid_from_account_id')
     # ### end Alembic commands ###

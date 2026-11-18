@@ -175,6 +175,14 @@ class JournalLineIn(SQLModel):
         return self
 
 
+class OpeningBalanceIn(SQLModel):
+    """Cash, bank, debts and capital on the day the books start; Saldo
+    Awal takes the difference."""
+
+    entry_date: date
+    lines: list[JournalLineIn] = Field(min_length=1, max_length=100)
+
+
 class ManualEntryIn(SQLModel):
     entry_date: date
     description: str = Field(min_length=1, max_length=300)

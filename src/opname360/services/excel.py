@@ -13,13 +13,16 @@ from openpyxl.utils import get_column_letter
 from opname360.core.formatting import sku_label
 from opname360.models import (
     AbcReport,
+    BalanceSheet,
     DailyStock,
     FastMoving,
     HourlySales,
+    ProfitAndLoss,
     SalesFigures,
     SalesGroupBy,
     SalesReport,
     SalesRow,
+    StatementLine,
     StockFlow,
     VarianceFigures,
     VarianceGroupBy,
@@ -343,6 +346,119 @@ def variances(report: VarianceReport) -> bytes:
             Column('Lebih', 10),
             Column('Nilai lebih', 16, MONEY),
             Column('Selisih bersih', 16, MONEY),
+        ],
+        rows,
+    )
+
+
+def _statement_rows(
+    title: str, lines: list[StatementLine], total: Decimal, total_label: str
+) -> list[Row]:
+    rows: list[Row] = [([title, ''], True)]
+    rows += [
+        (
+            [
+                f'    {line.code or ""} {line.name}'.rstrip(),
+                rupiah(line.amount),
+            ],
+            False,
+        )
+        for line in lines
+    ]
+    rows.append(([total_label, rupiah(total)], True))
+    rows.append((['', ''], False))
+    return rows
+
+
+def profit_and_loss(report: ProfitAndLoss) -> bytes:
+    rows: list[Row] = [
+        *_statement_rows(
+            'Pendapatan usaha',
+            report.sales,
+            report.net_sales,
+            'Penjualan bersih',
+        ),
+        *_statement_rows(
+            'Harga pokok penjualan',
+            report.cogs,
+            report.total_cogs,
+            'Jumlah HPP',
+        ),
+        (['Laba kotor', rupiah(report.gross_profit)], True),
+        (['', ''], False),
+        *_statement_rows(
+            'Beban', report.expenses, report.total_expenses, 'Jumlah beban'
+        ),
+        *_statement_rows(
+            'Pendapatan lain',
+            report.other_income,
+            report.total_other_income,
+            'Jumlah pendapatan lain',
+        ),
+        (['Laba bersih', rupiah(report.net_profit)], True),
+    ]
+    return workbook(
+        'Laba Rugi',
+        _period(report.start, report.end),
+        [Column('Akun', 44), Column('Jumlah', 18, MONEY)],
+        rows,
+    )
+
+
+def balance_sheet(report: BalanceSheet) -> bytes:
+    """T layout: assets on the left, liabilities and equity on the right."""
+
+    def side(
+        groups: list[tuple[str, list[StatementLine], Decimal]],
+    ) -> list[tuple[str, object, bool]]:
+        cells: list[tuple[str, object, bool]] = []
+        for title, lines, total in groups:
+            cells.append((title, '', True))
+            cells += [
+                (
+                    f'    {line.code or ""} {line.name}'.rstrip(),
+                    rupiah(line.amount),
+                    False,
+                )
+                for line in lines
+            ]
+            cells.append((f'Jumlah {title.lower()}', rupiah(total), True))
+        return cells
+
+    left = side([('Aset', report.assets, report.total_assets)])
+    right = side(
+        [
+            ('Kewajiban', report.liabilities, report.total_liabilities),
+            ('Ekuitas', report.equity, report.total_equity),
+        ]
+    )
+    height = max(len(left), len(right))
+    blank: tuple[str, object, bool] = ('', '', False)
+    left += [blank] * (height - len(left))
+    right += [blank] * (height - len(right))
+    rows: list[Row] = [
+        ([a[0], a[1], b[0], b[1]], a[2] or b[2])
+        for a, b in zip(left, right, strict=True)
+    ]
+    rows.append(
+        (
+            [
+                'Total aset',
+                rupiah(report.total_assets),
+                'Total kewajiban dan ekuitas',
+                rupiah(report.total_liabilities_and_equity),
+            ],
+            True,
+        )
+    )
+    return workbook(
+        'Neraca',
+        f'Per {long_date(report.on)}',
+        [
+            Column('Aset', 36),
+            Column('Jumlah', 18, MONEY),
+            Column('Kewajiban dan ekuitas', 36),
+            Column('Jumlah', 18, MONEY),
         ],
         rows,
     )

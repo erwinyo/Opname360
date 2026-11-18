@@ -42,11 +42,15 @@ import { VariancesPage } from '@/pages/reports/VariancesPage'
 import { AccountBookPage } from '@/pages/ledger/AccountBookPage'
 import { AccountSettingsPage } from '@/pages/ledger/AccountSettingsPage'
 import { CashOutsPage } from '@/pages/ledger/CashOutsPage'
+import { DebtsPage } from '@/pages/ledger/DebtsPage'
 import { AccountsPage } from '@/pages/ledger/AccountsPage'
+import { BalanceSheetPage } from '@/pages/ledger/BalanceSheetPage'
 import { JournalEntryPage } from '@/pages/ledger/JournalEntryPage'
 import { JournalPage } from '@/pages/ledger/JournalPage'
+import { LockDatePage } from '@/pages/ledger/LockDatePage'
 import { ManualEntryPage } from '@/pages/ledger/ManualEntryPage'
 import { OpeningBalancesPage } from '@/pages/ledger/OpeningBalancesPage'
+import { ProfitAndLossPage } from '@/pages/ledger/ProfitAndLossPage'
 import { SupplierPaymentsPage } from '@/pages/ledger/SupplierPaymentsPage'
 import { TransfersPage } from '@/pages/ledger/TransfersPage'
 import { TrialBalancePage } from '@/pages/ledger/TrialBalancePage'
@@ -162,6 +166,9 @@ export function App() {
             <Route path="kas-keluar" element={<CashOutsPage />} />
             <Route path="pindah-kas" element={<TransfersPage />} />
             <Route path="bayar-hutang" element={<SupplierPaymentsPage />} />
+            <Route path="hutang-usaha" element={<DebtsPage />} />
+            <Route path="laba-rugi" element={<ProfitAndLossPage />} />
+            <Route path="neraca" element={<BalanceSheetPage />} />
           </>
         )}
         {user.role === 'owner' && (
@@ -173,6 +180,7 @@ export function App() {
             <Route path="metode-pembayaran" element={<PaymentMethodsPage />} />
             <Route path="pengaturan-akun" element={<AccountSettingsPage />} />
             <Route path="saldo-awal" element={<OpeningBalancesPage />} />
+            <Route path="tutup-periode" element={<LockDatePage />} />
           </>
         )}
         <Route path="*" element={<Navigate to="/" replace />} />

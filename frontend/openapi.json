@@ -8632,6 +8632,361 @@
         }
       }
     },
+    "/api/v1/ledger/profit-and-loss": {
+      "get": {
+        "tags": [
+          "ledger"
+        ],
+        "summary": "Profit And Loss",
+        "operationId": "ledger-profit_and_loss",
+        "parameters": [
+          {
+            "name": "start",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "title": "Start"
+            }
+          },
+          {
+            "name": "end",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "title": "End"
+            }
+          },
+          {
+            "name": "opname360_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Opname360 Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProfitAndLoss"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/ledger/profit-and-loss/excel": {
+      "get": {
+        "tags": [
+          "ledger"
+        ],
+        "summary": "Profit And Loss Excel",
+        "operationId": "ledger-profit_and_loss_excel",
+        "parameters": [
+          {
+            "name": "start",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "title": "Start"
+            }
+          },
+          {
+            "name": "end",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "title": "End"
+            }
+          },
+          {
+            "name": "opname360_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Opname360 Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {}
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/ledger/balance-sheet": {
+      "get": {
+        "tags": [
+          "ledger"
+        ],
+        "summary": "Balance Sheet",
+        "operationId": "ledger-balance_sheet",
+        "parameters": [
+          {
+            "name": "on",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "title": "On"
+            }
+          },
+          {
+            "name": "opname360_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Opname360 Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BalanceSheet"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/ledger/balance-sheet/excel": {
+      "get": {
+        "tags": [
+          "ledger"
+        ],
+        "summary": "Balance Sheet Excel",
+        "operationId": "ledger-balance_sheet_excel",
+        "parameters": [
+          {
+            "name": "on",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "title": "On"
+            }
+          },
+          {
+            "name": "opname360_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Opname360 Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {}
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/ledger/lock-date": {
+      "get": {
+        "tags": [
+          "ledger"
+        ],
+        "summary": "Read Lock Date",
+        "operationId": "ledger-read_lock_date",
+        "parameters": [
+          {
+            "name": "opname360_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Opname360 Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LockDate"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "ledger"
+        ],
+        "summary": "Set Lock Date",
+        "description": "Rule 12: only the Owner moves it.",
+        "operationId": "ledger-set_lock_date",
+        "parameters": [
+          {
+            "name": "opname360_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Opname360 Session"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LockDate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LockDate"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/cash/outs": {
       "get": {
         "tags": [
@@ -10194,6 +10549,65 @@
           "shifts_waiting"
         ],
         "title": "Attention"
+      },
+      "BalanceSheet": {
+        "properties": {
+          "on": {
+            "type": "string",
+            "format": "date",
+            "title": "On"
+          },
+          "assets": {
+            "items": {
+              "$ref": "#/components/schemas/StatementLine"
+            },
+            "type": "array",
+            "title": "Assets"
+          },
+          "total_assets": {
+            "type": "string",
+            "title": "Total Assets"
+          },
+          "liabilities": {
+            "items": {
+              "$ref": "#/components/schemas/StatementLine"
+            },
+            "type": "array",
+            "title": "Liabilities"
+          },
+          "total_liabilities": {
+            "type": "string",
+            "title": "Total Liabilities"
+          },
+          "equity": {
+            "items": {
+              "$ref": "#/components/schemas/StatementLine"
+            },
+            "type": "array",
+            "title": "Equity"
+          },
+          "total_equity": {
+            "type": "string",
+            "title": "Total Equity"
+          },
+          "total_liabilities_and_equity": {
+            "type": "string",
+            "title": "Total Liabilities And Equity"
+          }
+        },
+        "type": "object",
+        "required": [
+          "on",
+          "assets",
+          "total_assets",
+          "liabilities",
+          "total_liabilities",
+          "equity",
+          "total_equity",
+          "total_liabilities_and_equity"
+        ],
+        "title": "BalanceSheet",
+        "description": "Rule 13, in T layout: assets on the left, the rest on the right."
       },
       "Body_products-preview_import": {
         "properties": {
@@ -12726,6 +13140,27 @@
         ],
         "title": "LocationPublic"
       },
+      "LockDate": {
+        "properties": {
+          "lock_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lock Date"
+          }
+        },
+        "type": "object",
+        "required": [
+          "lock_date"
+        ],
+        "title": "LockDate"
+      },
       "LoginRequest": {
         "properties": {
           "username": {
@@ -14309,6 +14744,89 @@
           "line_count"
         ],
         "title": "ProductionReceiptSummary"
+      },
+      "ProfitAndLoss": {
+        "properties": {
+          "start": {
+            "type": "string",
+            "format": "date",
+            "title": "Start"
+          },
+          "end": {
+            "type": "string",
+            "format": "date",
+            "title": "End"
+          },
+          "sales": {
+            "items": {
+              "$ref": "#/components/schemas/StatementLine"
+            },
+            "type": "array",
+            "title": "Sales"
+          },
+          "net_sales": {
+            "type": "string",
+            "title": "Net Sales"
+          },
+          "cogs": {
+            "items": {
+              "$ref": "#/components/schemas/StatementLine"
+            },
+            "type": "array",
+            "title": "Cogs"
+          },
+          "total_cogs": {
+            "type": "string",
+            "title": "Total Cogs"
+          },
+          "gross_profit": {
+            "type": "string",
+            "title": "Gross Profit"
+          },
+          "expenses": {
+            "items": {
+              "$ref": "#/components/schemas/StatementLine"
+            },
+            "type": "array",
+            "title": "Expenses"
+          },
+          "total_expenses": {
+            "type": "string",
+            "title": "Total Expenses"
+          },
+          "other_income": {
+            "items": {
+              "$ref": "#/components/schemas/StatementLine"
+            },
+            "type": "array",
+            "title": "Other Income"
+          },
+          "total_other_income": {
+            "type": "string",
+            "title": "Total Other Income"
+          },
+          "net_profit": {
+            "type": "string",
+            "title": "Net Profit"
+          }
+        },
+        "type": "object",
+        "required": [
+          "start",
+          "end",
+          "sales",
+          "net_sales",
+          "cogs",
+          "total_cogs",
+          "gross_profit",
+          "expenses",
+          "total_expenses",
+          "other_income",
+          "total_other_income",
+          "net_profit"
+        ],
+        "title": "ProfitAndLoss",
+        "description": "Rule 14. Sales lines carry their sign: discounts and returns are\nbelow zero."
       },
       "PromotionPage": {
         "properties": {
@@ -16287,6 +16805,48 @@
           "role"
         ],
         "title": "StaffOption"
+      },
+      "StatementLine": {
+        "properties": {
+          "account_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Account Id"
+          },
+          "code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Code"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "amount": {
+            "type": "string",
+            "title": "Amount"
+          }
+        },
+        "type": "object",
+        "required": [
+          "account_id",
+          "code",
+          "name",
+          "amount"
+        ],
+        "title": "StatementLine"
       },
       "StockCard": {
         "properties": {

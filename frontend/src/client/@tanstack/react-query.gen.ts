@@ -46,16 +46,22 @@ import {
   goodsReceiptsUpdateReceipt,
   healthHealthCheck,
   ledgerAssignRole,
+  ledgerBalanceSheet,
+  ledgerBalanceSheetExcel,
   ledgerCreateAccount,
   ledgerCreateManualEntry,
   ledgerDeleteAccount,
   ledgerEnterOpeningBalances,
   ledgerListAccounts,
   ledgerListEntries,
+  ledgerProfitAndLoss,
+  ledgerProfitAndLossExcel,
   ledgerReadAccountBook,
   ledgerReadEntry,
+  ledgerReadLockDate,
   ledgerReadOpeningBalances,
   ledgerReverseEntry,
+  ledgerSetLockDate,
   ledgerTrialBalance,
   ledgerUpdateAccount,
   opnamesApproveOpname,
@@ -259,6 +265,11 @@ import type {
   LedgerAssignRoleData,
   LedgerAssignRoleError,
   LedgerAssignRoleResponse,
+  LedgerBalanceSheetData,
+  LedgerBalanceSheetError,
+  LedgerBalanceSheetExcelData,
+  LedgerBalanceSheetExcelError,
+  LedgerBalanceSheetResponse,
   LedgerCreateAccountData,
   LedgerCreateAccountError,
   LedgerCreateAccountResponse,
@@ -277,18 +288,29 @@ import type {
   LedgerListEntriesData,
   LedgerListEntriesError,
   LedgerListEntriesResponse,
+  LedgerProfitAndLossData,
+  LedgerProfitAndLossError,
+  LedgerProfitAndLossExcelData,
+  LedgerProfitAndLossExcelError,
+  LedgerProfitAndLossResponse,
   LedgerReadAccountBookData,
   LedgerReadAccountBookError,
   LedgerReadAccountBookResponse,
   LedgerReadEntryData,
   LedgerReadEntryError,
   LedgerReadEntryResponse,
+  LedgerReadLockDateData,
+  LedgerReadLockDateError,
+  LedgerReadLockDateResponse,
   LedgerReadOpeningBalancesData,
   LedgerReadOpeningBalancesError,
   LedgerReadOpeningBalancesResponse,
   LedgerReverseEntryData,
   LedgerReverseEntryError,
   LedgerReverseEntryResponse,
+  LedgerSetLockDateData,
+  LedgerSetLockDateError,
+  LedgerSetLockDateResponse,
   LedgerTrialBalanceData,
   LedgerTrialBalanceError,
   LedgerTrialBalanceResponse,
@@ -5285,6 +5307,279 @@ export const ledgerTrialBalanceOptions = (
     },
     queryKey: ledgerTrialBalanceQueryKey(options),
   })
+
+export const ledgerProfitAndLossQueryKey = (
+  options: Options<LedgerProfitAndLossData>,
+) => createQueryKey('ledgerProfitAndLoss', options)
+
+/**
+ * Profit And Loss
+ */
+export const ledgerProfitAndLossOptions = (
+  options: Options<LedgerProfitAndLossData>,
+) =>
+  queryOptions<
+    LedgerProfitAndLossResponse,
+    LedgerProfitAndLossError,
+    LedgerProfitAndLossResponse,
+    ReturnType<typeof ledgerProfitAndLossQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await ledgerProfitAndLoss({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      })
+      return data
+    },
+    queryKey: ledgerProfitAndLossQueryKey(options),
+  })
+
+export const ledgerProfitAndLossInfiniteQueryKey = (
+  options: Options<LedgerProfitAndLossData>,
+): QueryKey<Options<LedgerProfitAndLossData>> =>
+  createQueryKey('ledgerProfitAndLoss', options, true)
+
+/**
+ * Profit And Loss
+ */
+export const ledgerProfitAndLossInfiniteOptions = (
+  options: Options<LedgerProfitAndLossData>,
+) => {
+  const opts = infiniteQueryOptions<
+    LedgerProfitAndLossResponse,
+    LedgerProfitAndLossError,
+    InfiniteData<LedgerProfitAndLossResponse>,
+    QueryKey<Options<LedgerProfitAndLossData>>,
+    | string
+    | Pick<
+        QueryKey<Options<LedgerProfitAndLossData>>[0],
+        'body' | 'headers' | 'path' | 'query'
+      >
+  >(
+    // @ts-ignore
+    {
+      queryFn: async ({ pageParam, queryKey, signal }) => {
+        // @ts-ignore
+        const page: Pick<
+          QueryKey<Options<LedgerProfitAndLossData>>[0],
+          'body' | 'headers' | 'path' | 'query'
+        > =
+          typeof pageParam === 'object'
+            ? pageParam
+            : {
+                query: {
+                  start: pageParam,
+                },
+              }
+        const params = createInfiniteParams(queryKey, page)
+        const { data } = await ledgerProfitAndLoss({
+          ...options,
+          ...params,
+          signal,
+          throwOnError: true,
+        })
+        return data
+      },
+      queryKey: ledgerProfitAndLossInfiniteQueryKey(options),
+    },
+  )
+  return opts as Omit<typeof opts, 'initialData'>
+}
+
+export const ledgerProfitAndLossExcelQueryKey = (
+  options: Options<LedgerProfitAndLossExcelData>,
+) => createQueryKey('ledgerProfitAndLossExcel', options)
+
+/**
+ * Profit And Loss Excel
+ */
+export const ledgerProfitAndLossExcelOptions = (
+  options: Options<LedgerProfitAndLossExcelData>,
+) =>
+  queryOptions<
+    unknown,
+    LedgerProfitAndLossExcelError,
+    unknown,
+    ReturnType<typeof ledgerProfitAndLossExcelQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await ledgerProfitAndLossExcel({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      })
+      return data
+    },
+    queryKey: ledgerProfitAndLossExcelQueryKey(options),
+  })
+
+export const ledgerProfitAndLossExcelInfiniteQueryKey = (
+  options: Options<LedgerProfitAndLossExcelData>,
+): QueryKey<Options<LedgerProfitAndLossExcelData>> =>
+  createQueryKey('ledgerProfitAndLossExcel', options, true)
+
+/**
+ * Profit And Loss Excel
+ */
+export const ledgerProfitAndLossExcelInfiniteOptions = (
+  options: Options<LedgerProfitAndLossExcelData>,
+) => {
+  const opts = infiniteQueryOptions<
+    unknown,
+    LedgerProfitAndLossExcelError,
+    InfiniteData<unknown>,
+    QueryKey<Options<LedgerProfitAndLossExcelData>>,
+    | string
+    | Pick<
+        QueryKey<Options<LedgerProfitAndLossExcelData>>[0],
+        'body' | 'headers' | 'path' | 'query'
+      >
+  >(
+    // @ts-ignore
+    {
+      queryFn: async ({ pageParam, queryKey, signal }) => {
+        // @ts-ignore
+        const page: Pick<
+          QueryKey<Options<LedgerProfitAndLossExcelData>>[0],
+          'body' | 'headers' | 'path' | 'query'
+        > =
+          typeof pageParam === 'object'
+            ? pageParam
+            : {
+                query: {
+                  start: pageParam,
+                },
+              }
+        const params = createInfiniteParams(queryKey, page)
+        const { data } = await ledgerProfitAndLossExcel({
+          ...options,
+          ...params,
+          signal,
+          throwOnError: true,
+        })
+        return data
+      },
+      queryKey: ledgerProfitAndLossExcelInfiniteQueryKey(options),
+    },
+  )
+  return opts as Omit<typeof opts, 'initialData'>
+}
+
+export const ledgerBalanceSheetQueryKey = (
+  options: Options<LedgerBalanceSheetData>,
+) => createQueryKey('ledgerBalanceSheet', options)
+
+/**
+ * Balance Sheet
+ */
+export const ledgerBalanceSheetOptions = (
+  options: Options<LedgerBalanceSheetData>,
+) =>
+  queryOptions<
+    LedgerBalanceSheetResponse,
+    LedgerBalanceSheetError,
+    LedgerBalanceSheetResponse,
+    ReturnType<typeof ledgerBalanceSheetQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await ledgerBalanceSheet({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      })
+      return data
+    },
+    queryKey: ledgerBalanceSheetQueryKey(options),
+  })
+
+export const ledgerBalanceSheetExcelQueryKey = (
+  options: Options<LedgerBalanceSheetExcelData>,
+) => createQueryKey('ledgerBalanceSheetExcel', options)
+
+/**
+ * Balance Sheet Excel
+ */
+export const ledgerBalanceSheetExcelOptions = (
+  options: Options<LedgerBalanceSheetExcelData>,
+) =>
+  queryOptions<
+    unknown,
+    LedgerBalanceSheetExcelError,
+    unknown,
+    ReturnType<typeof ledgerBalanceSheetExcelQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await ledgerBalanceSheetExcel({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      })
+      return data
+    },
+    queryKey: ledgerBalanceSheetExcelQueryKey(options),
+  })
+
+export const ledgerReadLockDateQueryKey = (
+  options?: Options<LedgerReadLockDateData>,
+) => createQueryKey('ledgerReadLockDate', options)
+
+/**
+ * Read Lock Date
+ */
+export const ledgerReadLockDateOptions = (
+  options?: Options<LedgerReadLockDateData>,
+) =>
+  queryOptions<
+    LedgerReadLockDateResponse,
+    LedgerReadLockDateError,
+    LedgerReadLockDateResponse,
+    ReturnType<typeof ledgerReadLockDateQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await ledgerReadLockDate({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      })
+      return data
+    },
+    queryKey: ledgerReadLockDateQueryKey(options),
+  })
+
+/**
+ * Set Lock Date
+ *
+ * Rule 12: only the Owner moves it.
+ */
+export const ledgerSetLockDateMutation = (
+  options?: Partial<Options<LedgerSetLockDateData>>,
+): UseMutationOptions<
+  LedgerSetLockDateResponse,
+  LedgerSetLockDateError,
+  Options<LedgerSetLockDateData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    LedgerSetLockDateResponse,
+    LedgerSetLockDateError,
+    Options<LedgerSetLockDateData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await ledgerSetLockDate({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      })
+      return data
+    },
+  }
+  return mutationOptions
+}
 
 export const cashListCashOutsQueryKey = (
   options?: Options<CashListCashOutsData>,

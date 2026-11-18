@@ -118,6 +118,12 @@ import type {
   LedgerAssignRoleData,
   LedgerAssignRoleErrors,
   LedgerAssignRoleResponses,
+  LedgerBalanceSheetData,
+  LedgerBalanceSheetErrors,
+  LedgerBalanceSheetExcelData,
+  LedgerBalanceSheetExcelErrors,
+  LedgerBalanceSheetExcelResponses,
+  LedgerBalanceSheetResponses,
   LedgerCreateAccountData,
   LedgerCreateAccountErrors,
   LedgerCreateAccountResponses,
@@ -136,18 +142,30 @@ import type {
   LedgerListEntriesData,
   LedgerListEntriesErrors,
   LedgerListEntriesResponses,
+  LedgerProfitAndLossData,
+  LedgerProfitAndLossErrors,
+  LedgerProfitAndLossExcelData,
+  LedgerProfitAndLossExcelErrors,
+  LedgerProfitAndLossExcelResponses,
+  LedgerProfitAndLossResponses,
   LedgerReadAccountBookData,
   LedgerReadAccountBookErrors,
   LedgerReadAccountBookResponses,
   LedgerReadEntryData,
   LedgerReadEntryErrors,
   LedgerReadEntryResponses,
+  LedgerReadLockDateData,
+  LedgerReadLockDateErrors,
+  LedgerReadLockDateResponses,
   LedgerReadOpeningBalancesData,
   LedgerReadOpeningBalancesErrors,
   LedgerReadOpeningBalancesResponses,
   LedgerReverseEntryData,
   LedgerReverseEntryErrors,
   LedgerReverseEntryResponses,
+  LedgerSetLockDateData,
+  LedgerSetLockDateErrors,
+  LedgerSetLockDateResponses,
   LedgerTrialBalanceData,
   LedgerTrialBalanceErrors,
   LedgerTrialBalanceResponses,
@@ -2845,6 +2863,111 @@ export const ledgerTrialBalance = <ThrowOnError extends boolean = false>(
     LedgerTrialBalanceErrors,
     ThrowOnError
   >({ url: '/api/v1/ledger/trial-balance', ...options })
+
+/**
+ * Profit And Loss
+ */
+export const ledgerProfitAndLoss = <ThrowOnError extends boolean = false>(
+  options: Options<LedgerProfitAndLossData, ThrowOnError>,
+): RequestResult<
+  LedgerProfitAndLossResponses,
+  LedgerProfitAndLossErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    LedgerProfitAndLossResponses,
+    LedgerProfitAndLossErrors,
+    ThrowOnError
+  >({ url: '/api/v1/ledger/profit-and-loss', ...options })
+
+/**
+ * Profit And Loss Excel
+ */
+export const ledgerProfitAndLossExcel = <ThrowOnError extends boolean = false>(
+  options: Options<LedgerProfitAndLossExcelData, ThrowOnError>,
+): RequestResult<
+  LedgerProfitAndLossExcelResponses,
+  LedgerProfitAndLossExcelErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    LedgerProfitAndLossExcelResponses,
+    LedgerProfitAndLossExcelErrors,
+    ThrowOnError
+  >({ url: '/api/v1/ledger/profit-and-loss/excel', ...options })
+
+/**
+ * Balance Sheet
+ */
+export const ledgerBalanceSheet = <ThrowOnError extends boolean = false>(
+  options: Options<LedgerBalanceSheetData, ThrowOnError>,
+): RequestResult<
+  LedgerBalanceSheetResponses,
+  LedgerBalanceSheetErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    LedgerBalanceSheetResponses,
+    LedgerBalanceSheetErrors,
+    ThrowOnError
+  >({ url: '/api/v1/ledger/balance-sheet', ...options })
+
+/**
+ * Balance Sheet Excel
+ */
+export const ledgerBalanceSheetExcel = <ThrowOnError extends boolean = false>(
+  options: Options<LedgerBalanceSheetExcelData, ThrowOnError>,
+): RequestResult<
+  LedgerBalanceSheetExcelResponses,
+  LedgerBalanceSheetExcelErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    LedgerBalanceSheetExcelResponses,
+    LedgerBalanceSheetExcelErrors,
+    ThrowOnError
+  >({ url: '/api/v1/ledger/balance-sheet/excel', ...options })
+
+/**
+ * Read Lock Date
+ */
+export const ledgerReadLockDate = <ThrowOnError extends boolean = false>(
+  options?: Options<LedgerReadLockDateData, ThrowOnError>,
+): RequestResult<
+  LedgerReadLockDateResponses,
+  LedgerReadLockDateErrors,
+  ThrowOnError
+> =>
+  (options?.client ?? client).get<
+    LedgerReadLockDateResponses,
+    LedgerReadLockDateErrors,
+    ThrowOnError
+  >({ url: '/api/v1/ledger/lock-date', ...options })
+
+/**
+ * Set Lock Date
+ *
+ * Rule 12: only the Owner moves it.
+ */
+export const ledgerSetLockDate = <ThrowOnError extends boolean = false>(
+  options: Options<LedgerSetLockDateData, ThrowOnError>,
+): RequestResult<
+  LedgerSetLockDateResponses,
+  LedgerSetLockDateErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).put<
+    LedgerSetLockDateResponses,
+    LedgerSetLockDateErrors,
+    ThrowOnError
+  >({
+    url: '/api/v1/ledger/lock-date',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  })
 
 /**
  * List Cash Outs

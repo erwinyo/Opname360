@@ -345,6 +345,46 @@ export type Attention = {
 }
 
 /**
+ * BalanceSheet
+ *
+ * Rule 13, in T layout: assets on the left, the rest on the right.
+ */
+export type BalanceSheet = {
+  /**
+   * On
+   */
+  on: string
+  /**
+   * Assets
+   */
+  assets: Array<StatementLine>
+  /**
+   * Total Assets
+   */
+  total_assets: string
+  /**
+   * Liabilities
+   */
+  liabilities: Array<StatementLine>
+  /**
+   * Total Liabilities
+   */
+  total_liabilities: string
+  /**
+   * Equity
+   */
+  equity: Array<StatementLine>
+  /**
+   * Total Equity
+   */
+  total_equity: string
+  /**
+   * Total Liabilities And Equity
+   */
+  total_liabilities_and_equity: string
+}
+
+/**
  * Body_products-preview_import
  */
 export type BodyProductsPreviewImport = {
@@ -1759,6 +1799,16 @@ export type LocationPublic = {
 }
 
 /**
+ * LockDate
+ */
+export type LockDate = {
+  /**
+   * Lock Date
+   */
+  lock_date: string | null
+}
+
+/**
  * LoginRequest
  */
 export type LoginRequest = {
@@ -2626,6 +2676,63 @@ export type ProductionReceiptSummary = {
    * Line Count
    */
   line_count: number
+}
+
+/**
+ * ProfitAndLoss
+ *
+ * Rule 14. Sales lines carry their sign: discounts and returns are
+ * below zero.
+ */
+export type ProfitAndLoss = {
+  /**
+   * Start
+   */
+  start: string
+  /**
+   * End
+   */
+  end: string
+  /**
+   * Sales
+   */
+  sales: Array<StatementLine>
+  /**
+   * Net Sales
+   */
+  net_sales: string
+  /**
+   * Cogs
+   */
+  cogs: Array<StatementLine>
+  /**
+   * Total Cogs
+   */
+  total_cogs: string
+  /**
+   * Gross Profit
+   */
+  gross_profit: string
+  /**
+   * Expenses
+   */
+  expenses: Array<StatementLine>
+  /**
+   * Total Expenses
+   */
+  total_expenses: string
+  /**
+   * Other Income
+   */
+  other_income: Array<StatementLine>
+  /**
+   * Total Other Income
+   */
+  total_other_income: string
+  /**
+   * Net Profit
+   */
+  net_profit: string
 }
 
 /**
@@ -3737,6 +3844,28 @@ export type StaffOption = {
    */
   full_name: string
   role: Role
+}
+
+/**
+ * StatementLine
+ */
+export type StatementLine = {
+  /**
+   * Account Id
+   */
+  account_id: number | null
+  /**
+   * Code
+   */
+  code: string | null
+  /**
+   * Name
+   */
+  name: string
+  /**
+   * Amount
+   */
+  amount: string
 }
 
 /**
@@ -8862,6 +8991,190 @@ export type LedgerTrialBalanceResponses = {
 
 export type LedgerTrialBalanceResponse =
   LedgerTrialBalanceResponses[keyof LedgerTrialBalanceResponses]
+
+export type LedgerProfitAndLossData = {
+  body?: never
+  path?: never
+  query: {
+    /**
+     * Start
+     */
+    start: string
+    /**
+     * End
+     */
+    end: string
+  }
+  url: '/api/v1/ledger/profit-and-loss'
+}
+
+export type LedgerProfitAndLossErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError
+}
+
+export type LedgerProfitAndLossError =
+  LedgerProfitAndLossErrors[keyof LedgerProfitAndLossErrors]
+
+export type LedgerProfitAndLossResponses = {
+  /**
+   * Successful Response
+   */
+  200: ProfitAndLoss
+}
+
+export type LedgerProfitAndLossResponse =
+  LedgerProfitAndLossResponses[keyof LedgerProfitAndLossResponses]
+
+export type LedgerProfitAndLossExcelData = {
+  body?: never
+  path?: never
+  query: {
+    /**
+     * Start
+     */
+    start: string
+    /**
+     * End
+     */
+    end: string
+  }
+  url: '/api/v1/ledger/profit-and-loss/excel'
+}
+
+export type LedgerProfitAndLossExcelErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError
+}
+
+export type LedgerProfitAndLossExcelError =
+  LedgerProfitAndLossExcelErrors[keyof LedgerProfitAndLossExcelErrors]
+
+export type LedgerProfitAndLossExcelResponses = {
+  /**
+   * Successful Response
+   */
+  200: unknown
+}
+
+export type LedgerBalanceSheetData = {
+  body?: never
+  path?: never
+  query: {
+    /**
+     * On
+     */
+    on: string
+  }
+  url: '/api/v1/ledger/balance-sheet'
+}
+
+export type LedgerBalanceSheetErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError
+}
+
+export type LedgerBalanceSheetError =
+  LedgerBalanceSheetErrors[keyof LedgerBalanceSheetErrors]
+
+export type LedgerBalanceSheetResponses = {
+  /**
+   * Successful Response
+   */
+  200: BalanceSheet
+}
+
+export type LedgerBalanceSheetResponse =
+  LedgerBalanceSheetResponses[keyof LedgerBalanceSheetResponses]
+
+export type LedgerBalanceSheetExcelData = {
+  body?: never
+  path?: never
+  query: {
+    /**
+     * On
+     */
+    on: string
+  }
+  url: '/api/v1/ledger/balance-sheet/excel'
+}
+
+export type LedgerBalanceSheetExcelErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError
+}
+
+export type LedgerBalanceSheetExcelError =
+  LedgerBalanceSheetExcelErrors[keyof LedgerBalanceSheetExcelErrors]
+
+export type LedgerBalanceSheetExcelResponses = {
+  /**
+   * Successful Response
+   */
+  200: unknown
+}
+
+export type LedgerReadLockDateData = {
+  body?: never
+  path?: never
+  query?: never
+  url: '/api/v1/ledger/lock-date'
+}
+
+export type LedgerReadLockDateErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError
+}
+
+export type LedgerReadLockDateError =
+  LedgerReadLockDateErrors[keyof LedgerReadLockDateErrors]
+
+export type LedgerReadLockDateResponses = {
+  /**
+   * Successful Response
+   */
+  200: LockDate
+}
+
+export type LedgerReadLockDateResponse =
+  LedgerReadLockDateResponses[keyof LedgerReadLockDateResponses]
+
+export type LedgerSetLockDateData = {
+  body: LockDate
+  path?: never
+  query?: never
+  url: '/api/v1/ledger/lock-date'
+}
+
+export type LedgerSetLockDateErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError
+}
+
+export type LedgerSetLockDateError =
+  LedgerSetLockDateErrors[keyof LedgerSetLockDateErrors]
+
+export type LedgerSetLockDateResponses = {
+  /**
+   * Successful Response
+   */
+  200: LockDate
+}
+
+export type LedgerSetLockDateResponse =
+  LedgerSetLockDateResponses[keyof LedgerSetLockDateResponses]
 
 export type CashListCashOutsData = {
   body?: never

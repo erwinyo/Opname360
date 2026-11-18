@@ -1,7 +1,7 @@
 from datetime import date
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Path, Query, status
+from fastapi import APIRouter, Depends, Path, Query, Response, status
 
 from opname360.api.deps import (
     AdminDep,
@@ -9,22 +9,27 @@ from opname360.api.deps import (
     SessionDep,
     require_admin,
 )
+from opname360.api.routes.reports import EXCEL, excel_file
 from opname360.models import (
     AccountBook,
     AccountBookFilter,
     AccountPublic,
     AccountRole,
     AccountSave,
+    BalanceSheet,
     JournalEntryPublic,
     JournalFilter,
     JournalPage,
+    LockDate,
     ManualEntryIn,
     OpeningBalanceIn,
+    ProfitAndLoss,
     ReversalCreate,
     RoleAssign,
+    StatementPeriod,
     TrialBalance,
 )
-from opname360.services import cash, ledger
+from opname360.services import cash, excel, ledger
 
 
 # Rule 15: the Owner and the Admin keep the books; a Cashier sees none.
@@ -144,3 +149,51 @@ def trial_balance(
     session: SessionDep, on: Annotated[date, Query()]
 ) -> TrialBalance:
     return ledger.trial_balance(session, on)
+
+
+@router.get('/profit-and-loss')
+def profit_and_loss(
+    session: SessionDep, period: Annotated[StatementPeriod, Query()]
+) -> ProfitAndLoss:
+    return ledger.profit_and_loss(session, period.start, period.end)
+
+
+@router.get('/profit-and-loss/excel', response_class=Response, responses=EXCEL)
+def profit_and_loss_excel(
+    session: SessionDep, period: Annotated[StatementPeriod, Query()]
+) -> Response:
+    report = ledger.profit_and_loss(session, period.start, period.end)
+    return excel_file(
+        excel.profit_and_loss(report),
+        f'laba-rugi-{period.start}-{period.end}.xlsx',
+    )
+
+
+@router.get('/balance-sheet')
+def balance_sheet(
+    session: SessionDep, on: Annotated[date, Query()]
+) -> BalanceSheet:
+    return ledger.balance_sheet(session, on)
+
+
+@router.get('/balance-sheet/excel', response_class=Response, responses=EXCEL)
+def balance_sheet_excel(
+    session: SessionDep, on: Annotated[date, Query()]
+) -> Response:
+    report = ledger.balance_sheet(session, on)
+    return excel_file(excel.balance_sheet(report), f'neraca-{on}.xlsx')
+
+
+@router.get('/lock-date')
+def read_lock_date(session: SessionDep) -> LockDate:
+    return LockDate(lock_date=ledger.lock_date(session))
+
+
+@router.put('/lock-date')
+def set_lock_date(
+    session: SessionDep, data: LockDate, owner: OwnerDep
+) -> LockDate:
+    """Rule 12: only the Owner moves it."""
+    return LockDate(
+        lock_date=ledger.set_lock_date(session, data.lock_date, actor=owner)
+    )

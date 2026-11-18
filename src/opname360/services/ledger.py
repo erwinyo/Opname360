@@ -21,6 +21,7 @@ from opname360.models import (
     AccountRole,
     AccountSave,
     AccountType,
+    BalanceSheet,
     EntrySource,
     JournalEntry,
     JournalEntryPublic,
@@ -29,7 +30,9 @@ from opname360.models import (
     JournalLinePublic,
     JournalPage,
     ManualEntryIn,
+    ProfitAndLoss,
     ShopSettings,
+    StatementLine,
     Supplier,
     TrialBalance,
     TrialBalanceRow,
@@ -820,3 +823,173 @@ def trial_balance(session: Session, on: date) -> TrialBalance:
         total_debit=sum((row.debit for row in rows), ZERO),
         total_credit=sum((row.credit for row in rows), ZERO),
     )
+
+
+# Laba Rugi and Neraca
+
+SALES_ROLES = (
+    AccountRole.sales,
+    AccountRole.sales_discount,
+    AccountRole.sales_return,
+)
+PROFIT_TYPES = (AccountType.revenue, AccountType.cogs, AccountType.expense)
+
+
+def _totals_between(
+    session: Session, start: date | None, end: date
+) -> dict[int, Decimal]:
+    """Debit minus credit per account for entries dated in [start, end]."""
+    query: Any = (
+        select(
+            JournalLine.account_id,
+            func.sum(JournalLine.debit - JournalLine.credit),
+        )
+        .join(JournalEntry, col(JournalLine.entry_id) == JournalEntry.id)
+        .where(col(JournalEntry.entry_date) <= end)
+        .group_by(col(JournalLine.account_id))
+    )
+    if start is not None:
+        query = query.where(col(JournalEntry.entry_date) >= start)
+    return dict(session.exec(query).all())
+
+
+def _line(account: Account, amount: Decimal) -> StatementLine:
+    return StatementLine(
+        account_id=account.id,
+        code=account.code,
+        name=account.name,
+        amount=amount,
+    )
+
+
+def _profit(session: Session, start: date | None, end: date) -> Decimal:
+    """Revenue less COGS and expenses over a period: credit minus debit."""
+    totals = _totals_between(session, start, end)
+    accounts = session.exec(
+        select(Account).where(col(Account.type).in_(PROFIT_TYPES))
+    ).all()
+    return -sum((totals.get(a.id or 0, ZERO) for a in accounts), ZERO)
+
+
+def profit_and_loss(session: Session, start: date, end: date) -> ProfitAndLoss:
+    """Rule 14: net sales, COGS, gross profit, expenses by account, other
+    income, net profit."""
+    totals = _totals_between(session, start, end)
+    accounts = session.exec(
+        select(Account)
+        .where(col(Account.type).in_(PROFIT_TYPES))
+        .order_by(col(Account.code))
+    ).all()
+    sales, cogs, expenses, other = [], [], [], []
+    for account in accounts:
+        total = totals.get(account.id or 0, ZERO)
+        if account.type == AccountType.revenue:
+            # Revenue is credit; a discount or return is a debit, below zero.
+            row = _line(account, -total)
+            if account.role in SALES_ROLES:
+                sales.append(row)
+            elif total:
+                other.append(row)
+        elif total:
+            row = _line(account, total)
+            (cogs if account.type == AccountType.cogs else expenses).append(
+                row
+            )
+    # Penjualan, then Diskon Penjualan, then Retur Penjualan.
+    roles = {account.id: account.role for account in accounts}
+    order = {role: index for index, role in enumerate(SALES_ROLES)}
+    sales.sort(key=lambda row: order.get(roles.get(row.account_id), 0))
+
+    def total_of(rows: list[StatementLine]) -> Decimal:
+        return sum((row.amount for row in rows), ZERO)
+
+    net_sales = total_of(sales)
+    gross_profit = net_sales - total_of(cogs)
+    return ProfitAndLoss(
+        start=start,
+        end=end,
+        sales=sales,
+        net_sales=net_sales,
+        cogs=cogs,
+        total_cogs=total_of(cogs),
+        gross_profit=gross_profit,
+        expenses=expenses,
+        total_expenses=total_of(expenses),
+        other_income=other,
+        total_other_income=total_of(other),
+        net_profit=gross_profit - total_of(expenses) + total_of(other),
+    )
+
+
+def balance_sheet(session: Session, on: date) -> BalanceSheet:
+    """Rule 13: assets equal liabilities plus equity on any date. Profit of
+    earlier years shows as Laba Ditahan and this year's as Laba Tahun
+    Berjalan, worked out now: there is no year-end closing entry."""
+    totals = _totals_between(session, None, on)
+    accounts = session.exec(select(Account).order_by(col(Account.code))).all()
+    assets, liabilities, equity = [], [], []
+    retained: Account | None = None
+    for account in accounts:
+        total = totals.get(account.id or 0, ZERO)
+        if account.role == AccountRole.retained_earnings:
+            retained = account
+        elif account.type == AccountType.asset and total:
+            assets.append(_line(account, total))
+        elif account.type == AccountType.liability and total:
+            liabilities.append(_line(account, -total))
+        elif account.type == AccountType.equity and total:
+            equity.append(_line(account, -total))
+    year_start = date(on.year, 1, 1)
+    earlier = _profit(session, None, year_start - timedelta(days=1))
+    assert retained is not None
+    retained_amount = -totals.get(retained.id or 0, ZERO) + earlier
+    if retained_amount:
+        equity.append(_line(retained, retained_amount))
+    this_year = _profit(session, year_start, on)
+    equity.append(
+        StatementLine(
+            account_id=None,
+            code=None,
+            name='Laba Tahun Berjalan',
+            amount=this_year,
+        )
+    )
+
+    def total_of(rows: list[StatementLine]) -> Decimal:
+        return sum((row.amount for row in rows), ZERO)
+
+    return BalanceSheet(
+        on=on,
+        assets=assets,
+        total_assets=total_of(assets),
+        liabilities=liabilities,
+        total_liabilities=total_of(liabilities),
+        equity=equity,
+        total_equity=total_of(equity),
+        total_liabilities_and_equity=total_of(liabilities) + total_of(equity),
+    )
+
+
+def set_lock_date(
+    session: Session, lock_date: date | None, *, actor: User
+) -> date | None:
+    """Rule 12: only the Owner moves it, and never to today or later, so
+    the till can always post."""
+    if lock_date is not None and lock_date >= today():
+        raise ConflictError('Tanggal tutup buku harus sebelum hari ini.')
+    settings = session.get(ShopSettings, 1)
+    assert settings is not None
+    settings.lock_date = lock_date
+    session.add(settings)
+    activity_log.record(
+        session,
+        actor=actor,
+        action='ledger.lock',
+        summary=(
+            f'Menutup pembukuan sampai {lock_date:%d-%m-%Y}.'
+            if lock_date
+            else 'Membuka semua periode pembukuan.'
+        ),
+    )
+    session.commit()
+    return lock_date

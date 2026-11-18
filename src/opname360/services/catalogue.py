@@ -25,7 +25,7 @@ from opname360.models import (
     SubCategoryPublic,
     User,
 )
-from opname360.services import activity_log, stock
+from opname360.services import activity_log, costing, stock
 
 
 METHOD_LABELS = {
@@ -129,16 +129,6 @@ def update_category(
             _check_category_name(session, name, exclude=category)
             changes.append(f'nama dari {category.name} menjadi {name}')
             category.name = name
-    method = category_in.costing_method
-    if method is not None and method != category.costing_method:
-        if stock.has_movements(session, _sku_ids(session, category=category)):
-            raise ConflictError(
-                f'Metode HPP {category.name} tidak bisa diubah '
-                'karena stoknya sudah bergerak.'
-            )
-        changes.append(f'metode HPP menjadi {METHOD_LABELS[method]}')
-        category.costing_method = method
-
     if changes:
         session.add(category)
         activity_log.record(
@@ -150,6 +140,41 @@ def update_category(
             entity_id=category.id,
         )
         session.commit()
+    return category
+
+
+def switch_costing_method(
+    session: Session,
+    category: Category,
+    method: CostingMethod,
+    *,
+    actor: User,
+) -> Category:
+    """The Owner's switch, from this moment on (slice 6, rules 1-5)."""
+    locked = session.get(
+        Category, category.id, with_for_update=True, populate_existing=True
+    )
+    assert locked is not None
+    category = locked
+    if method == category.costing_method:
+        raise ConflictError(
+            f'{category.name} sudah memakai HPP {METHOD_LABELS[method]}.'
+        )
+    before = METHOD_LABELS[category.costing_method]
+    value = costing.switch_method(session, category, method)
+    activity_log.record(
+        session,
+        actor=actor,
+        action='category.switch_costing_method',
+        summary=(
+            f'Mengganti metode HPP {category.name} dari {before} ke '
+            f'{METHOD_LABELS[method]}; nilai stok saat itu '
+            f'{rupiah(round(value))}.'
+        ),
+        entity_type='category',
+        entity_id=category.id,
+    )
+    session.commit()
     return category
 
 

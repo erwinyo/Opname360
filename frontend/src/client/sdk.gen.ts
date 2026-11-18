@@ -65,6 +65,9 @@ import type {
   CategoriesRenameSubCategoryData,
   CategoriesRenameSubCategoryErrors,
   CategoriesRenameSubCategoryResponses,
+  CategoriesSwitchCostingMethodData,
+  CategoriesSwitchCostingMethodErrors,
+  CategoriesSwitchCostingMethodResponses,
   CategoriesUpdateCategoryData,
   CategoriesUpdateCategoryErrors,
   CategoriesUpdateCategoryResponses,
@@ -675,6 +678,33 @@ export const categoriesUpdateCategory = <ThrowOnError extends boolean = false>(
     ThrowOnError
   >({
     url: '/api/v1/categories/{category_id}',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  })
+
+/**
+ * Switch Costing Method
+ *
+ * Only the Owner switches, from this moment on (ADR 0002).
+ */
+export const categoriesSwitchCostingMethod = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<CategoriesSwitchCostingMethodData, ThrowOnError>,
+): RequestResult<
+  CategoriesSwitchCostingMethodResponses,
+  CategoriesSwitchCostingMethodErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    CategoriesSwitchCostingMethodResponses,
+    CategoriesSwitchCostingMethodErrors,
+    ThrowOnError
+  >({
+    url: '/api/v1/categories/{category_id}/costing-method',
     ...options,
     headers: {
       'Content-Type': 'application/json',

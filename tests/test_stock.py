@@ -190,27 +190,6 @@ def test_a_sku_with_stock_history_cannot_be_deleted(
     assert delete_product.status_code == 409
 
 
-def test_costing_method_is_fixed_once_stock_has_moved(
-    owner_client: TestClient, session: Session
-) -> None:
-    sku = new_sku(owner_client, session, 'moving_average')
-    category_id = sku.product.sub_category.category_id
-    url = f'/api/v1/categories/{category_id}'
-    assert (
-        owner_client.patch(url, json={'costing_method': 'fifo'}).status_code
-        == 200
-    )
-    supplier = new_supplier(owner_client)
-    new_receipt(owner_client, supplier['id'], [line(sku.id, 10, 5000)])
-
-    change = owner_client.patch(url, json={'costing_method': 'moving_average'})
-    rename = owner_client.patch(url, json={'name': 'Nama Baru'})
-
-    assert change.status_code == 409
-    assert 'stoknya sudah bergerak' in change.json()['detail']
-    assert rename.status_code == 200
-
-
 def test_scanning_finds_a_sku_by_barcode_code_or_name(
     owner_client: TestClient,
 ) -> None:

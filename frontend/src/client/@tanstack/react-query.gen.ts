@@ -28,6 +28,7 @@ import {
   categoriesDeleteSubCategory,
   categoriesListCategories,
   categoriesRenameSubCategory,
+  categoriesSwitchCostingMethod,
   categoriesUpdateCategory,
   countingAddCount,
   countingCancelCount,
@@ -212,6 +213,9 @@ import type {
   CategoriesRenameSubCategoryData,
   CategoriesRenameSubCategoryError,
   CategoriesRenameSubCategoryResponse,
+  CategoriesSwitchCostingMethodData,
+  CategoriesSwitchCostingMethodError,
+  CategoriesSwitchCostingMethodResponse,
   CategoriesUpdateCategoryData,
   CategoriesUpdateCategoryError,
   CategoriesUpdateCategoryResponse,
@@ -937,6 +941,35 @@ export const categoriesUpdateCategoryMutation = (
   > = {
     mutationFn: async (fnOptions) => {
       const { data } = await categoriesUpdateCategory({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      })
+      return data
+    },
+  }
+  return mutationOptions
+}
+
+/**
+ * Switch Costing Method
+ *
+ * Only the Owner switches, from this moment on (ADR 0002).
+ */
+export const categoriesSwitchCostingMethodMutation = (
+  options?: Partial<Options<CategoriesSwitchCostingMethodData>>,
+): UseMutationOptions<
+  CategoriesSwitchCostingMethodResponse,
+  CategoriesSwitchCostingMethodError,
+  Options<CategoriesSwitchCostingMethodData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    CategoriesSwitchCostingMethodResponse,
+    CategoriesSwitchCostingMethodError,
+    Options<CategoriesSwitchCostingMethodData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await categoriesSwitchCostingMethod({
         ...options,
         ...fnOptions,
         throwOnError: true,

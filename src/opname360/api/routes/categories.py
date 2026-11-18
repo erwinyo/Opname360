@@ -2,12 +2,18 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, Path, status
 
-from opname360.api.deps import AdminDep, SessionDep, require_admin
+from opname360.api.deps import (
+    AdminDep,
+    OwnerDep,
+    SessionDep,
+    require_admin,
+)
 from opname360.models import (
     Category,
     CategoryCreate,
     CategoryPublic,
     CategoryUpdate,
+    CostingMethodSwitch,
     SubCategory,
     SubCategorySave,
 )
@@ -58,6 +64,20 @@ def update_category(
     category_in: CategoryUpdate,
 ) -> CategoryPublic:
     catalogue.update_category(session, category, category_in, actor=admin)
+    return catalogue.category_public(session, category)
+
+
+@router.post('/{category_id}/costing-method')
+def switch_costing_method(
+    session: SessionDep,
+    owner: OwnerDep,
+    category: CategoryDep,
+    body: CostingMethodSwitch,
+) -> CategoryPublic:
+    """Only the Owner switches, from this moment on (ADR 0002)."""
+    category = catalogue.switch_costing_method(
+        session, category, body.costing_method, actor=owner
+    )
     return catalogue.category_public(session, category)
 
 

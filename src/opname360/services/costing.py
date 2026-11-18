@@ -11,12 +11,15 @@ from sqlalchemy.dialects.postgresql import insert
 from sqlmodel import Session, col, select
 
 from opname360.models import (
+    Category,
     CostLayer,
     CostingMethod,
     MovementReason,
+    Product,
     Sku,
     StockBalance,
     StockMovement,
+    SubCategory,
     User,
 )
 
@@ -291,6 +294,49 @@ def found_unit_cost(sku: Sku, balance: StockBalance | None) -> Decimal | None:
     ):
         return money(balance.value / balance.quantity)
     return sku.latest_unit_cost
+
+
+def switch_method(
+    session: Session, category: Category, method: CostingMethod
+) -> Decimal:
+    """Change a Category's Costing Method from now on (ADR 0002).
+
+    FIFO -> Moving Average drops the Cost Layers, leaving their average;
+    Moving Average -> FIFO starts each SKU from one layer at its average
+    cost. Stock Value doesn't change; it is returned for the log.
+    """
+    sku_ids = (
+        select(Sku.id)
+        .join(Product)
+        .join(SubCategory)
+        .where(SubCategory.category_id == category.id)
+    )
+    # Every balance of the Category, so no sale moves stock mid-switch.
+    balances = session.exec(
+        select(StockBalance)
+        .where(col(StockBalance.sku_id).in_(sku_ids))
+        .order_by(col(StockBalance.sku_id), col(StockBalance.location_id))
+        .with_for_update()
+        .execution_options(populate_existing=True)
+    ).all()
+    for layer in session.exec(
+        select(CostLayer).where(col(CostLayer.sku_id).in_(sku_ids))
+    ).all():
+        session.delete(layer)
+    if method == CostingMethod.fifo:
+        for balance in balances:
+            if balance.quantity > 0:
+                session.add(
+                    CostLayer(
+                        sku_id=balance.sku_id,
+                        location_id=balance.location_id,
+                        unit_cost=money(balance.value / balance.quantity),
+                        quantity_remaining=balance.quantity,
+                    )
+                )
+    category.costing_method = method
+    session.add(category)
+    return sum((balance.value for balance in balances), ZERO)
 
 
 def _method(sku: Sku) -> CostingMethod:

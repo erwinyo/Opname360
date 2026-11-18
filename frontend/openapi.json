@@ -632,6 +632,76 @@
         }
       }
     },
+    "/api/v1/categories/{category_id}/costing-method": {
+      "post": {
+        "tags": [
+          "categories"
+        ],
+        "summary": "Switch Costing Method",
+        "description": "Only the Owner switches, from this moment on (ADR 0002).",
+        "operationId": "categories-switch_costing_method",
+        "parameters": [
+          {
+            "name": "category_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "title": "Category Id"
+            }
+          },
+          {
+            "name": "opname360_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Opname360 Session"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CostingMethodSwitch"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CategoryPublic"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/categories/{category_id}/sub-categories": {
       "post": {
         "tags": [
@@ -11111,16 +11181,6 @@
               }
             ],
             "title": "Name"
-          },
-          "costing_method": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/CostingMethod"
-              },
-              {
-                "type": "null"
-              }
-            ]
           }
         },
         "type": "object",
@@ -11164,6 +11224,18 @@
           "fifo"
         ],
         "title": "CostingMethod"
+      },
+      "CostingMethodSwitch": {
+        "properties": {
+          "costing_method": {
+            "$ref": "#/components/schemas/CostingMethod"
+          }
+        },
+        "type": "object",
+        "required": [
+          "costing_method"
+        ],
+        "title": "CostingMethodSwitch"
       },
       "CountCreate": {
         "properties": {

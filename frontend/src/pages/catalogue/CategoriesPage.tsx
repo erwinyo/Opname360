@@ -13,6 +13,7 @@ import {
   categoriesListCategoriesOptions,
   categoriesListCategoriesQueryKey,
   categoriesRenameSubCategoryMutation,
+  categoriesSwitchCostingMethodMutation,
   categoriesUpdateCategoryMutation,
 } from '@/client/@tanstack/react-query.gen'
 import { Field, FormDialog } from '@/components/FormDialog'
@@ -33,6 +34,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { errorMessage, queryClient } from '@/lib/api'
+import { useMe } from '@/lib/auth'
 
 const METHOD_LABELS: Record<CostingMethod, string> = {
   moving_average: 'Rata-rata',
@@ -50,7 +52,7 @@ const refresh = () =>
 
 type OpenDialog =
   | { kind: 'create' }
-  | { kind: 'edit' | 'delete'; category: CategoryPublic }
+  | { kind: 'edit' | 'delete' | 'switch'; category: CategoryPublic }
   | { kind: 'rename-sub' | 'delete-sub'; sub: SubCategoryPublic }
   | null
 
@@ -58,6 +60,7 @@ export function CategoriesPage() {
   const categories = useQuery(categoriesListCategoriesOptions())
   const [dialog, setDialog] = useState<OpenDialog>(null)
   const close = () => setDialog(null)
+  const isOwner = useMe().data?.role === 'owner'
 
   return (
     <>
@@ -115,6 +118,13 @@ export function CategoriesPage() {
                   >
                     Ubah kategori
                   </DropdownMenuItem>
+                  {isOwner && (
+                    <DropdownMenuItem
+                      onSelect={() => setDialog({ kind: 'switch', category })}
+                    >
+                      Ganti metode HPP
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuItem
                     variant="destructive"
                     onSelect={() => setDialog({ kind: 'delete', category })}
@@ -164,6 +174,9 @@ export function CategoriesPage() {
       )}
       {dialog?.kind === 'delete' && (
         <DeleteCategoryDialog category={dialog.category} onClose={close} />
+      )}
+      {dialog?.kind === 'switch' && (
+        <SwitchMethodDialog category={dialog.category} onClose={close} />
       )}
       {dialog?.kind === 'rename-sub' && (
         <RenameSubCategoryDialog sub={dialog.sub} onClose={close} />
@@ -240,11 +253,10 @@ function CategoryDialog({
   const submit = () => {
     setChecked(true)
     if (nameError) return
-    const body = { name, costing_method: method }
     if (category) {
-      update.mutate({ path: { category_id: category.id }, body })
+      update.mutate({ path: { category_id: category.id }, body: { name } })
     } else {
-      create.mutate({ body })
+      create.mutate({ body: { name, costing_method: method } })
     }
   }
 
@@ -269,22 +281,75 @@ function CategoryDialog({
           autoFocus
         />
       </Field>
-      <Field id="costing-method" label="Metode HPP" hint={METHOD_HINTS[method]}>
-        <Select
-          value={method}
-          onValueChange={(value) => setMethod(value as CostingMethod)}
+      {!category && (
+        <Field
+          id="costing-method"
+          label="Metode HPP"
+          hint={METHOD_HINTS[method]}
         >
-          <SelectTrigger id="costing-method" className="w-full">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="moving_average">
-              {METHOD_LABELS.moving_average}
-            </SelectItem>
-            <SelectItem value="fifo">{METHOD_LABELS.fifo}</SelectItem>
-          </SelectContent>
-        </Select>
-      </Field>
+          <Select
+            value={method}
+            onValueChange={(value) => setMethod(value as CostingMethod)}
+          >
+            <SelectTrigger id="costing-method" className="w-full">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="moving_average">
+                {METHOD_LABELS.moving_average}
+              </SelectItem>
+              <SelectItem value="fifo">{METHOD_LABELS.fifo}</SelectItem>
+            </SelectContent>
+          </Select>
+        </Field>
+      )}
+    </FormDialog>
+  )
+}
+
+/** The Owner's switch: from this moment on, stock value unchanged. */
+function SwitchMethodDialog({
+  category,
+  onClose,
+}: {
+  category: CategoryPublic
+  onClose: () => void
+}) {
+  const next: CostingMethod =
+    category.costing_method === 'fifo' ? 'moving_average' : 'fifo'
+  const change = useMutation({
+    ...categoriesSwitchCostingMethodMutation(),
+    onSuccess: () => {
+      refresh()
+      toast.success(
+        `${category.name} sekarang memakai HPP ${METHOD_LABELS[next]}.`,
+      )
+      onClose()
+    },
+  })
+  return (
+    <FormDialog
+      title={`Ganti HPP ${category.name} ke ${METHOD_LABELS[next]}?`}
+      description={
+        next === 'fifo'
+          ? 'Stok yang ada sekarang menjadi satu lapisan dengan harga rata-ratanya. Barang yang masuk sesudah ini dihitung FIFO.'
+          : 'Sisa lapisan FIFO dirata-rata. Barang yang keluar sesudah ini memakai harga rata-rata.'
+      }
+      submitLabel={`Ganti ke ${METHOD_LABELS[next]}`}
+      pending={change.isPending}
+      error={change.error}
+      onSubmit={() =>
+        change.mutate({
+          path: { category_id: category.id },
+          body: { costing_method: next },
+        })
+      }
+      onClose={onClose}
+    >
+      <p className="text-sm text-muted-foreground">
+        Berlaku mulai saat ini dan tidak bisa dimundurkan. Nilai stok tidak
+        berubah; HPP dan laporan yang sudah lewat juga tidak berubah.
+      </p>
     </FormDialog>
   )
 }

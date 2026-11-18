@@ -80,7 +80,7 @@ def test_rename_category_and_sub_category(owner_client: TestClient) -> None:
 
     owner_client.patch(
         f'{CATEGORIES}{category["id"]}',
-        json={'name': 'Seragam', 'costing_method': 'fifo'},
+        json={'name': 'Seragam'},
     )
     renamed = owner_client.patch(
         f'{CATEGORIES}sub-categories/{sub_category["id"]}',
@@ -88,7 +88,6 @@ def test_rename_category_and_sub_category(owner_client: TestClient) -> None:
     ).json()
 
     assert renamed['name'] == 'Seragam'
-    assert renamed['costing_method'] == 'fifo'
     assert renamed['sub_categories'][0]['name'] == 'Topi'
 
 

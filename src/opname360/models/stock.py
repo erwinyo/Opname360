@@ -75,7 +75,10 @@ class CostLayer(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True)
     sku_id: int = Field(foreign_key='sku.id', index=True)
     location_id: int = Field(foreign_key='location.id')
-    movement_id: int = Field(foreign_key='stock_movement.id')
+    # None for the one layer a switch to FIFO starts from.
+    movement_id: int | None = Field(
+        default=None, foreign_key='stock_movement.id'
+    )
     unit_cost: Decimal = Field(max_digits=18, decimal_places=4)
     quantity_remaining: Decimal = Field(max_digits=14, decimal_places=3)
     received_at: datetime = Field(default_factory=utc_now)

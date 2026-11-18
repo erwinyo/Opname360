@@ -107,7 +107,10 @@ class CategoryCreate(SQLModel):
 
 class CategoryUpdate(SQLModel):
     name: str | None = Field(default=None, min_length=1, max_length=100)
-    costing_method: CostingMethod | None = None
+
+
+class CostingMethodSwitch(SQLModel):
+    costing_method: CostingMethod
 
 
 class SubCategorySave(SQLModel):

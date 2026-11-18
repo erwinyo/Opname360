@@ -674,7 +674,6 @@ export type CategoryUpdate = {
    * Name
    */
   name?: string | null
-  costing_method?: CostingMethod | null
 }
 
 /**
@@ -700,6 +699,13 @@ export type ChargeStatus = 'outstanding' | 'settled' | 'cancelled'
  * CostingMethod
  */
 export type CostingMethod = 'moving_average' | 'fifo'
+
+/**
+ * CostingMethodSwitch
+ */
+export type CostingMethodSwitch = {
+  costing_method: CostingMethod
+}
 
 /**
  * CountCreate
@@ -5154,6 +5160,38 @@ export type CategoriesUpdateCategoryResponses = {
 
 export type CategoriesUpdateCategoryResponse =
   CategoriesUpdateCategoryResponses[keyof CategoriesUpdateCategoryResponses]
+
+export type CategoriesSwitchCostingMethodData = {
+  body: CostingMethodSwitch
+  path: {
+    /**
+     * Category Id
+     */
+    category_id: number
+  }
+  query?: never
+  url: '/api/v1/categories/{category_id}/costing-method'
+}
+
+export type CategoriesSwitchCostingMethodErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError
+}
+
+export type CategoriesSwitchCostingMethodError =
+  CategoriesSwitchCostingMethodErrors[keyof CategoriesSwitchCostingMethodErrors]
+
+export type CategoriesSwitchCostingMethodResponses = {
+  /**
+   * Successful Response
+   */
+  200: CategoryPublic
+}
+
+export type CategoriesSwitchCostingMethodResponse =
+  CategoriesSwitchCostingMethodResponses[keyof CategoriesSwitchCostingMethodResponses]
 
 export type CategoriesCreateSubCategoryData = {
   body: SubCategorySave

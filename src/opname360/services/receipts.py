@@ -40,6 +40,7 @@ from opname360.models import (
 from opname360.models._types import utc_now
 from opname360.services import (
     activity_log,
+    batches,
     catalogue,
     costing,
     documents,
@@ -47,6 +48,7 @@ from opname360.services import (
     posting,
     promotions,
     shop_settings,
+    stock,
 )
 from opname360.services import shifts as shifts_service
 
@@ -94,9 +96,10 @@ class _Priced:
         return self.gross - self.discount
 
 
-def _price(session: Session, cart: Cart) -> list[_Priced]:
+def _price(session: Session, cart: Cart, location_id: int) -> list[_Priced]:
     """Each SKU once, at its Selling Price now, less the biggest running
-    Promotion (rules 6 and 7)."""
+    Promotion (rules 6 and 7). Medicine that may be expired is refused
+    (slice 6, rule 10)."""
     quantities: dict[int, Decimal] = {}
     for line in cart.lines:
         quantities[line.sku_id] = (
@@ -115,6 +118,8 @@ def _price(session: Session, cart: Cart) -> list[_Priced]:
         if not sku.is_active:
             label = sku_label(sku.product.name, sku.size, sku.color)
             raise ConflictError(f'{label} sudah tidak dijual.')
+        if batches.tracks(sku):
+            batches.allocate(session, sku, location_id, quantities[sku_id])
     discounts = promotions.best_discounts(
         session, list(skus.values()), utc_now()
     )
@@ -277,7 +282,7 @@ def _totals(priced: list[_Priced], returned: list[_Returned]) -> _Totals:
 
 
 def quote(session: Session, cart: Cart) -> Quote:
-    priced = _price(session, cart)
+    priced = _price(session, cart, stock.resolve_location(session, None))
     returned = _price_returns(session, cart)
     totals = _totals(priced, returned)
     return Quote(
@@ -327,7 +332,7 @@ def complete(
         # Two returns at once can't both take back the last unit.
         get_receipt(session, receipt_in.original_receipt_id)
         documents.lock(session, Receipt, receipt_in.original_receipt_id)
-    priced = _price(session, receipt_in)
+    priced = _price(session, receipt_in, shift.location_id)
     returned = _price_returns(session, receipt_in)
     if not priced and not returned:
         raise ConflictError('Keranjang masih kosong.')
@@ -408,18 +413,29 @@ def _sell(
     source: costing.Source,
     actor: User,
 ) -> None:
-    """Stock out at its cost; Negative Stock never stops a sale (rule 9)."""
+    """Stock out at its cost; Negative Stock never stops a sale (rule 9).
+    Medicine leaves from the Batch that expires first (slice 6)."""
     assert receipt.id is not None
     assert line.sku.id is not None
-    movement = costing.issue(
-        session,
-        sku=line.sku,
-        location_id=location_id,
-        quantity=line.quantity,
-        reason=MovementReason.sale,
-        source=source,
-        actor=actor,
-    )
+    takes: list[tuple[int | None, Decimal]] = [(None, line.quantity)]
+    if batches.tracks(line.sku):
+        costing.lock_balance(session, line.sku.id, location_id)
+        takes = [
+            *batches.allocate(session, line.sku, location_id, line.quantity)
+        ]
+    cost = Decimal(0)
+    for batch_id, quantity in takes:
+        movement = costing.issue(
+            session,
+            sku=line.sku,
+            location_id=location_id,
+            quantity=quantity,
+            reason=MovementReason.sale,
+            source=source,
+            actor=actor,
+            batch_id=batch_id,
+        )
+        cost -= movement.value
     session.add(
         ReceiptLine(
             receipt_id=receipt.id,
@@ -429,7 +445,7 @@ def _sell(
             promotion_id=line.promotion.id if line.promotion else None,
             discount=line.discount,
             line_total=line.line_total,
-            unit_cogs=costing.money(-movement.value / line.quantity),
+            unit_cogs=costing.money(cost / line.quantity),
         )
     )
 
@@ -447,6 +463,7 @@ def _take_back(
     assert receipt.id is not None
     assert item.sku.id is not None
     original = item.original
+    batch_id = batches.sold_from(session, original.receipt_id, item.sku.id)
     movement = costing.receive(
         session,
         sku=item.sku,
@@ -457,6 +474,7 @@ def _take_back(
         source=source,
         actor=actor,
         sets_latest_cost=False,
+        batch_id=batch_id,
     )
     if item.condition == ReturnCondition.damaged:
         session.flush()
@@ -470,6 +488,7 @@ def _take_back(
             actor=actor,
             unit_cost=original.unit_cogs,
             layer_of=movement.id,
+            batch_id=batch_id,
         )
     gross = -item.gross
     session.add(

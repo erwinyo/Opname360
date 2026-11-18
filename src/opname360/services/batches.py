@@ -13,7 +13,13 @@ from sqlmodel import Session, col, func, select
 
 from opname360.core.errors import ConflictError
 from opname360.core.formatting import sku_label
-from opname360.models import Batch, BatchStock, Sku, StockMovement
+from opname360.models import (
+    Batch,
+    BatchStock,
+    MovementReason,
+    Sku,
+    StockMovement,
+)
 from opname360.services.documents import shop_now
 
 
@@ -103,3 +109,76 @@ def stock(session: Session, sku_id: int, location_id: int) -> list[BatchStock]:
         )
         for batch, quantity in quantities(session, sku_id, location_id)
     ]
+
+
+def allocate(
+    session: Session, sku: Sku, location_id: int, quantity: Decimal
+) -> list[tuple[int, Decimal]]:
+    """Which Batches a sale of `quantity` takes from (rules 9-11).
+
+    The one that expires first goes first; what no unexpired Batch holds
+    goes out of that first one too. Raises when the till must refuse
+    (rule 10). To be exact, the caller holds the SKU's balance lock.
+    """
+    assert sku.id is not None
+    on = today()
+    label = sku_label(sku.product.name, sku.size, sku.color)
+    rows = quantities(session, sku.id, location_id)
+    fresh = [
+        (batch, held) for batch, held in rows if not is_expired(batch, on)
+    ]
+    stale = [
+        batch for batch, held in rows if is_expired(batch, on) and held > 0
+    ]
+    if not rows:
+        raise ConflictError(
+            f'{label} belum punya batch tercatat, jadi tanggal '
+            'kedaluwarsanya tidak diketahui. Catat lewat Barang Masuk atau '
+            'Stok Opname dulu.'
+        )
+    if not fresh:
+        latest = rows[-1][0]
+        raise ConflictError(
+            f'{label}: semua batch sudah kedaluwarsa (terakhir batch '
+            f'{latest.number}, {long_date(latest.expires_on)}). Jangan '
+            'dijual; serahkan ke Admin.'
+        )
+    unexpired = sum((max(held, Decimal(0)) for _, held in fresh), Decimal(0))
+    if quantity > unexpired and stale:
+        numbers = ', '.join(batch.number for batch in stale)
+        raise ConflictError(
+            f'{label}: yang belum kedaluwarsa tinggal '
+            f'{unexpired.normalize():f} {sku.stock_unit}; sisanya batch '
+            f'{numbers} yang sudah kedaluwarsa. Jangan dijual; serahkan ke '
+            'Admin.'
+        )
+    takes: dict[int, Decimal] = {}
+    left = quantity
+    for batch, held in fresh:
+        take = min(left, max(held, Decimal(0)))
+        if take > 0:
+            assert batch.id is not None
+            takes[batch.id] = take
+            left -= take
+    if left > 0:
+        first = fresh[0][0].id
+        assert first is not None
+        takes[first] = takes.get(first, Decimal(0)) + left
+    return list(takes.items())
+
+
+def sold_from(session: Session, receipt_id: int, sku_id: int) -> int | None:
+    """The Batch a Receipt sold this SKU from; of several, the one that
+    expires first (rule 12)."""
+    return session.exec(
+        select(Batch.id)
+        .join(StockMovement, col(StockMovement.batch_id) == Batch.id)
+        .where(
+            StockMovement.document_type == 'receipt',
+            StockMovement.document_id == receipt_id,
+            StockMovement.sku_id == sku_id,
+            StockMovement.reason == MovementReason.sale,
+        )
+        .order_by(col(Batch.expires_on), col(Batch.id))
+        .limit(1)
+    ).first()

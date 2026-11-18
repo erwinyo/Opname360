@@ -1,6 +1,6 @@
 # Build plan
 
-Status: **agreed on 2026-11-15. Slices 1 to 5 are built** (branches `slice-1-foundation`, `slice-2-stock-opname`, `slice-3-pos`, `slice-4-reports` and `slice-5-ledger`). Slice 6 is planned when needed.
+Status: **agreed on 2026-11-15. Slices 1 to 5 are built; slice 6 is being built** (branches `slice-1-foundation`, `slice-2-stock-opname`, `slice-3-pos`, `slice-4-reports`, `slice-5-ledger` and `slice-6-later`).
 
 Vocabulary is in [GLOSSARY.md](../GLOSSARY.md), decisions in [adr/](adr/), open client questions in [client-questions.md](client-questions.md).
 
@@ -15,7 +15,7 @@ Each slice works end to end (API, screens, tests) before the next starts.
 | 3 | [POS](plan/slice-3-pos.md) | Sell, return, exchange, take payments, run Shifts and Promotions, print Receipts. Smartlink can be switched off | 6 |
 | 4 | [Reports](plan/slice-4-reports.md) | The Owner sees live sales and gross profit by hour, daily stock, what sells, and where stock went missing | 5 |
 | 5 | [Ledger](plan/slice-5-ledger.md) | Cash-out, supplier debts, Profit and Loss, Balance Sheet in T layout | 6 |
-| 6 | [Later](plan/slice-6-later.md) | Medicine Batches, switching the Costing Method, and the list of what's deliberately left out | planned when needed |
+| 6 | [Later](plan/slice-6-later.md) | Medicine Batches, switching the Costing Method, and the list of what's deliberately left out | 5 |
 
 ## How the work runs
 

@@ -52,7 +52,7 @@ One screen per report above, all usable on a phone. Each has a period or date pi
 
 ## Decided while building
 
-- **Where sales figures come from:** completed Receipts, at the time each was made. COGS is each line's quantity times the unit COGS stored on it (to 4 decimals, so the hours add up to the day exactly). A return takes back the cost it was sold at, Resellable or Damaged; writing off a Damaged Return is a stock loss, not COGS (slice 5 books it to Barang Rusak).
+- **Where sales figures come from:** completed Receipts, at the time each was made. COGS is the value of the Receipt's Stock Movements, exactly what the Ledger posts (slice 5). A return takes back the cost it was sold at, Resellable or Damaged; writing off a Damaged Return is a stock loss, not COGS (the Ledger books it to Barang Rusak).
 - **Negative Stock cost adjustments** (costing rule 6), and their Reversals, are COGS in the hour they are booked, as the Ledger will book them. A voided Receipt's adjustments count for nothing.
 - **Groupings:** a Cashier's or a Payment Method's row stops at Net Sales; COGS belongs to goods. A Payment Method shows what it took, net of change and refunds. In Penjualan by Category, a Receipt with lines in two Categories counts in both, with only that Category's lines as its amount.
 - **Laporan Stok Harian** lists every SKU that had moved by the end of the day, including those back at zero, for the shop's first Location. Subtotals add quantities as they are, whatever the unit.
@@ -65,7 +65,7 @@ One screen per report above, all usable on a phone. Each has a period or date pi
 - **Selisih Opname** takes Stock Opnames approved in the period and not reversed; the Opening Opname is not a Variance. Values are what approval actually moved. A Surplus has no reason or resolution, so it is its own row, "Selisih lebih".
 - **Things needing attention:** a Shortage gets its Variance Resolution when its opname is approved, so "Shortages waiting" shows as Stock Opnames waiting for approval. Each item links to its list, already filtered.
 - **Excel files** are made on the server by the same functions as the screens, money rounded to whole rupiah the way the screens round.
-- **Not yet in COGS:** the difference a Supplier Return books to Harga Pokok Penjualan in the Ledger plan. Slice 5 must add it here or post it elsewhere, so that its rule 7 (same gross profit as these reports) holds.
+- **Supplier Returns:** the difference a Supplier Return books to Harga Pokok Penjualan (its refund at the receipt's cost against stock's cost) counts in COGS when it is completed, and back when it is reversed, so the gross profit here matches the Ledger (slice 5, rule 7).
 
 ## Not in this slice
 

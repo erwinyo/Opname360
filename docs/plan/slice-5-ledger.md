@@ -1,5 +1,7 @@
 # Slice 5: Ledger
 
+**Status: built.** Every rule below has an API test in `tests/test_ledger_books.py`, `test_ledger_stock.py`, `test_ledger_pos.py`, `test_ledger_cash.py` and `test_ledger_statements.py`, and the main path has a browser test (`frontend/e2e/ledger.spec.ts`).
+
 **When it's done:** every stock, sales, opname and cash event is in double-entry books without anyone typing a journal; the Admin records Cash-outs and pays Suppliers; the Owner reads a Profit and Loss and a Balance Sheet in T layout.
 
 Needs slices 1 to 4. The reasoning is in [ADR 0003](../adr/0003-built-in-double-entry-ledger.md). New words used below: an **account** is one line of the chart of accounts; a **journal entry** is one balanced set of debits and credits; **posting** is writing the journal entry for a document.
@@ -106,6 +108,25 @@ Laba Rugi and Neraca print and export to Excel.
 4. **Cash and debts:** Kas Keluar, Pindah Kas, Bayar Hutang, Employee Charge settlement, Saldo Awal.
 5. **Statements:** Laba Rugi, Neraca, Hutang Usaha, Tutup Periode.
 6. **Browser test:** receive goods on credit → sell some → record a Cash-out → pay the Supplier → Laba Rugi and Neraca show the expected figures and the Neraca balances.
+
+## Decided while building
+
+- **Amounts keep 4 decimals**, like Stock Values, so Persediaan equals the Stok screen's total exactly (rule 6). Statements show whole rupiah.
+- **Persediaan by construction:** every Stock Movement's value goes to Persediaan in its document's entry. Value moved without goods (costing rule 6) is Harga Pokok Penjualan.
+- **Dates:** a document's entry is dated the Shop Day it took effect: completion, sale, approval, Shift opened or closed, Reversal. Typed entries (Jurnal Umum, Saldo Awal, Kas Keluar, Pindah Kas, Bayar Hutang) carry the date chosen, never in the future.
+- **Numbers:** every journal entry is `JR-2611-0001`, numbered in the month of its date. New documents: Kas Keluar `KK`, Pindah Kas `PK`, Bayar Hutang `BH`.
+- **A Goods Receipt paid at once** records the cash or bank account it was paid from, Kas Besar unless another is chosen. A Supplier Return from such a receipt is refunded into that account; from an owed one it lowers Hutang Usaha.
+- **An employee charged more than a Shortage cost** (the Owner set the amount): the excess is Pendapatan Lain.
+- **Accounts only documents move:** Persediaan, Kas Kasir, Hutang Usaha and Piutang Karyawan. Jurnal Umum can't touch them, and once they have entries their role can't move to another account. Other roles can move to an account of the right type, by the Owner in Pengaturan Akun.
+- **Payment Methods:** cash always goes into Kas Kasir; a non-cash method into Bank unless the Owner chooses another cash or bank account.
+- **The drawer:** a Cash-out from Kas Kasir can only be today, during an open Shift, and can be reversed only while that Shift is open. Pindah Kas never touches Kas Kasir; it fills and empties with its Shift.
+- **Debts are whole rupiah:** a receipt's 4-decimal cost rounds. Debts from before the books start are entered in Saldo Awal on Hutang Usaha, naming the Supplier, and paid in Bayar Hutang like a receipt.
+- **Employee Charges** are settled whole: paid back into a cash or bank account, or deducted from salary (Gaji).
+- **Saldo Awal** is entered once; the Saldo Awal account takes the difference. To change it, reverse its journal entry and enter it again.
+- **The lock date** must be before today, so the till can always post. Backfill refuses to run once a period is closed.
+- **Backfill** is `uv run opname360 ledger-backfill`, run once when the Ledger is switched on; running it again posts nothing twice.
+- **Slice 4 reports** now take COGS from the same Stock Movement values and include a Supplier Return's cost difference, so a day's gross profit is the same in both (rule 7). The one exception: a Void on a later day than its sale, possible only if a Shift runs past midnight. The reports drop the voided Receipt entirely, while the Ledger reverses it on the day of the Void.
+- **Menu:** Keuangan (Laba Rugi, Neraca, Hutang Usaha, Kas Keluar, Pindah Kas, Bayar Hutang) for daily use, Pembukuan (Jurnal, Buku Besar, Neraca Saldo, Akun, Saldo Awal, Tutup Periode) for the books themselves.
 
 ## Not in this slice
 

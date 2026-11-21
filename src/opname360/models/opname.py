@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date, datetime
 from decimal import Decimal
 from enum import StrEnum
 from typing import Self
@@ -32,6 +32,8 @@ class ShortageReason(StrEnum):
     lost = 'lost'
     miscounted = 'miscounted'
     unknown = 'unknown'
+    # Medicine past its expiry date, taken off the shelf (slice 6).
+    expired = 'expired'
 
 
 class Resolution(StrEnum):
@@ -84,16 +86,27 @@ class OpnameChecker(SQLModel, table=True):
 
 
 class OpnameLine(SQLModel, table=True):
-    """One SKU in Scope. Counted once it has an active Count Entry."""
+    """One SKU in Scope, or one Batch of a medicine. Counted once it has
+    an active Count Entry."""
 
     __tablename__ = 'stock_opname_line'
-    __table_args__ = (UniqueConstraint('opname_id', 'sku_id'),)
+    __table_args__ = (
+        UniqueConstraint(
+            'opname_id',
+            'sku_id',
+            'batch_id',
+            postgresql_nulls_not_distinct=True,
+        ),
+    )
 
     id: int | None = Field(default=None, primary_key=True)
     opname_id: int = Field(
         foreign_key='stock_opname.id', index=True, ondelete='CASCADE'
     )
     sku_id: int = Field(foreign_key='sku.id', index=True)
+    # Medicine: the Batch counted here. A medicine's line without one stands
+    # for "no Batch known yet" and becomes the first Batch counted.
+    batch_id: int | None = Field(default=None, foreign_key='batch.id')
     # The System Quantity when the first Count Entry came in.
     system_quantity: Decimal | None = Field(
         default=None, max_digits=14, decimal_places=3
@@ -276,6 +289,8 @@ class OpnameLinePublic(SQLModel):
     code: str
     barcode: str
     stock_unit: str
+    batch_number: str | None = None
+    expires_on: date | None = None
     counted: bool
     recount: bool
     # The rest is None unless the session is revealed to this user.
@@ -333,13 +348,20 @@ class CountingSummary(SQLModel):
 
 
 class CountCreate(SQLModel):
-    """A scan (code, quantity 1) or a typed quantity for a code or SKU."""
+    """A scan (code, quantity 1) or a typed quantity for a code or SKU.
+
+    A medicine also needs its Batch: a known one, or a new number with its
+    expiry date.
+    """
 
     code: str | None = Field(default=None, max_length=64)
     sku_id: int | None = None
     quantity: Decimal = Field(
         default=Decimal(1), gt=0, max_digits=14, decimal_places=3
     )
+    batch_id: int | None = None
+    batch_number: str | None = Field(default=None, max_length=50)
+    expires_on: date | None = None
 
     @model_validator(mode='after')
     def code_or_sku(self) -> Self:
@@ -356,6 +378,7 @@ class MyCountEntry(SQLModel):
     color: str | None
     code: str
     stock_unit: str
+    batch_number: str | None = None
     quantity: Decimal
     counted_at: datetime
 
@@ -373,6 +396,14 @@ class CountSheet(SQLModel):
     entries: list[MyCountEntry]
     entry_count: int
     sku_count: int
+    # Medicines in Scope, so a scan of one asks for its Batch first.
+    batch_skus: list['CountSkuOption']
+
+
+class CountBatchOption(SQLModel):
+    id: int
+    number: str
+    expires_on: date
 
 
 class CountSkuOption(SQLModel):
@@ -385,3 +416,5 @@ class CountSkuOption(SQLModel):
     code: str
     barcode: str
     stock_unit: str
+    # Medicine only: every Batch it has, the one that expires first first.
+    batches: list[CountBatchOption] | None = None

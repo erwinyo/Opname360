@@ -284,6 +284,7 @@ export type {
   ClientOptions,
   CostingMethod,
   CostingMethodSwitch,
+  CountBatchOption,
   CountCreate,
   CountingAddCountData,
   CountingAddCountError,

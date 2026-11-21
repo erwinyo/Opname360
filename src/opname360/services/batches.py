@@ -16,9 +16,12 @@ from opname360.core.formatting import sku_label
 from opname360.models import (
     Batch,
     BatchStock,
+    Category,
     MovementReason,
+    Product,
     Sku,
     StockMovement,
+    SubCategory,
 )
 from opname360.services.documents import shop_now
 
@@ -98,6 +101,51 @@ def quantities(
         .order_by(col(Batch.expires_on), col(Batch.id))
     ).all()
     return [(batch, Decimal(quantity)) for batch, quantity in rows]
+
+
+def quantity(
+    session: Session, sku_id: int, location_id: int, batch_id: int | None
+) -> Decimal:
+    """What one Batch holds at the Location; with no Batch, the SKU's units
+    that are in none."""
+    total = session.exec(
+        select(func.coalesce(func.sum(StockMovement.quantity), 0)).where(
+            StockMovement.sku_id == sku_id,
+            StockMovement.location_id == location_id,
+            col(StockMovement.batch_id).is_not_distinct_from(batch_id),
+        )
+    ).one()
+    return Decimal(total)
+
+
+def held(
+    session: Session, sku_ids: list[int], location_id: int
+) -> dict[int, list[int]]:
+    """Each of these SKUs that tracks Batches, with the Batches it holds or
+    owes at the Location, the one that expires first first (rule 13)."""
+    tracked = session.exec(
+        select(Sku.id)
+        .join(Product, col(Sku.product_id) == Product.id)
+        .join(SubCategory, col(Product.sub_category_id) == SubCategory.id)
+        .join(Category, col(SubCategory.category_id) == Category.id)
+        .where(col(Sku.id).in_(sku_ids), col(Category.tracks_batches))
+    ).all()
+    found: dict[int, list[int]] = {sku_id: [] for sku_id in tracked if sku_id}
+    rows = session.exec(
+        select(Batch.sku_id, Batch.id)
+        .join(StockMovement, col(StockMovement.batch_id) == Batch.id)
+        .where(
+            col(Batch.sku_id).in_(found),
+            StockMovement.location_id == location_id,
+        )
+        .group_by(col(Batch.id))
+        .having(func.sum(StockMovement.quantity) != 0)
+        .order_by(col(Batch.expires_on), col(Batch.id))
+    ).all()
+    for sku_id, batch_id in rows:
+        if batch_id is not None:
+            found[sku_id].append(batch_id)
+    return found
 
 
 def stock(session: Session, sku_id: int, location_id: int) -> list[BatchStock]:

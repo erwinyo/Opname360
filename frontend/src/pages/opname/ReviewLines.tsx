@@ -43,6 +43,7 @@ import {
 import { RESOLUTION_LABELS, SHORTAGE_REASON_LABELS } from '@/lib/labels'
 import { cn } from '@/lib/utils'
 import { refreshOpname } from '@/pages/opname/refresh'
+import { LineBatch } from '@/pages/opname/shared'
 
 const PAGE_SIZE = 50
 
@@ -229,6 +230,7 @@ function ReviewLine({
           <p className="text-sm text-muted-foreground tabular-nums">
             {line.code} · {line.barcode}
           </p>
+          <LineBatch line={line} />
         </div>
         {line.moved_while_counting && (
           <Badge

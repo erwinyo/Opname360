@@ -11,7 +11,14 @@ import {
 import { BackLink } from '@/components/documents'
 import { Button } from '@/components/ui/button'
 import { errorMessage } from '@/lib/api'
-import { formatDateTime, money, quantity, rupiah, skuName } from '@/lib/format'
+import {
+  batchLabel,
+  formatDateTime,
+  money,
+  quantity,
+  rupiah,
+  skuName,
+} from '@/lib/format'
 import { RESOLUTION_LABELS, SHORTAGE_REASON_LABELS } from '@/lib/labels'
 
 /** The printable record of an approved session, with signature lines. */
@@ -150,7 +157,7 @@ function Report({
                 <td>
                   {skuName(line)}
                   <span className="block text-[8pt] tabular-nums">
-                    {line.code}
+                    {[line.code, batchLabel(line)].filter(Boolean).join(' · ')}
                   </span>
                 </td>
                 <td className="text-right tabular-nums">

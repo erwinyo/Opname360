@@ -4,10 +4,12 @@ The rules are in docs/plan/slice-2-stock-opname.md; the reason the shop stays
 open while counting is ADR 0004.
 """
 
+from collections.abc import Sequence
 from decimal import Decimal
 from typing import Any
 
 from sqlalchemy import and_
+from sqlalchemy.dialects.postgresql import insert
 from sqlmodel import Session, col, func, or_, select
 
 from opname360.core.errors import (
@@ -18,7 +20,9 @@ from opname360.core.errors import (
 )
 from opname360.core.formatting import ANGLE, sku_label
 from opname360.models import (
+    Batch,
     Category,
+    CountBatchOption,
     CountCreate,
     CountEntry,
     CountSheet,
@@ -58,6 +62,7 @@ from opname360.models import (
 from opname360.models._types import utc_now
 from opname360.services import (
     activity_log,
+    batches,
     costing,
     documents,
     employee_charges,
@@ -148,14 +153,19 @@ def open_opname(
         if opname.is_opening
         else {}
     )
+    # A medicine gets a line per Batch it holds or owes, or one without a
+    # Batch (rule 13 of slice 6); anything else one line.
+    medicines = batches.held(session, sku_ids, location_id)
     for sku_id in sorted(sku_ids):
-        session.add(
-            OpnameLine(
-                opname_id=opname.id,
-                sku_id=sku_id,
-                unit_cost=opening_costs.get(sku_id),
+        for batch_id in medicines.get(sku_id) or [None]:
+            session.add(
+                OpnameLine(
+                    opname_id=opname.id,
+                    sku_id=sku_id,
+                    batch_id=batch_id,
+                    unit_cost=opening_costs.get(sku_id),
+                )
             )
-        )
     for user in checkers:
         assert user.id is not None
         session.add(OpnameChecker(opname_id=opname.id, user_id=user.id))
@@ -570,6 +580,7 @@ def list_lines(
                 col(Product.name).icontains(search, autoescape=True),
                 col(Sku.code).icontains(search, autoescape=True),
                 col(Sku.barcode).icontains(search, autoescape=True),
+                col(Batch.number).icontains(search, autoescape=True),
             )
         )
 
@@ -585,8 +596,14 @@ def list_lines(
             ),
             isouter=True,
         )
+        .join(Batch, col(OpnameLine.batch_id) == Batch.id, isouter=True)
         .where(*conditions)
-        .order_by(col(Product.name), col(Sku.id))
+        .order_by(
+            col(Product.name),
+            col(Sku.id),
+            col(Batch.expires_on).nulls_first(),
+            col(OpnameLine.id),
+        )
     )
     rows = session.exec(query).all()
     if filters.show == LineShow.needs_cost:
@@ -599,9 +616,25 @@ def list_lines(
         ]
     page = rows[filters.offset : filters.offset + filters.limit]
     names = _charged_names(session, [line for line, *_ in page])
+    batch_ids = {line.batch_id for line, *_ in page if line.batch_id}
+    known = {
+        batch.id: batch
+        for batch in session.exec(
+            select(Batch).where(col(Batch.id).in_(batch_ids))
+        ).all()
+    }
     return OpnameLinePage(
         items=[
-            _line_public(opname, line, sku, name, balance, show, names)
+            _line_public(
+                opname,
+                line,
+                sku,
+                name,
+                balance,
+                known.get(line.batch_id or 0),
+                show,
+                names,
+            )
             for line, sku, name, balance in page
         ],
         total=len(rows),
@@ -621,6 +654,7 @@ def line_public(
         sku,
         sku.product.name,
         balance,
+        session.get(Batch, line.batch_id) if line.batch_id else None,
         revealed(session, opname, user),
         _charged_names(session, [line]),
     )
@@ -642,6 +676,7 @@ def _line_public(
     sku: Sku,
     product_name: str,
     balance: StockBalance | None,
+    batch: Batch | None,
     show: bool,
     charged_names: dict[int, str],
 ) -> OpnameLinePublic:
@@ -654,6 +689,8 @@ def _line_public(
         code=sku.code,
         barcode=sku.barcode,
         stock_unit=sku.stock_unit,
+        batch_number=batch.number if batch else None,
+        expires_on=batch.expires_on if batch else None,
         counted=line.first_counted_at is not None,
         recount=line.recount,
     )
@@ -736,20 +773,30 @@ def count_sheet(
         OpnameLine.opname_id == opname.id,
     )
     entry_count, sku_count = session.exec(
-        select(func.count(), func.count(func.distinct(CountEntry.line_id)))
+        # SKUs, not lines: a medicine's Batches count as one.
+        select(func.count(), func.count(func.distinct(OpnameLine.sku_id)))
         .select_from(CountEntry)
         .join(OpnameLine)
         .where(*mine)
     ).one()
     rows = session.exec(
-        select(CountEntry, Sku, Product.name)
+        select(CountEntry, Sku, Product.name, Batch.number)
         .select_from(CountEntry)
         .join(OpnameLine, col(CountEntry.line_id) == OpnameLine.id)
         .join(Sku, col(OpnameLine.sku_id) == Sku.id)
         .join(Product, col(Sku.product_id) == Product.id)
+        .join(Batch, col(OpnameLine.batch_id) == Batch.id, isouter=True)
         .where(*mine)
         .order_by(col(CountEntry.id).desc())
         .limit(MY_ENTRIES_SHOWN)
+    ).all()
+    medicines = session.exec(
+        select(Sku, Product.name)
+        .join(Product, col(Sku.product_id) == Product.id)
+        .join(SubCategory, col(Product.sub_category_id) == SubCategory.id)
+        .join(Category, col(SubCategory.category_id) == Category.id)
+        .where(col(Sku.id).in_(_skus_in(opname)), col(Category.tracks_batches))
+        .order_by(col(Product.name), col(Sku.id))
     ).all()
     return CountSheet(
         id=opname.id or 0,
@@ -758,13 +805,19 @@ def count_sheet(
         scope_label=opname.scope_label,
         location_name=location.name,
         can_count=_can_count(session, opname),
-        entries=[_my_entry(entry, sku, name) for entry, sku, name in rows],
+        entries=[
+            _my_entry(entry, sku, name, number)
+            for entry, sku, name, number in rows
+        ],
         entry_count=entry_count,
         sku_count=sku_count,
+        batch_skus=_sku_options(session, medicines),
     )
 
 
-def _my_entry(entry: CountEntry, sku: Sku, product_name: str) -> MyCountEntry:
+def _my_entry(
+    entry: CountEntry, sku: Sku, product_name: str, batch_number: str | None
+) -> MyCountEntry:
     return MyCountEntry(
         id=entry.id or 0,
         sku_id=sku.id or 0,
@@ -773,9 +826,38 @@ def _my_entry(entry: CountEntry, sku: Sku, product_name: str) -> MyCountEntry:
         color=sku.color,
         code=sku.code,
         stock_unit=sku.stock_unit,
+        batch_number=batch_number,
         quantity=entry.quantity,
         counted_at=entry.counted_at,
     )
+
+
+def _skus_in(opname: StockOpname) -> Any:
+    """The SKUs in the session's Scope, as a subquery."""
+    return select(OpnameLine.sku_id).where(OpnameLine.opname_id == opname.id)
+
+
+def _sku_options(
+    session: Session, rows: Sequence[tuple[Sku, str]]
+) -> list[CountSkuOption]:
+    """Count options; a medicine's carry every Batch it has."""
+    medicines = [sku.id for sku, _ in rows if batches.tracks(sku)]
+    known: dict[int, list[CountBatchOption]] = {
+        sku_id: [] for sku_id in medicines if sku_id
+    }
+    for batch in session.exec(
+        select(Batch)
+        .where(col(Batch.sku_id).in_(known))
+        .order_by(col(Batch.expires_on), col(Batch.id))
+    ).all():
+        known[batch.sku_id].append(CountBatchOption.model_validate(batch))
+    return [
+        CountSkuOption.model_validate(
+            sku,
+            update={'product_name': name, 'batches': known.get(sku.id or 0)},
+        )
+        for sku, name in rows
+    ]
 
 
 def find_skus(
@@ -788,10 +870,9 @@ def find_skus(
         return []
     rows = session.exec(
         select(Sku, Product.name)
-        .join(OpnameLine, col(OpnameLine.sku_id) == Sku.id)
         .join(Product, col(Sku.product_id) == Product.id)
         .where(
-            OpnameLine.opname_id == opname.id,
+            col(Sku.id).in_(_skus_in(opname)),
             or_(
                 col(Product.name).icontains(search, autoescape=True),
                 col(Sku.code).icontains(search, autoescape=True),
@@ -801,10 +882,7 @@ def find_skus(
         .order_by(col(Product.name), col(Sku.id))
         .limit(20)
     ).all()
-    return [
-        CountSkuOption.model_validate(sku, update={'product_name': name})
-        for sku, name in rows
-    ]
+    return _sku_options(session, rows)
 
 
 def add_count(
@@ -846,11 +924,21 @@ def add_count(
         if sku is None:
             raise NotFoundError('SKU tidak ditemukan.')
 
-    line = _lock_line(session, opname.id, sku.id)
     label = sku_label(sku.product.name, sku.size, sku.color)
-    if line is None:
+    in_scope = session.exec(
+        select(OpnameLine.id)
+        .where(OpnameLine.opname_id == opname.id, OpnameLine.sku_id == sku.id)
+        .limit(1)
+    ).first()
+    if in_scope is None:
         raise ConflictError(f'{label} tidak termasuk opname ini.')
-    if opname.status == OpnameStatus.review and not line.recount:
+    batch = _counted_batch(session, sku, count_in)
+    if batch is not None:
+        label = f'{label} batch {batch.number}'
+    line = _line_for(session, opname, sku, batch)
+    if line is None or (
+        opname.status == OpnameStatus.review and not line.recount
+    ):
         raise ConflictError(
             f'{label} sudah selesai dihitung. Saat peninjauan hanya barang '
             'yang diminta hitung ulang yang bisa dihitung.'
@@ -858,7 +946,67 @@ def add_count(
 
     entry = _count(session, opname, line, count_in.quantity, user=user)
     session.commit()
-    return _my_entry(entry, sku, sku.product.name)
+    return _my_entry(
+        entry, sku, sku.product.name, batch.number if batch else None
+    )
+
+
+def _counted_batch(
+    session: Session, sku: Sku, count_in: CountCreate
+) -> Batch | None:
+    """The Batch a medicine's count is for: one it has, or a new number
+    with its expiry date (rule 13 of slice 6). None for anything else."""
+    if not batches.tracks(sku):
+        return None
+    label = sku_label(sku.product.name, sku.size, sku.color)
+    if count_in.batch_id is not None:
+        batch = session.get(Batch, count_in.batch_id)
+        if batch is None or batch.sku_id != sku.id:
+            raise NotFoundError(f'Batch {label} tidak ditemukan.')
+        return batch
+    number = batches.clean_number(count_in.batch_number)
+    if number is None or count_in.expires_on is None:
+        raise ConflictError(
+            f'{label}: pilih batch-nya, atau isi nomor batch dan tanggal '
+            'kedaluwarsa.'
+        )
+    return batches.resolve(session, sku, number, count_in.expires_on)
+
+
+def _line_for(
+    session: Session, opname: StockOpname, sku: Sku, batch: Batch | None
+) -> OpnameLine | None:
+    """The locked line a count goes to.
+
+    A Batch without a line takes over the medicine's line without a Batch
+    while that one is uncounted; otherwise it gets a line of its own, but
+    not once Review has begun. None when no line may take the count.
+    """
+    assert opname.id is not None and sku.id is not None
+    batch_id = batch.id if batch else None
+    line = _lock_line(session, opname.id, sku.id, batch_id)
+    if line is not None or batch is None:
+        return line
+    blank = _lock_line(session, opname.id, sku.id, None)
+    if blank is not None and blank.first_counted_at is None:
+        blank.batch_id = batch_id
+        session.add(blank)
+        session.flush()
+        return blank
+    if opname.status != OpnameStatus.counting:
+        return None
+    session.exec(
+        insert(OpnameLine)
+        .values(
+            opname_id=opname.id,
+            sku_id=sku.id,
+            batch_id=batch_id,
+            # An Opening Opname starts every line at the imported cost.
+            unit_cost=sku.latest_unit_cost if opname.is_opening else None,
+        )
+        .on_conflict_do_nothing()
+    )
+    return _lock_line(session, opname.id, sku.id, batch_id)
 
 
 def _count(
@@ -875,16 +1023,8 @@ def _count(
     now = utc_now()
     if line.first_counted_at is None:
         # The snapshot every later count of this line is measured against
-        # (rule 5).
-        balance = session.exec(
-            select(StockBalance)
-            .where(
-                StockBalance.sku_id == line.sku_id,
-                StockBalance.location_id == opname.location_id,
-            )
-            .execution_options(populate_existing=True)
-        ).first()
-        line.system_quantity = balance.quantity if balance else ZERO
+        # (rule 5); a medicine's line measures its own Batch.
+        line.system_quantity = _system_quantity(session, opname, line)
         line.first_counted_at = now
     elif not line.moved_while_counting:
         # Sold, returned or received since the first count (rule 8).
@@ -893,6 +1033,9 @@ def _count(
             .where(
                 StockMovement.sku_id == line.sku_id,
                 StockMovement.location_id == opname.location_id,
+                col(StockMovement.batch_id).is_not_distinct_from(
+                    line.batch_id
+                ),
                 col(StockMovement.created_at) > line.first_counted_at,
             )
             .limit(1)
@@ -906,6 +1049,26 @@ def _count(
     session.add(entry)
     session.flush()
     return entry
+
+
+def _system_quantity(
+    session: Session, opname: StockOpname, line: OpnameLine
+) -> Decimal:
+    sku = session.get(Sku, line.sku_id)
+    assert sku is not None
+    if batches.tracks(sku):
+        return batches.quantity(
+            session, line.sku_id, opname.location_id, line.batch_id
+        )
+    balance = session.exec(
+        select(StockBalance)
+        .where(
+            StockBalance.sku_id == line.sku_id,
+            StockBalance.location_id == opname.location_id,
+        )
+        .execution_options(populate_existing=True)
+    ).first()
+    return balance.quantity if balance else ZERO
 
 
 def cancel_count(
@@ -925,9 +1088,7 @@ def cancel_count(
         or entry.cancelled_at is not None
     ):
         raise NotFoundError('Hitungan tidak ditemukan.')
-    assert opname.id is not None
-    line = _lock_line(session, opname.id, line.sku_id)
-    assert line is not None
+    line = _lock_line_by_id(session, line)
     if opname.status == OpnameStatus.review and not line.recount:
         raise ConflictError('Hitungan ini sudah ditinjau.')
     entry.cancelled_at = utc_now()
@@ -990,14 +1151,26 @@ def _share_lock(session: Session, opname: StockOpname) -> StockOpname:
 
 
 def _lock_line(
-    session: Session, opname_id: int, sku_id: int | None
+    session: Session, opname_id: int, sku_id: int, batch_id: int | None
 ) -> OpnameLine | None:
     return session.exec(
         select(OpnameLine)
-        .where(OpnameLine.opname_id == opname_id, OpnameLine.sku_id == sku_id)
+        .where(
+            OpnameLine.opname_id == opname_id,
+            OpnameLine.sku_id == sku_id,
+            col(OpnameLine.batch_id).is_not_distinct_from(batch_id),
+        )
         .with_for_update()
         .execution_options(populate_existing=True)
     ).first()
+
+
+def _lock_line_by_id(session: Session, line: OpnameLine) -> OpnameLine:
+    locked = session.get(
+        OpnameLine, line.id, with_for_update=True, populate_existing=True
+    )
+    assert locked is not None
+    return locked
 
 
 # Changing the session
@@ -1139,9 +1312,7 @@ def recount(
     11). Its entries are cancelled, not deleted."""
     opname = _lock_for_review(session, opname, actor)
     assert opname.id is not None
-    locked = _lock_line(session, opname.id, line.sku_id)
-    assert locked is not None
-    line = locked
+    line = _lock_line_by_id(session, line)
     now = utc_now()
     for entry in _active_entries(session, line):
         entry.cancelled_at = now
@@ -1161,14 +1332,20 @@ def recount(
         actor=actor,
         action='stock_opname.recount',
         summary=(
-            f'Meminta hitung ulang '
-            f'{sku_label(sku.product.name, sku.size, sku.color)} di stok '
+            f'Meminta hitung ulang {_line_label(session, line, sku)} di stok '
             f'opname {opname.number}.'
         ),
         entity_type=DOCUMENT_TYPE,
         entity_id=opname.id,
     )
     session.commit()
+
+
+def _line_label(session: Session, line: OpnameLine, sku: Sku) -> str:
+    """The SKU, and the Batch when the line counts one."""
+    label = sku_label(sku.product.name, sku.size, sku.color)
+    batch = session.get(Batch, line.batch_id) if line.batch_id else None
+    return f'{label} batch {batch.number}' if batch else label
 
 
 def _lock_for_review(
@@ -1243,7 +1420,7 @@ def approve(
         .join(Sku, col(OpnameLine.sku_id) == Sku.id)
         .where(OpnameLine.opname_id == opname.id)
         # SKU order, like every other stock document, avoids deadlocks.
-        .order_by(col(OpnameLine.sku_id))
+        .order_by(col(OpnameLine.sku_id), col(OpnameLine.id))
     ).all()
     waiting = sum(1 for line, _ in rows if line.first_counted_at is None)
     if waiting:
@@ -1283,6 +1460,7 @@ def approve(
                     reason=reason,
                     source=source,
                     actor=actor,
+                    batch_id=line.batch_id,
                 )
             else:
                 movement = costing.found(
@@ -1294,6 +1472,7 @@ def approve(
                     source=source,
                     actor=actor,
                     unit_cost=line.unit_cost,
+                    batch_id=line.batch_id,
                 )
         else:
             shortages += 1
@@ -1305,6 +1484,7 @@ def approve(
                 reason=reason,
                 source=source,
                 actor=actor,
+                batch_id=line.batch_id,
             )
         line.adjusted_value = movement.value
         if variance < 0 and not opname.is_opening:
@@ -1340,7 +1520,7 @@ def _approval_problem(
 ) -> str | None:
     """What still stops this line from being approved, if anything."""
     variance = _variance(line)
-    label = sku_label(sku.product.name, sku.size, sku.color)
+    label = _line_label(session, line, sku)
     if variance > 0:
         balance = session.get(StockBalance, (sku.id, opname.location_id))
         if _unit_cost(opname, line, sku, balance) is None:
@@ -1377,7 +1557,7 @@ def _charge(
     assert line.charged_user_id is not None
     assert opname.id is not None
     amount = charge_amount(line, value)
-    label = sku_label(sku.product.name, sku.size, sku.color)
+    label = _line_label(session, line, sku)
     shortage = -_variance(line)
     session.add(
         EmployeeCharge(

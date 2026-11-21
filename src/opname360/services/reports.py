@@ -840,6 +840,7 @@ REASON_LABELS = {
     ShortageReason.lost: 'Hilang',
     ShortageReason.miscounted: 'Salah hitung',
     ShortageReason.unknown: 'Tidak diketahui',
+    ShortageReason.expired: 'Kedaluwarsa',
 }
 RESOLUTION_LABELS = {
     Resolution.company_loss: 'Kerugian perusahaan',

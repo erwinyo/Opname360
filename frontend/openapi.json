@@ -11292,6 +11292,30 @@
         ],
         "title": "CostingMethodSwitch"
       },
+      "CountBatchOption": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "number": {
+            "type": "string",
+            "title": "Number"
+          },
+          "expires_on": {
+            "type": "string",
+            "format": "date",
+            "title": "Expires On"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "number",
+          "expires_on"
+        ],
+        "title": "CountBatchOption"
+      },
       "CountCreate": {
         "properties": {
           "code": {
@@ -11329,11 +11353,46 @@
             ],
             "title": "Quantity",
             "default": "1"
+          },
+          "batch_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Batch Id"
+          },
+          "batch_number": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 50
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Batch Number"
+          },
+          "expires_on": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expires On"
           }
         },
         "type": "object",
         "title": "CountCreate",
-        "description": "A scan (code, quantity 1) or a typed quantity for a code or SKU."
+        "description": "A scan (code, quantity 1) or a typed quantity for a code or SKU.\n\nA medicine also needs its Batch: a known one, or a new number with its\nexpiry date."
       },
       "CountSheet": {
         "properties": {
@@ -11374,6 +11433,13 @@
           "sku_count": {
             "type": "integer",
             "title": "Sku Count"
+          },
+          "batch_skus": {
+            "items": {
+              "$ref": "#/components/schemas/CountSkuOption"
+            },
+            "type": "array",
+            "title": "Batch Skus"
           }
         },
         "type": "object",
@@ -11386,7 +11452,8 @@
           "can_count",
           "entries",
           "entry_count",
-          "sku_count"
+          "sku_count",
+          "batch_skus"
         ],
         "title": "CountSheet",
         "description": "What one Checker sees: their own entries, never a System Quantity."
@@ -11434,6 +11501,20 @@
           "stock_unit": {
             "type": "string",
             "title": "Stock Unit"
+          },
+          "batches": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/CountBatchOption"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Batches"
           }
         },
         "type": "object",
@@ -13451,6 +13532,17 @@
             "type": "string",
             "title": "Stock Unit"
           },
+          "batch_number": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Batch Number"
+          },
           "quantity": {
             "type": "string",
             "title": "Quantity"
@@ -13568,6 +13660,29 @@
           "stock_unit": {
             "type": "string",
             "title": "Stock Unit"
+          },
+          "batch_number": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Batch Number"
+          },
+          "expires_on": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expires On"
           },
           "counted": {
             "type": "boolean",
@@ -16593,7 +16708,8 @@
           "damaged",
           "lost",
           "miscounted",
-          "unknown"
+          "unknown",
+          "expired"
         ],
         "title": "ShortageReason"
       },

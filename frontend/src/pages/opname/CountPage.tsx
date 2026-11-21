@@ -11,7 +11,7 @@ import { useEffect, useRef, useState } from 'react'
 import type { FormEvent } from 'react'
 import { useParams } from 'react-router'
 
-import type { CountCreate } from '@/client'
+import type { CountCreate, CountSkuOption } from '@/client'
 import {
   countingAddCountMutation,
   countingCancelCountMutation,
@@ -26,10 +26,19 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { errorMessage, queryClient } from '@/lib/api'
 import { cameraScanning } from '@/lib/camera'
-import { parseQuantity, quantity, skuName } from '@/lib/format'
+import {
+  formatDate,
+  parseQuantity,
+  quantity,
+  skuName,
+  today,
+} from '@/lib/format'
 import { cn } from '@/lib/utils'
 
 type Feedback = { ok: boolean; text: string }
+type Target = { code: string } | { sku_id: number }
+/** A medicine waiting for the Checker to say which Batch it is. */
+type Picking = { option: CountSkuOption; target: Target }
 
 const timeOnly = new Intl.DateTimeFormat('id-ID', { timeStyle: 'short' })
 
@@ -44,6 +53,9 @@ export function CountPage() {
   const [typed, setTyped] = useState('')
   const [search, setSearch] = useState('')
   const [feedback, setFeedback] = useState<Feedback | null>(null)
+  const [picking, setPicking] = useState<Picking | null>(null)
+  const [newNumber, setNewNumber] = useState('')
+  const [newExpiry, setNewExpiry] = useState('')
   const scanInput = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
@@ -62,11 +74,13 @@ export function CountPage() {
   const add = useMutation({
     ...countingAddCountMutation(),
     onSuccess: (entry) => {
+      const batch = entry.batch_number ? ` (batch ${entry.batch_number})` : ''
       setFeedback({
         ok: true,
-        text: `${skuName(entry)}: +${quantity(entry.quantity)} ${entry.stock_unit}`,
+        text: `${skuName(entry)}${batch}: +${quantity(entry.quantity)} ${entry.stock_unit}`,
       })
       setAmount('1')
+      setPicking(null)
       void refresh()
     },
     onError: (error) => setFeedback({ ok: false, text: errorMessage(error) }),
@@ -90,12 +104,37 @@ export function CountPage() {
     }
     add.mutate({ path, body: { ...body, quantity: perScan } })
   }
+  const startPicking = (next: Picking) => {
+    setPicking(next)
+    setNewNumber('')
+    setNewExpiry('')
+    setFeedback(null)
+  }
+  /** A medicine first asks for its Batch; anything else is counted. */
+  const scan = (scanned: string) => {
+    const medicine = sheet.data?.batch_skus.find(
+      (option) =>
+        option.barcode === scanned ||
+        option.code.toLowerCase() === scanned.toLowerCase(),
+    )
+    if (medicine) startPicking({ option: medicine, target: { code: scanned } })
+    else send({ code: scanned })
+  }
   const submitCode = (event: FormEvent) => {
     event.preventDefault()
     if (!code.trim()) return
-    send({ code: code.trim() })
+    scan(code.trim())
     setCode('')
     scanInput.current?.focus()
+  }
+  const submitNewBatch = (event: FormEvent) => {
+    event.preventDefault()
+    if (!picking || !newNumber.trim() || !newExpiry) return
+    send({
+      ...picking.target,
+      batch_number: newNumber.trim(),
+      expires_on: newExpiry,
+    })
   }
 
   if (sheet.isPending) return <p className="text-muted-foreground">Memuat…</p>
@@ -173,11 +212,96 @@ export function CountPage() {
               </Button>
               {camera && (
                 <div className="mt-3">
-                  <CameraScanner
-                    onScan={(scanned) => send({ code: scanned })}
-                  />
+                  <CameraScanner onScan={scan} />
                 </div>
               )}
+            </div>
+          )}
+
+          {picking && (
+            <div className="grid gap-3 rounded-lg border border-primary/40 bg-primary/5 p-3">
+              <p className="font-medium">
+                Batch yang mana?
+                <span className="block text-sm font-normal text-muted-foreground">
+                  {skuName(picking.option)} · {amount}{' '}
+                  {picking.option.stock_unit}
+                </span>
+              </p>
+              {picking.option.batches && picking.option.batches.length > 0 && (
+                <ul className="grid gap-2">
+                  {picking.option.batches.map((batch) => {
+                    const expired = batch.expires_on < today()
+                    return (
+                      <li key={batch.id}>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          className="h-auto w-full justify-between py-2.5"
+                          disabled={add.isPending}
+                          onClick={() =>
+                            send({ ...picking.target, batch_id: batch.id })
+                          }
+                        >
+                          <span className="font-semibold tabular-nums">
+                            {batch.number}
+                          </span>
+                          <span
+                            className={cn(
+                              'text-sm tabular-nums',
+                              expired
+                                ? 'text-destructive'
+                                : 'text-muted-foreground',
+                            )}
+                          >
+                            {expired ? 'Kedaluwarsa' : 'Sampai'}{' '}
+                            {formatDate(batch.expires_on)}
+                          </span>
+                        </Button>
+                      </li>
+                    )
+                  })}
+                </ul>
+              )}
+              <form onSubmit={submitNewBatch} className="grid gap-2">
+                <Label htmlFor="new-batch">
+                  {picking.option.batches?.length
+                    ? 'Batch lain'
+                    : 'Nomor batch di kemasan'}
+                </Label>
+                <div className="flex flex-wrap gap-2">
+                  <Input
+                    id="new-batch"
+                    value={newNumber}
+                    onChange={(event) => setNewNumber(event.target.value)}
+                    placeholder="No. batch"
+                    maxLength={50}
+                    autoComplete="off"
+                    className="w-32 flex-1 uppercase"
+                  />
+                  <Input
+                    type="date"
+                    value={newExpiry}
+                    onChange={(event) => setNewExpiry(event.target.value)}
+                    aria-label="Tanggal kedaluwarsa"
+                    className="w-40 flex-1"
+                  />
+                </div>
+                <div className="flex gap-2">
+                  <Button
+                    type="submit"
+                    disabled={!newNumber.trim() || !newExpiry || add.isPending}
+                  >
+                    Hitung batch ini
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={() => setPicking(null)}
+                  >
+                    Batal
+                  </Button>
+                </div>
+              </form>
             </div>
           )}
 
@@ -223,7 +347,14 @@ export function CountPage() {
                     <button
                       type="button"
                       onClick={() => {
-                        send({ sku_id: option.id })
+                        if (option.batches) {
+                          startPicking({
+                            option,
+                            target: { sku_id: option.id },
+                          })
+                        } else {
+                          send({ sku_id: option.id })
+                        }
                         setTyped('')
                       }}
                       className="flex w-full items-baseline gap-3 px-3 py-2.5 text-left hover:bg-muted"
@@ -257,7 +388,10 @@ export function CountPage() {
                   {skuName(entry)}
                 </span>
                 <span className="block text-sm text-muted-foreground tabular-nums">
-                  {entry.code} · {timeOnly.format(new Date(entry.counted_at))}
+                  {entry.code}
+                  {entry.batch_number &&
+                    ` · Batch ${entry.batch_number}`} ·{' '}
+                  {timeOnly.format(new Date(entry.counted_at))}
                 </span>
               </span>
               <span className="font-semibold whitespace-nowrap tabular-nums">

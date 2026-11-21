@@ -227,8 +227,9 @@ def stock_opname(
     from opname360.services.opnames import charge_amount
 
     assert opname.id is not None and opname.approved_at is not None
+    # A medicine has a line, and so a movement, per Batch.
     lines = {
-        line.sku_id: line
+        (line.sku_id, line.batch_id): line
         for line in session.exec(
             select(OpnameLine).where(OpnameLine.opname_id == opname.id)
         ).all()
@@ -248,7 +249,7 @@ def stock_opname(
         if movement.quantity > 0:
             amounts.append(Amount(surplus, -movement.value))
         elif movement.quantity < 0:
-            line = lines[movement.sku_id]
+            line = lines[movement.sku_id, movement.batch_id]
             lost = -movement.value
             charged = ZERO
             if line.resolution == Resolution.employee_charge:

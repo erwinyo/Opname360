@@ -39,7 +39,7 @@ import { formatDateTime, money, skuName } from '@/lib/format'
 import { cn } from '@/lib/utils'
 import { refreshOpname } from '@/pages/opname/refresh'
 import { ReviewLines } from '@/pages/opname/ReviewLines'
-import { OpnameStatusBadge, Progress } from '@/pages/opname/shared'
+import { LineBatch, OpnameStatusBadge, Progress } from '@/pages/opname/shared'
 
 const PAGE_SIZE = 50
 
@@ -402,6 +402,7 @@ function ProgressLines({
                       <span className="block text-sm text-muted-foreground tabular-nums">
                         {line.code} · {line.barcode}
                       </span>
+                      <LineBatch line={line} />
                     </TableCell>
                     <TableCell
                       className={cn(

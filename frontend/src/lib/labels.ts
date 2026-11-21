@@ -57,6 +57,7 @@ export const SHORTAGE_REASON_LABELS: Record<ShortageReason, string> = {
   lost: 'Hilang',
   miscounted: 'Salah hitung',
   unknown: 'Tidak diketahui',
+  expired: 'Kedaluwarsa',
 }
 
 export const RESOLUTION_LABELS: Record<Resolution, string> = {

@@ -74,6 +74,18 @@ export function skuName(sku: {
   return [sku.product_name, variantLabel(sku)].filter(Boolean).join(' · ')
 }
 
+/** A medicine's Batch: "Batch A12 · Kedaluwarsa 15 Nov 2027", or "". */
+export function batchLabel(line: {
+  batch_number?: string | null
+  expires_on?: string | null
+}): string {
+  if (!line.batch_number) return ''
+  const expiry = line.expires_on
+    ? ` · Kedaluwarsa ${formatDate(line.expires_on)}`
+    : ''
+  return `Batch ${line.batch_number}${expiry}`
+}
+
 /** An ISO time as a `datetime-local` input wants it, in the browser's time. */
 export function toLocalInput(iso: string | Date): string {
   const at = new Date(iso)

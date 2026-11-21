@@ -110,6 +110,7 @@ from opname360.models.ledger import (
     TrialBalanceRow,
 )
 from opname360.models.opname import (
+    CountBatchOption,
     CountCreate,
     CountEntry,
     CountSheet,
@@ -327,6 +328,7 @@ __all__ = [
     'CostLayer',
     'CostingMethod',
     'CostingMethodSwitch',
+    'CountBatchOption',
     'CountCreate',
     'CountEntry',
     'CountSheet',

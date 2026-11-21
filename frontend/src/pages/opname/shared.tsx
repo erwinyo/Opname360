@@ -1,6 +1,24 @@
-import type { OpnameStatus } from '@/client'
+import type { OpnameLinePublic, OpnameStatus } from '@/client'
 import { Badge } from '@/components/ui/badge'
+import { batchLabel, today } from '@/lib/format'
 import { OPNAME_STATUS_LABELS } from '@/lib/labels'
+import { cn } from '@/lib/utils'
+
+/** The Batch a medicine's line counts, red once it has expired. */
+export function LineBatch({ line }: { line: OpnameLinePublic }) {
+  if (!line.batch_number) return null
+  const expired = Boolean(line.expires_on && line.expires_on < today())
+  return (
+    <span
+      className={cn(
+        'block text-sm font-medium tabular-nums',
+        expired && 'text-destructive',
+      )}
+    >
+      {batchLabel(line)}
+    </span>
+  )
+}
 
 export function OpnameStatusBadge({ status }: { status: OpnameStatus }) {
   const variant =

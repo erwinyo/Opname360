@@ -746,9 +746,30 @@ export type CostingMethodSwitch = {
 }
 
 /**
+ * CountBatchOption
+ */
+export type CountBatchOption = {
+  /**
+   * Id
+   */
+  id: number
+  /**
+   * Number
+   */
+  number: string
+  /**
+   * Expires On
+   */
+  expires_on: string
+}
+
+/**
  * CountCreate
  *
  * A scan (code, quantity 1) or a typed quantity for a code or SKU.
+ *
+ * A medicine also needs its Batch: a known one, or a new number with its
+ * expiry date.
  */
 export type CountCreate = {
   /**
@@ -763,6 +784,18 @@ export type CountCreate = {
    * Quantity
    */
   quantity?: number | string
+  /**
+   * Batch Id
+   */
+  batch_id?: number | null
+  /**
+   * Batch Number
+   */
+  batch_number?: string | null
+  /**
+   * Expires On
+   */
+  expires_on?: string | null
 }
 
 /**
@@ -804,6 +837,10 @@ export type CountSheet = {
    * Sku Count
    */
   sku_count: number
+  /**
+   * Batch Skus
+   */
+  batch_skus: Array<CountSkuOption>
 }
 
 /**
@@ -840,6 +877,10 @@ export type CountSkuOption = {
    * Stock Unit
    */
   stock_unit: string
+  /**
+   * Batches
+   */
+  batches?: Array<CountBatchOption> | null
 }
 
 /**
@@ -1952,6 +1993,10 @@ export type MyCountEntry = {
    */
   stock_unit: string
   /**
+   * Batch Number
+   */
+  batch_number?: string | null
+  /**
    * Quantity
    */
   quantity: string
@@ -2028,6 +2073,14 @@ export type OpnameLinePublic = {
    * Stock Unit
    */
   stock_unit: string
+  /**
+   * Batch Number
+   */
+  batch_number?: string | null
+  /**
+   * Expires On
+   */
+  expires_on?: string | null
   /**
    * Counted
    */
@@ -3709,7 +3762,8 @@ export type ShopSettingsSave = {
 /**
  * ShortageReason
  */
-export type ShortageReason = 'damaged' | 'lost' | 'miscounted' | 'unknown'
+export type ShortageReason =
+  'damaged' | 'lost' | 'miscounted' | 'unknown' | 'expired'
 
 /**
  * SkuOption

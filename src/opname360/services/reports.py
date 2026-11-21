@@ -23,6 +23,7 @@ from opname360.models import (
     AbcRow,
     ActivityLog,
     Attention,
+    Batch,
     Category,
     DailyStock,
     DailyStockCategory,
@@ -30,6 +31,9 @@ from opname360.models import (
     DailyStockRow,
     DailyStockSubCategory,
     Dashboard,
+    ExpiryFilter,
+    ExpiryReport,
+    ExpiryRow,
     FastMoving,
     FastMovingFilter,
     FastMovingRow,
@@ -74,7 +78,7 @@ from opname360.models import (
     VarianceRow,
     VoidToday,
 )
-from opname360.services import shop_settings, stock
+from opname360.services import batches, costing, shop_settings, stock
 from opname360.services.documents import shop_now
 
 
@@ -1002,4 +1006,86 @@ def attention(session: Session) -> Attention:
         ],
         opnames_waiting=opnames,
         shifts_waiting=shifts,
+        expired_batches=len(_held_batches(session, shop_now().date(), -1)),
     )
+
+
+# Kedaluwarsa
+
+
+def expiry(session: Session, filters: ExpiryFilter) -> ExpiryReport:
+    """Batches still in stock that have expired or expire within the
+    days asked, valued at their SKU's average cost (slice 6, rule 15)."""
+    on = shop_now().date()
+    rows = _held_batches(session, on, filters.days)
+    location_id = stock.resolve_location(session, None)
+    balances = {
+        balance.sku_id: balance
+        for balance in session.exec(
+            select(StockBalance).where(
+                StockBalance.location_id == location_id,
+                col(StockBalance.sku_id).in_(
+                    {sku.id for _, sku, _, _ in rows}
+                ),
+            )
+        ).all()
+    }
+    out = [
+        ExpiryRow(
+            batch_id=batch.id or 0,
+            sku_id=sku.id or 0,
+            product_name=name,
+            size=sku.size,
+            color=sku.color,
+            code=sku.code,
+            stock_unit=sku.stock_unit,
+            batch_number=batch.number,
+            expires_on=batch.expires_on,
+            expired=batches.is_expired(batch, on),
+            quantity=quantity,
+            value=costing.money(
+                quantity * _average_cost(sku, balances.get(sku.id or 0))
+            ),
+        )
+        for batch, sku, name, quantity in rows
+    ]
+    return ExpiryReport(
+        days=filters.days,
+        rows=out,
+        expired_value=sum((row.value for row in out if row.expired), ZERO),
+        expiring_value=sum(
+            (row.value for row in out if not row.expired), ZERO
+        ),
+    )
+
+
+def _held_batches(
+    session: Session, on: date, days: int
+) -> list[tuple[Batch, Sku, str, Decimal]]:
+    """Batches holding stock here that expire no later than `days` after
+    `on`, the one that expires first first. -1 days: only the expired."""
+    location_id = stock.resolve_location(session, None)
+    held = func.sum(StockMovement.quantity)
+    rows = session.exec(
+        select(Batch, Sku, Product.name, held)
+        .join(Sku, col(Batch.sku_id) == Sku.id)
+        .join(Product, col(Sku.product_id) == Product.id)
+        .join(
+            StockMovement,
+            and_(
+                col(StockMovement.batch_id) == Batch.id,
+                col(StockMovement.location_id) == location_id,
+            ),
+        )
+        .where(col(Batch.expires_on) <= on + timedelta(days=days))
+        .group_by(col(Batch.id), col(Sku.id), col(Product.id))
+        .having(held > 0)
+        .order_by(col(Batch.expires_on), col(Product.name), col(Batch.id))
+    ).all()
+    return [(batch, sku, name, Decimal(qty)) for batch, sku, name, qty in rows]
+
+
+def _average_cost(sku: Sku, balance: StockBalance | None) -> Decimal:
+    if balance is not None and balance.quantity > 0:
+        return balance.value / balance.quantity
+    return sku.latest_unit_cost or ZERO

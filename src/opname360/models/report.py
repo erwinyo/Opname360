@@ -288,8 +288,42 @@ class Attention(SQLModel):
     voids_today: list[VoidToday]
     opnames_waiting: int
     shifts_waiting: int
+    # Medicine past its expiry date still in stock (slice 6).
+    expired_batches: int
 
 
 class Dashboard(SQLModel):
     today: HourlySales
     attention: Attention
+
+
+# Kedaluwarsa (slice 6)
+
+
+class ExpiryFilter(SQLModel):
+    # Batches that expire within this many days, plus those already expired.
+    days: int = Field(default=90, ge=1, le=365)
+
+
+class ExpiryRow(SQLModel):
+    batch_id: int
+    sku_id: int
+    product_name: str
+    size: str | None
+    color: str | None
+    code: str
+    stock_unit: str
+    batch_number: str
+    expires_on: date
+    expired: bool
+    quantity: Decimal
+    # At the SKU's average cost.
+    value: Decimal
+
+
+class ExpiryReport(SQLModel):
+    days: int
+    # The one that expires first first.
+    rows: list[ExpiryRow]
+    expired_value: Decimal
+    expiring_value: Decimal

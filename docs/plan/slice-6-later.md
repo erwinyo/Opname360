@@ -1,6 +1,6 @@
 # Slice 6: Later
 
-**Status: being built** on branch `slice-6-later`.
+**Status: built.** Every rule below has an API test in `tests/test_costing_switch.py`, `test_batches.py`, `test_batch_selling.py`, `test_batch_opname.py` and `test_expiry_report.py`, and the main path has a browser test (`frontend/e2e/batches.spec.ts`).
 
 Two features that were decided but not needed at go-live, and the list of what is deliberately left out.
 
@@ -67,6 +67,13 @@ The Category form no longer offers the method when editing. It is chosen when th
 3. **Selling by Batch:** sale, return, Exchange and Void at the till (rules 9 to 12).
 4. **Opname by Batch:** lines per Batch, the Checker's picker, the expired reason (rules 13 and 14).
 5. **Expiry report and browser test:** Kedaluwarsa, the Dashboard count (rule 15); a browser test that switches a Category's method, then receives a medicine with a Batch, sells it and finds it in the expiry report.
+
+## Decided while building
+
+- **A Batch nobody recorded** that turns up on the shelf during counting gets a line of its own. Lines are only added while counting is open, not once Review has begun. A known batch number must come with the expiry date already recorded for it.
+- **Expired Batches are counted like any other**, so expired stock on the shelf is on record before it is written off.
+- **Per Batch, costed per SKU:** the snapshot, "moved while counting" and the Variance are per Batch line; approval moves each line's Batch, and its value follows the SKU's Costing Method as before. A Shortage in one Batch and a Surplus in another of the same SKU are two adjustments.
+- **The expiry report** offers 30, 60 or 90 days on screen; "within" includes the last day. A Batch is valued at its SKU's average cost, or its latest unit cost while the SKU holds none. Its expired section hands those SKUs to a new Partial Opname (rule 14). No Excel export yet.
 
 ## To confirm with the client
 

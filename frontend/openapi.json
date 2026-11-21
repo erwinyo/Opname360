@@ -7698,6 +7698,67 @@
         }
       }
     },
+    "/api/v1/reports/expiry": {
+      "get": {
+        "tags": [
+          "reports"
+        ],
+        "summary": "Expiry",
+        "operationId": "reports-expiry",
+        "parameters": [
+          {
+            "name": "days",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 365,
+              "minimum": 1,
+              "default": 90,
+              "title": "Days"
+            }
+          },
+          {
+            "name": "opname360_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Opname360 Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExpiryReport"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/reports/dashboard": {
       "get": {
         "tags": [
@@ -10609,6 +10670,10 @@
           "shifts_waiting": {
             "type": "integer",
             "title": "Shifts Waiting"
+          },
+          "expired_batches": {
+            "type": "integer",
+            "title": "Expired Batches"
           }
         },
         "type": "object",
@@ -10616,7 +10681,8 @@
           "negative_stock",
           "voids_today",
           "opnames_waiting",
-          "shifts_waiting"
+          "shifts_waiting",
+          "expired_batches"
         ],
         "title": "Attention"
       },
@@ -11991,6 +12057,120 @@
           "opening"
         ],
         "title": "EntrySource"
+      },
+      "ExpiryReport": {
+        "properties": {
+          "days": {
+            "type": "integer",
+            "title": "Days"
+          },
+          "rows": {
+            "items": {
+              "$ref": "#/components/schemas/ExpiryRow"
+            },
+            "type": "array",
+            "title": "Rows"
+          },
+          "expired_value": {
+            "type": "string",
+            "title": "Expired Value"
+          },
+          "expiring_value": {
+            "type": "string",
+            "title": "Expiring Value"
+          }
+        },
+        "type": "object",
+        "required": [
+          "days",
+          "rows",
+          "expired_value",
+          "expiring_value"
+        ],
+        "title": "ExpiryReport"
+      },
+      "ExpiryRow": {
+        "properties": {
+          "batch_id": {
+            "type": "integer",
+            "title": "Batch Id"
+          },
+          "sku_id": {
+            "type": "integer",
+            "title": "Sku Id"
+          },
+          "product_name": {
+            "type": "string",
+            "title": "Product Name"
+          },
+          "size": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Size"
+          },
+          "color": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Color"
+          },
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "stock_unit": {
+            "type": "string",
+            "title": "Stock Unit"
+          },
+          "batch_number": {
+            "type": "string",
+            "title": "Batch Number"
+          },
+          "expires_on": {
+            "type": "string",
+            "format": "date",
+            "title": "Expires On"
+          },
+          "expired": {
+            "type": "boolean",
+            "title": "Expired"
+          },
+          "quantity": {
+            "type": "string",
+            "title": "Quantity"
+          },
+          "value": {
+            "type": "string",
+            "title": "Value"
+          }
+        },
+        "type": "object",
+        "required": [
+          "batch_id",
+          "sku_id",
+          "product_name",
+          "size",
+          "color",
+          "code",
+          "stock_unit",
+          "batch_number",
+          "expires_on",
+          "expired",
+          "quantity",
+          "value"
+        ],
+        "title": "ExpiryRow"
       },
       "FastMoving": {
         "properties": {

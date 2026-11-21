@@ -331,6 +331,9 @@ import type {
   ReportsDashboardData,
   ReportsDashboardErrors,
   ReportsDashboardResponses,
+  ReportsExpiryData,
+  ReportsExpiryErrors,
+  ReportsExpiryResponses,
   ReportsFastMovingData,
   ReportsFastMovingErrors,
   ReportsFastMovingExcelData,
@@ -2605,6 +2608,18 @@ export const reportsVariancesExcel = <ThrowOnError extends boolean = false>(
     ReportsVariancesExcelErrors,
     ThrowOnError
   >({ url: '/api/v1/reports/variances/excel', ...options })
+
+/**
+ * Expiry
+ */
+export const reportsExpiry = <ThrowOnError extends boolean = false>(
+  options?: Options<ReportsExpiryData, ThrowOnError>,
+): RequestResult<ReportsExpiryResponses, ReportsExpiryErrors, ThrowOnError> =>
+  (options?.client ?? client).get<
+    ReportsExpiryResponses,
+    ReportsExpiryErrors,
+    ThrowOnError
+  >({ url: '/api/v1/reports/expiry', ...options })
 
 /**
  * Dashboard

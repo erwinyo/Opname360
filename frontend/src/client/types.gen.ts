@@ -342,6 +342,10 @@ export type Attention = {
    * Shifts Waiting
    */
   shifts_waiting: number
+  /**
+   * Expired Batches
+   */
+  expired_batches: number
 }
 
 /**
@@ -1195,6 +1199,82 @@ export type EmployeeChargeTotal = {
  * EntrySource
  */
 export type EntrySource = 'document' | 'manual' | 'opening'
+
+/**
+ * ExpiryReport
+ */
+export type ExpiryReport = {
+  /**
+   * Days
+   */
+  days: number
+  /**
+   * Rows
+   */
+  rows: Array<ExpiryRow>
+  /**
+   * Expired Value
+   */
+  expired_value: string
+  /**
+   * Expiring Value
+   */
+  expiring_value: string
+}
+
+/**
+ * ExpiryRow
+ */
+export type ExpiryRow = {
+  /**
+   * Batch Id
+   */
+  batch_id: number
+  /**
+   * Sku Id
+   */
+  sku_id: number
+  /**
+   * Product Name
+   */
+  product_name: string
+  /**
+   * Size
+   */
+  size: string | null
+  /**
+   * Color
+   */
+  color: string | null
+  /**
+   * Code
+   */
+  code: string
+  /**
+   * Stock Unit
+   */
+  stock_unit: string
+  /**
+   * Batch Number
+   */
+  batch_number: string
+  /**
+   * Expires On
+   */
+  expires_on: string
+  /**
+   * Expired
+   */
+  expired: boolean
+  /**
+   * Quantity
+   */
+  quantity: string
+  /**
+   * Value
+   */
+  value: string
+}
 
 /**
  * FastMoving
@@ -8678,6 +8758,37 @@ export type ReportsVariancesExcelResponses = {
    */
   200: unknown
 }
+
+export type ReportsExpiryData = {
+  body?: never
+  path?: never
+  query?: {
+    /**
+     * Days
+     */
+    days?: number
+  }
+  url: '/api/v1/reports/expiry'
+}
+
+export type ReportsExpiryErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError
+}
+
+export type ReportsExpiryError = ReportsExpiryErrors[keyof ReportsExpiryErrors]
+
+export type ReportsExpiryResponses = {
+  /**
+   * Successful Response
+   */
+  200: ExpiryReport
+}
+
+export type ReportsExpiryResponse =
+  ReportsExpiryResponses[keyof ReportsExpiryResponses]
 
 export type ReportsDashboardData = {
   body?: never

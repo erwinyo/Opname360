@@ -13,6 +13,8 @@ from opname360.models import (
     DailyStock,
     DailyStockFilter,
     Dashboard,
+    ExpiryFilter,
+    ExpiryReport,
     FastMoving,
     FastMovingFilter,
     HourlySales,
@@ -156,6 +158,13 @@ def variances_excel(
         excel.variances(report),
         f'selisih-opname-{filters.start}-{filters.end}-{filters.group_by}.xlsx',
     )
+
+
+@router.get('/expiry')
+def expiry(
+    session: SessionDep, filters: Annotated[ExpiryFilter, Query()]
+) -> ExpiryReport:
+    return reports.expiry(session, filters)
 
 
 @router.get('/dashboard')

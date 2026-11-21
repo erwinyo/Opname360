@@ -1,6 +1,6 @@
 # Build plan
 
-Status: **agreed on 2026-11-15. Slices 1 to 5 are built; slice 6 is being built** (branches `slice-1-foundation`, `slice-2-stock-opname`, `slice-3-pos`, `slice-4-reports`, `slice-5-ledger` and `slice-6-later`).
+Status: **agreed on 2026-11-15. Slices 1 to 6 are built** (branches `slice-1-foundation`, `slice-2-stock-opname`, `slice-3-pos`, `slice-4-reports`, `slice-5-ledger` and `slice-6-later`). What is deliberately left out, and when to build it, is listed in [slice 6](plan/slice-6-later.md#deliberately-left-out).
 
 Vocabulary is in [GLOSSARY.md](../GLOSSARY.md), decisions in [adr/](adr/), open client questions in [client-questions.md](client-questions.md).
 

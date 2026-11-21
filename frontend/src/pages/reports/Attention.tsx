@@ -1,5 +1,6 @@
 import {
   BoxesIcon,
+  CalendarClockIcon,
   ClipboardCheckIcon,
   CircleCheckIcon,
   Undo2Icon,
@@ -49,6 +50,13 @@ export function AttentionList({ attention }: { attention: Attention }) {
           ))}
         </ul>
       ),
+    })
+  }
+  if (attention.expired_batches > 0) {
+    items.push({
+      icon: CalendarClockIcon,
+      to: '/laporan/kedaluwarsa',
+      text: `${attention.expired_batches} batch kedaluwarsa masih ada stoknya`,
     })
   }
   if (attention.opnames_waiting > 0) {

@@ -34,6 +34,7 @@ import { SupplierReturnsPage } from '@/pages/purchasing/SupplierReturnsPage'
 import { SuppliersPage } from '@/pages/purchasing/SuppliersPage'
 import { AbcPage } from '@/pages/reports/AbcPage'
 import { DailyStockPage } from '@/pages/reports/DailyStockPage'
+import { ExpiryPage } from '@/pages/reports/ExpiryPage'
 import { FastMovingPage } from '@/pages/reports/FastMovingPage'
 import { HourlyPage } from '@/pages/reports/HourlyPage'
 import { SalesPage } from '@/pages/reports/SalesPage'
@@ -157,6 +158,7 @@ export function App() {
             <Route path="laporan/fast-moving" element={<FastMovingPage />} />
             <Route path="laporan/kontribusi-omzet" element={<AbcPage />} />
             <Route path="laporan/selisih-opname" element={<VariancesPage />} />
+            <Route path="laporan/kedaluwarsa" element={<ExpiryPage />} />
             <Route path="akun" element={<AccountsPage />} />
             <Route path="jurnal" element={<JournalPage />} />
             <Route path="jurnal/baru" element={<ManualEntryPage />} />

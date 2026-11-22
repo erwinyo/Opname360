@@ -1051,6 +1051,7 @@ def expiry(session: Session, filters: ExpiryFilter) -> ExpiryReport:
     ]
     return ExpiryReport(
         days=filters.days,
+        on=on,
         rows=out,
         expired_value=sum((row.value for row in out if row.expired), ZERO),
         expiring_value=sum(

@@ -323,6 +323,8 @@ class ExpiryRow(SQLModel):
 
 class ExpiryReport(SQLModel):
     days: int
+    # The Shop Day it was worked out on.
+    on: date
     # The one that expires first first.
     rows: list[ExpiryRow]
     expired_value: Decimal

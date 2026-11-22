@@ -127,6 +127,10 @@ test('medicine: switch costing, receive a batch, sell, expiry report', async ({
     await expect(row).toContainText('20 hari lagi')
     await expect(row).toContainText('9 botol')
     await expect(row).toContainText('Rp 180.000')
+    await expect(page.getByRole('link', { name: 'Excel' })).toHaveAttribute(
+      'href',
+      /reports\/expiry\/excel\?days=30$/,
+    )
     await shot(page, 'batches-03-expiry')
   })
 })

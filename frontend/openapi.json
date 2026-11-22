@@ -7759,6 +7759,63 @@
         }
       }
     },
+    "/api/v1/reports/expiry/excel": {
+      "get": {
+        "tags": [
+          "reports"
+        ],
+        "summary": "Expiry Excel",
+        "operationId": "reports-expiry_excel",
+        "parameters": [
+          {
+            "name": "days",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 365,
+              "minimum": 1,
+              "default": 90,
+              "title": "Days"
+            }
+          },
+          {
+            "name": "opname360_session",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Opname360 Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {}
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/reports/dashboard": {
       "get": {
         "tags": [
@@ -12064,6 +12121,11 @@
             "type": "integer",
             "title": "Days"
           },
+          "on": {
+            "type": "string",
+            "format": "date",
+            "title": "On"
+          },
           "rows": {
             "items": {
               "$ref": "#/components/schemas/ExpiryRow"
@@ -12083,6 +12145,7 @@
         "type": "object",
         "required": [
           "days",
+          "on",
           "rows",
           "expired_value",
           "expiring_value"

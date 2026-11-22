@@ -24,6 +24,7 @@ import {
 } from '@/components/ui/table'
 import { errorMessage } from '@/lib/api'
 import { formatDate, money, quantity, skuName, today } from '@/lib/format'
+import { withQuery } from '@/lib/reports'
 import { cn } from '@/lib/utils'
 import type { OpnameFromReport } from '@/pages/opname/OpenOpnamePage'
 
@@ -46,8 +47,9 @@ function untilExpiry(isoDate: string): string {
 export function ExpiryPage() {
   const navigate = useNavigate()
   const [days, setDays] = useState('90')
+  const query = { days: Number(days) }
   const report = useQuery({
-    ...reportsExpiryOptions({ query: { days: Number(days) } }),
+    ...reportsExpiryOptions({ query }),
     placeholderData: keepPreviousData,
   })
   const data = report.data
@@ -72,6 +74,7 @@ export function ExpiryPage() {
       <ReportHeader
         title="Kedaluwarsa"
         description="Batch yang masih ada stoknya dan sudah lewat atau mendekati tanggal kedaluwarsa, dinilai dengan HPP rata-rata barangnya."
+        excel={withQuery('reports/expiry/excel', query)}
       />
       <Filters>
         <Select value={days} onValueChange={setDays}>

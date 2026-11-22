@@ -24,5 +24,5 @@ Belum terjawab di meeting pertama. Sampai dijawab, pengembangan memakai asumsi d
 | 18 | Apakah admin kadang juga melayani penjualan di kasir? | Tidak. Admin tidak bisa menjual; kasir tidak bisa membuka menu admin. |
 | 19 | Uang retur dikembalikan tunai atau lewat cara pembayaran semula? | Tunai dari laci; kasir bisa memilih cara lain. |
 | 20 | Kapan mau mulai dipakai: setelah stok, opname, kasir dan dashboard owner jadi, atau menunggu laporan keuangan (neraca) juga? | Mulai dipakai setelah dashboard owner jadi; laporan keuangan menyusul dan mencatat mundur sejak hari pertama. |
-| 21 | Apakah menjual obat China perlu izin khusus (mis. izin toko obat)? | Di luar sistem; klien yang mengurus. Sistem hanya mencatat batch dan tanggal kedaluwarsa. |
-| 22 | Apakah kemasan obat dari pemasok mencantumkan nomor batch dan tanggal kedaluwarsa di barcode-nya? | Tidak; nomor batch dan tanggal kedaluwarsa diketik saat Barang Masuk. |
+| 21 | Apakah menjual obat China perlu izin khusus (mis. izin toko obat)? | **Dijawab 22-11-2026:** tidak perlu izin; obat dijual dan dibeli seperti barang biasa. Sistem tetap mencatat batch dan tanggal kedaluwarsa. |
+| 22 | Apakah kemasan obat dari pemasok mencantumkan nomor batch dan tanggal kedaluwarsa di barcode-nya? | **Dijawab 22-11-2026:** tidak perlu dibaca dari barcode; jual beli biasa. Nomor batch dan tanggal kedaluwarsa diketik saat Barang Masuk. |

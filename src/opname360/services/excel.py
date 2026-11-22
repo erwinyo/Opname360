@@ -15,6 +15,7 @@ from opname360.models import (
     AbcReport,
     BalanceSheet,
     DailyStock,
+    ExpiryReport,
     FastMoving,
     HourlySales,
     ProfitAndLoss,
@@ -346,6 +347,63 @@ def variances(report: VarianceReport) -> bytes:
             Column('Lebih', 10),
             Column('Nilai lebih', 16, MONEY),
             Column('Selisih bersih', 16, MONEY),
+        ],
+        rows,
+    )
+
+
+def expiry(report: ExpiryReport) -> bytes:
+    def status(expires_on: date) -> str:
+        left = (expires_on - report.on).days
+        if left < 0:
+            return f'lewat {-left} hari'
+        return 'hari ini' if left == 0 else f'{left} hari lagi'
+
+    rows: list[Row] = [
+        (
+            [
+                sku_label(row.product_name, row.size, row.color),
+                row.code,
+                row.batch_number,
+                row.expires_on,
+                status(row.expires_on),
+                row.quantity,
+                row.stock_unit,
+                rupiah(row.value),
+            ],
+            False,
+        )
+        for row in report.rows
+    ]
+    # Totals sit under Nilai, the last of the eight columns.
+    gap = [''] * 6
+    rows += [
+        (
+            ['Total sudah kedaluwarsa', *gap, rupiah(report.expired_value)],
+            True,
+        ),
+        (
+            [
+                f'Total kedaluwarsa dalam {report.days} hari',
+                *gap,
+                rupiah(report.expiring_value),
+            ],
+            True,
+        ),
+    ]
+    return workbook(
+        'Kedaluwarsa',
+        f'Batch yang masih ada stoknya, sudah atau akan kedaluwarsa dalam '
+        f'{report.days} hari, per {long_date(report.on)}',
+        [
+            Column('Barang', 36),
+            Column('Kode', 16),
+            Column('Batch', 14),
+            Column('Kedaluwarsa', 14, 'dd-mm-yyyy'),
+            Column('Keterangan', 16),
+            Column('Jumlah', 10),
+            Column('Satuan', 10),
+            Column('Nilai', 16, MONEY),
         ],
         rows,
     )

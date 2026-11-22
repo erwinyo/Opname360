@@ -73,11 +73,11 @@ The Category form no longer offers the method when editing. It is chosen when th
 - **A Batch nobody recorded** that turns up on the shelf during counting gets a line of its own. Lines are only added while counting is open, not once Review has begun. A known batch number must come with the expiry date already recorded for it.
 - **Expired Batches are counted like any other**, so expired stock on the shelf is on record before it is written off.
 - **Per Batch, costed per SKU:** the snapshot, "moved while counting" and the Variance are per Batch line; approval moves each line's Batch, and its value follows the SKU's Costing Method as before. A Shortage in one Batch and a Surplus in another of the same SKU are two adjustments.
-- **The expiry report** offers 30, 60 or 90 days on screen; "within" includes the last day. A Batch is valued at its SKU's average cost, or its latest unit cost while the SKU holds none. Its expired section hands those SKUs to a new Partial Opname (rule 14). No Excel export yet.
+- **The expiry report** offers 30, 60 or 90 days on screen; "within" includes the last day. A Batch is valued at its SKU's average cost, or its latest unit cost while the SKU holds none. Its expired section hands those SKUs to a new Partial Opname (rule 14). It exports to Excel like the other reports.
 
-## To confirm with the client
+## Answered by the client
 
-Questions 21 and 22 in [client-questions.md](../client-questions.md): whether selling these medicines needs a licence, and whether the supplier's packaging carries batch and expiry in a barcode. Until then, batch and expiry are typed by hand at Barang Masuk.
+Questions 21 and 22 in [client-questions.md](../client-questions.md), answered on 2026-11-22: selling these medicines needs no licence, and they are bought and sold like any other goods. Batch and expiry are typed by hand at Barang Masuk; nothing is read from the supplier's barcode.
 
 ## Deliberately left out
 
@@ -92,4 +92,4 @@ Questions 21 and 22 in [client-questions.md](../client-questions.md): whether se
 | Buy-X-get-Y and bundle Promotions | Marketing asks for them |
 | VAT (PPN) | The business becomes VAT-registered |
 | Holding a sale at the POS | Queues show it's needed |
-| Reading batch and expiry from a barcode (GS1) | The client confirms the packaging carries them (question 22) |
+| Reading batch and expiry from a barcode (GS1) | A supplier's packaging starts carrying them and typing them becomes a burden (not needed, question 22) |

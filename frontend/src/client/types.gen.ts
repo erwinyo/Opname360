@@ -1209,6 +1209,10 @@ export type ExpiryReport = {
    */
   days: number
   /**
+   * On
+   */
+  on: string
+  /**
    * Rows
    */
   rows: Array<ExpiryRow>
@@ -8789,6 +8793,35 @@ export type ReportsExpiryResponses = {
 
 export type ReportsExpiryResponse =
   ReportsExpiryResponses[keyof ReportsExpiryResponses]
+
+export type ReportsExpiryExcelData = {
+  body?: never
+  path?: never
+  query?: {
+    /**
+     * Days
+     */
+    days?: number
+  }
+  url: '/api/v1/reports/expiry/excel'
+}
+
+export type ReportsExpiryExcelErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError
+}
+
+export type ReportsExpiryExcelError =
+  ReportsExpiryExcelErrors[keyof ReportsExpiryExcelErrors]
+
+export type ReportsExpiryExcelResponses = {
+  /**
+   * Successful Response
+   */
+  200: unknown
+}
 
 export type ReportsDashboardData = {
   body?: never

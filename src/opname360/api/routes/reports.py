@@ -167,6 +167,17 @@ def expiry(
     return reports.expiry(session, filters)
 
 
+@router.get('/expiry/excel', response_class=Response, responses=EXCEL)
+def expiry_excel(
+    session: SessionDep, filters: Annotated[ExpiryFilter, Query()]
+) -> Response:
+    report = reports.expiry(session, filters)
+    return excel_file(
+        excel.expiry(report),
+        f'kedaluwarsa-{report.on}-{report.days}-hari.xlsx',
+    )
+
+
 @router.get('/dashboard')
 def dashboard(session: SessionDep) -> Dashboard:
     return reports.dashboard(session)

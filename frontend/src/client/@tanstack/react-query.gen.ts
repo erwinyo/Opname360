@@ -119,6 +119,7 @@ import {
   reportsDailyStockExcel,
   reportsDashboard,
   reportsExpiry,
+  reportsExpiryExcel,
   reportsFastMoving,
   reportsFastMovingExcel,
   reportsHourly,
@@ -477,6 +478,8 @@ import type {
   ReportsDashboardResponse,
   ReportsExpiryData,
   ReportsExpiryError,
+  ReportsExpiryExcelData,
+  ReportsExpiryExcelError,
   ReportsExpiryResponse,
   ReportsFastMovingData,
   ReportsFastMovingError,
@@ -4876,6 +4879,34 @@ export const reportsExpiryOptions = (options?: Options<ReportsExpiryData>) =>
       return data
     },
     queryKey: reportsExpiryQueryKey(options),
+  })
+
+export const reportsExpiryExcelQueryKey = (
+  options?: Options<ReportsExpiryExcelData>,
+) => createQueryKey('reportsExpiryExcel', options)
+
+/**
+ * Expiry Excel
+ */
+export const reportsExpiryExcelOptions = (
+  options?: Options<ReportsExpiryExcelData>,
+) =>
+  queryOptions<
+    unknown,
+    ReportsExpiryExcelError,
+    unknown,
+    ReturnType<typeof reportsExpiryExcelQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await reportsExpiryExcel({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      })
+      return data
+    },
+    queryKey: reportsExpiryExcelQueryKey(options),
   })
 
 export const reportsDashboardQueryKey = (

@@ -2,8 +2,10 @@
 expired Batches still in stock."""
 
 from decimal import Decimal
+from io import BytesIO
 
 from fastapi.testclient import TestClient
+from openpyxl import load_workbook
 from sqlmodel import Session
 
 from .conftest import open_shift, sell
@@ -57,3 +59,18 @@ def test_batches_in_stock_that_expired_or_expire_soon(
 
     dashboard = owner_client.get('/api/v1/reports/dashboard').json()
     assert dashboard['attention']['expired_batches'] == 1
+
+    # The Excel file has the numbers on screen.
+    response = owner_client.get(f'{EXPIRY}/excel', params={'days': 30})
+    assert response.status_code == 200, response.text
+    sheet = load_workbook(BytesIO(response.content)).active
+    assert sheet is not None
+    lines = [[cell.value for cell in row] for row in sheet.iter_rows()][4:]
+    assert [(line[2], line[4], line[5], line[7]) for line in lines[:2]] == [
+        ('OLD', 'lewat 1 hari', 4, 80000),
+        ('SOON', '10 hari lagi', 3, 60000),
+    ]
+    assert [(line[0], line[7]) for line in lines[2:]] == [
+        ('Total sudah kedaluwarsa', 80000),
+        ('Total kedaluwarsa dalam 30 hari', 60000),
+    ]

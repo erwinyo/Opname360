@@ -542,9 +542,24 @@ def create_payment(
         raise NotFoundError('Pemasok tidak ditemukan.')
     paid_from = ledger.paying_account(session, data.paid_from_account_id)
     # Lock the receipts paid, so two payments can't both pay the same debt.
-    for line in data.lines:
-        if line.goods_receipt_id is not None:
-            documents.lock(session, GoodsReceipt, line.goods_receipt_id)
+    # In id order, like every other multi-row lock, so two payments listing
+    # the same receipts in different orders can't deadlock.
+    ids = sorted(
+        {
+            line.goods_receipt_id
+            for line in data.lines
+            if line.goods_receipt_id is not None
+        }
+    )
+    receipts = {
+        receipt_id: session.get(
+            GoodsReceipt,
+            receipt_id,
+            with_for_update=True,
+            populate_existing=True,
+        )
+        for receipt_id in ids
+    }
     owed = {
         row.goods_receipt_id: row.owed
         for debt in supplier_debts(session, supplier.id)
@@ -558,8 +573,10 @@ def create_payment(
             )
         seen.add(line.goods_receipt_id)
         if line.goods_receipt_id is not None:
-            receipt = session.get(GoodsReceipt, line.goods_receipt_id)
-            if receipt is None or receipt.supplier_id != supplier.id:
+            receipt = receipts[line.goods_receipt_id]
+            if receipt is None:
+                raise NotFoundError('Barang masuk tidak ditemukan.')
+            if receipt.supplier_id != supplier.id:
                 raise ConflictError('Barang masuk ini bukan dari pemasok ini.')
         limit = owed.get(line.goods_receipt_id, 0)
         if line.amount > limit:

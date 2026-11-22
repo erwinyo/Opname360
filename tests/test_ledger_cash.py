@@ -1,9 +1,14 @@
 """Slice 5, rules 4, 8-11 and 15: Cash-outs, transfers, supplier payments,
 settling Employee Charges and opening balances."""
 
+import time
+import threading
+
 from datetime import timedelta
+from decimal import Decimal
 
 from fastapi.testclient import TestClient
+from sqlalchemy import Engine, text
 from sqlmodel import Session, select
 
 from .conftest import (
@@ -20,9 +25,34 @@ from .conftest import (
     sell,
     switch_to,
 )
+from .database import wipe
 from .test_supplier_returns import new_return
 
-from opname360.models import Account, Role, User
+from opname360.models import (
+    Account,
+    CategoryCreate,
+    GoodsReceipt,
+    GoodsReceiptLineSave,
+    GoodsReceiptSave,
+    PaymentStatus,
+    ProductSave,
+    Role,
+    SkuSave,
+    SupplierCreate,
+    SupplierPayment,
+    SupplierPaymentCreate,
+    SupplierPaymentLineIn,
+    User,
+    UserCreate,
+)
+from opname360.services import (
+    cash,
+    catalogue,
+    documents,
+    goods_receipts,
+    suppliers,
+    users,
+)
 from opname360.services.documents import shop_now
 
 
@@ -214,6 +244,7 @@ def test_paying_a_supplier_up_to_what_is_owed(
     ]
     assert pay((first, 90001)).status_code == 409
     assert pay((foreign, 1000)).status_code == 409
+    assert pay(({'id': 999999}, 1000)).status_code == 404
     response = pay((first, 90000), (second, 20000))
     assert response.status_code == 201, response.text
     payment = response.json()
@@ -350,3 +381,126 @@ def test_a_cashier_records_no_money(
     switch_to(owner_client, make_user(session, 'kasir-kas', Role.cashier))
     assert owner_client.get(f'{CASH}outs').status_code == 403
     assert owner_client.get(PAYMENTS).status_code == 403
+
+
+def test_a_payment_locks_receipts_in_id_order(engine: Engine) -> None:
+    """Whatever order a payment lists its receipts in, it locks them in id
+    order, so two payments over the same receipts can't deadlock. Real
+    commits on separate connections, cleaned up afterwards."""
+    try:
+        with Session(engine) as session:
+            owner = users.create_user(
+                session,
+                UserCreate(
+                    username='owner',
+                    full_name='Owner',
+                    role=Role.owner,
+                    password='rahasia-123',
+                ),
+                actor=None,
+            )
+            category = catalogue.create_category(
+                session, CategoryCreate(name='Seragam'), actor=owner
+            )
+            sub_category = catalogue.create_sub_category(
+                session, category, 'Kemeja', actor=owner
+            )
+            assert sub_category.id is not None
+            product = catalogue.create_product(
+                session,
+                ProductSave(
+                    name='Kemeja',
+                    sub_category_id=sub_category.id,
+                    skus=[SkuSave(selling_price=85000)],
+                ),
+                actor=owner,
+            )
+            supplier = suppliers.create_supplier(
+                session, SupplierCreate(name='CV Sumber'), actor=owner
+            )
+            receipt_ids = []
+            for _ in range(2):
+                draft = goods_receipts.create_draft(
+                    session,
+                    GoodsReceiptSave(
+                        supplier_id=supplier.id or 0,
+                        received_on=shop_now().date(),
+                        payment_status=PaymentStatus.owed,
+                        lines=[
+                            GoodsReceiptLineSave(
+                                sku_id=product.skus[0].id or 0,
+                                quantity=Decimal(1),
+                                unit_cost=Decimal(5000),
+                            )
+                        ],
+                    ),
+                    actor=owner,
+                )
+                goods_receipts.complete(session, draft, actor=owner)
+                receipt_ids.append(draft.id or 0)
+            first_id, second_id = sorted(receipt_ids)
+            owner_id, supplier_id = owner.id, supplier.id or 0
+
+        errors: list[BaseException] = []
+
+        def pay() -> None:
+            try:
+                with Session(engine) as session:
+                    actor = session.get(User, owner_id)
+                    assert actor is not None
+                    cash.create_payment(
+                        session,
+                        SupplierPaymentCreate(
+                            supplier_id=supplier_id,
+                            paid_on=shop_now().date(),
+                            # The second receipt listed first.
+                            lines=[
+                                SupplierPaymentLineIn(
+                                    goods_receipt_id=receipt_id, amount=1000
+                                )
+                                for receipt_id in (second_id, first_id)
+                            ],
+                        ),
+                        actor=actor,
+                    )
+            except BaseException as error:
+                errors.append(error)
+
+        holder = Session(engine)
+        thread = threading.Thread(target=pay)
+        try:
+            # Another transaction holds the first receipt, so the payment
+            # has to wait for it.
+            documents.lock(holder, GoodsReceipt, first_id)
+            thread.start()
+            waiting = 0
+            for _ in range(100):
+                with Session(engine) as watcher:
+                    waiting = watcher.exec(
+                        text(
+                            'SELECT count(*) FROM pg_stat_activity WHERE '
+                            'datname = current_database() AND '
+                            "wait_event_type = 'Lock'"
+                        )
+                    ).scalar_one()
+                if waiting:
+                    break
+                time.sleep(0.05)
+            assert waiting == 1
+            # It waits on the first receipt without holding the second.
+            holder.exec(
+                select(GoodsReceipt)
+                .where(GoodsReceipt.id == second_id)
+                .with_for_update(nowait=True)
+            ).one()
+        finally:
+            holder.rollback()
+            holder.close()
+            thread.join(timeout=10)
+
+        assert errors == []
+        with Session(engine) as session:
+            payment = session.exec(select(SupplierPayment)).one()
+        assert payment.amount == 2000
+    finally:
+        wipe(engine)
